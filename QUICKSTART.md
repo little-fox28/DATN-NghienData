@@ -1,4 +1,4 @@
-# 🚀 Credit Risk ELT Pipeline - Quickstart Guide
+# 🚀 Credit Risk ELT Pipeline - Quickstart Guide (English ver)
 
 Welcome to the **Credit Risk Data Engineering Project**. This repository contains a production-ready ELT (Extract, Load, Transform) pipeline designed to ingest, validate, and process credit risk datasets for downstream machine learning.
 
@@ -89,4 +89,98 @@ The pipeline intelligently detects if data is already in CSV format to bypass re
 - Always check the `docs/data_issuses.txt` after a run to monitor dataset health.
 
 ---
+
+
+# 🚀 Credit Risk ELT Pipeline - Quickstart Guide (Tiếng việt)
+
+Chào mừng đén với  **Dự án xử lý và xây dựng dữ liệu rủi ro tín dụng**. Đây là kho lưu trữ chứa quy trình ELT (Extract (Trích xuất), Load (Tải), Transform (Chuyển đổi)) hệ thống chuẩn bị cho môi trường tiếp nhận dữ liệu, thu thập, xác thực, và xử lý các tập dữ liệu rủi ro tín dụng cho các ứng dụng học máy (Machine learning).
+
+---
+
+## 🛠 Điều kiện bắt buộc
+
+Trước khi bắt đầu, hãy đảm bảo đã cài đặt các chương trình sau:
+- **Python 3.11+**
+- **Git**
+- **Kaggle Account** (để trích xuất dữ liệu)
+
+---
+
+## ⚙️ Hướng dẫn cài đặt
+
+### 1. Sao chép kho lưu trữ từ git 
+```bash
+git clone <repository-url>
+cd DATN
+```
+
+### 2. Tạo môi trường ảo 
+```bash
+# Windows
+python -m venv .venv
+.venv\Scripts\activate
+
+# macOS/Linux
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Cài đặt thư viện
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Cài đặt cấu hình API của Kaggle
+1. Vào phần cài đặt tài khoản của bạn [Kaggle Account Settings](https://www.kaggle.com/settings).
+2. Click **'Your API Token'** -> **Generate New Key**.
+3. tạo một  `.env` tệp trong thư mục và thêm thông tin API Token của mình vào :
+   ```env
+   KAGGLE_API_TOKEN=KGAT_...
+   ```
+
+---
+
+## 🚀 Khởi chạy pipeline
+
+Để thực hiện các quy trình (Trích xuất -> Giám sát -> Chuyển đổi):
+
+```bash
+# Set PYTHONPATH to root and run main
+$env:PYTHONPATH = "."
+python -m src.main
+```
+
+---
+
+## 📂 Cấu trúc dự án
+
+- `src/elt/extract/`: Logic thu thập dữ liệu và **Trình quét chất lượng dữ liệu**.
+- `src/elt/transform/`: Chuyển đổi XLS sang CSV và phân tách dữ liệu.
+- `data/raw/`: Tệp gốc được tải xuống từ Kaggle.
+- `data/processed/`: dữ liệu đã được làm xạch và xác thực được lưu tại (`df_clean.csv`).
+- `docs/`: Các báo cáo chất lượng được tự động hoá lưu tại (`data_issuses.txt`).
+- `tests/`: Kiểm thử và tích hợp.
+
+---
+
+## ✨ các tính năng chính 
+
+### 🔍 1. Trình quét chất lượng dữ liệu (Giai đoạn Extract )
+Pipeline tự động quét dữ liệu thô để phát hiện các trường hợp vi phạm quy tắc nghiệp vụ (Tuổi, Thu nhập, Tỷ lệ, v.v.) và tạo báo cáo chất lượng trong `docs/data_issuses.txt`.
+
+### 🛡️ 2. Phân tách dữ liệu (Giai đoạn Transform)
+Các bản ghi hợp lệ sẽ được lưu vào `data/processed/df_clean.csv`, Trong khi các bản ghi không hợp lệ sẽ được lưu cách ly trong  `df_quarantine.csv` với ghi chú chi tiết về các lỗi vi phạm để hỗ trợ sửa lỗi.
+
+### ⚡ 3. Chuyển đổi thông minh
+Pipeline có kahr năng tự động nhận diện nếu dữ liệu đã ở định dạng CSV để bỏ qua các bước chuyển đổi không cần thiết, và giúp tiết kiệm thời gian và tài nguyên.
+
+---
+
+## 🤝 Đóng góp
+- Tuân thủ các **OOP (Object-Oriented Programming)** đã được xây dựng tại thư mục `src/`.
+- Đảm bảo cập nhật toàn bộ quy tắc nghiệp vụ trong `CreditDataValidator` nếu có yêu cầu thay đổi.
+- ALuôn kiêm tra file  `docs/data_issuses.txt` sau mỗi làn chạy để có thể theo dõi tình trạng chất lượng dữ liệu.
+
+---
 **Zui zẻ nha!** 📈
+
