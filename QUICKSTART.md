@@ -91,9 +91,9 @@ The pipeline intelligently detects if data is already in CSV format to bypass re
 ---
 
 
-# 🚀 Credit Risk ELT Pipeline - Quickstart Guide (Tiếng việt)
+# 🚀 Credit Risk ELT Pipeline - Hướng dẫn (Tiếng việt)
 
-Chào mừng đén với  **Dự án xử lý và xây dựng dữ liệu rủi ro tín dụng**. Đây là kho lưu trữ chứa quy trình ELT (Extract (Trích xuất), Load (Tải), Transform (Chuyển đổi)) hệ thống chuẩn bị cho môi trường tiếp nhận dữ liệu, thu thập, xác thực, và xử lý các tập dữ liệu rủi ro tín dụng cho các ứng dụng học máy (Machine learning).
+Chào mừng đến với  **Dự án xử lý và xây dựng dữ liệu rủi ro tín dụng**. Đây là kho lưu trữ chứa quy trình ELT (Extract (Trích xuất), Load (Tải), Transform (Chuyển đổi)) hệ thống chuẩn bị cho môi trường tiếp nhận dữ liệu, thu thập, xác thực, và xử lý các tập dữ liệu rủi ro tín dụng cho các ứng dụng học máy (Machine learning).
 
 ---
 
@@ -172,7 +172,7 @@ Pipeline tự động quét dữ liệu thô để phát hiện các trường h
 Các bản ghi hợp lệ sẽ được lưu vào `data/processed/df_clean.csv`, Trong khi các bản ghi không hợp lệ sẽ được lưu cách ly trong  `df_quarantine.csv` với ghi chú chi tiết về các lỗi vi phạm để hỗ trợ sửa lỗi.
 
 ### ⚡ 3. Chuyển đổi thông minh
-Pipeline có kahr năng tự động nhận diện nếu dữ liệu đã ở định dạng CSV để bỏ qua các bước chuyển đổi không cần thiết, và giúp tiết kiệm thời gian và tài nguyên.
+Pipeline có khả năng tự động nhận diện nếu dữ liệu đã ở định dạng CSV để bỏ qua các bước chuyển đổi không cần thiết, và giúp tiết kiệm thời gian và tài nguyên.
 
 ---
 
