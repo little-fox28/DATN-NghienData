@@ -13,7 +13,7 @@ NghienData-DATN/
 │   └── .gitkeep
 ├── src/                    # Mã nguồn chính của hệ thống
 │   ├── __init__.py
-│   └── elt/                # Luồng trích xuất - biến đổi - nạp dữ liệu
+│   └── etl/                # Luồng trích xuất - biến đổi - nạp dữ liệu
 │       ├── __init__.py
 │       ├── extract.py      # Trích xuất dữ liệu từ nguồn
 │       ├── transform.py     # Biến đổi và làm sạch dữ liệu
