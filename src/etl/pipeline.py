@@ -5,7 +5,8 @@ from .extract.fetch_data import download_kaggle_file
 from .extract.monitor_data import CreditDataValidator
 from .transform.convert_xls_to_csv import convert_xls_to_csv
 from src.utils.logger import get_logger
-
+from src.utils.connector import SQLServerConnector
+from src.etl.load import DataLoader
 logger = get_logger(__name__)
 
 
@@ -23,16 +24,25 @@ class ELTPipeline:
     PROCESSED_DATA_DIR = "data/processed"
     TRANSFORMED_FILE = "transformed.csv"
 
-    def __init__(self, raw_data_dir: str = RAW_DATA_DIR, processed_data_dir: str = PROCESSED_DATA_DIR) -> None:
+    def __init__(self, server: str, database: str, raw_data_dir: str = RAW_DATA_DIR, processed_data_dir: str = PROCESSED_DATA_DIR) -> None:
         """
         Initialize the ELT pipeline.
 
         Args:
+            server (str): SQL Server name.
+            database (str): Database name
             raw_data_dir (str): Directory for storing raw data.
-            processed_data_dir (str): Directory for storing processed/clean data.
+            processed_data_dir (str): Directory for storing processed/clean data.   
         """
         self.raw_data_dir = raw_data_dir
         self.processed_data_dir = processed_data_dir
+        # Database connection parameters
+        self.server = server
+        self.database = database
+        # Initialize SQL Server connector and engine
+        self.sql_connector = SQLServerConnector(server=self.server, database=self.database)
+        self.database_engine = self.sql_connector.get_engine()
+
         self.raw_data_path: Optional[Path] = None
         self.transformed_data_path: Optional[Path] = None
 
@@ -136,6 +146,27 @@ class ELTPipeline:
         except Exception as e:
             logger.error(f"Unexpected error during transform phase: {e}", exc_info=True)
             return False
+        
+    def load(self) -> bool:
+        """
+        Execute the Load phase.
+        Pushes the clean dataset (df_clean.csv) to the SQL Server database.
+        """
+        logger.info("=" * 60)
+        logger.info("Starting ELT Pipeline - Load Phase")
+        logger.info("=" * 60)
+
+        # Kiểm tra xem file sạch đã được tạo ở bước Transform chưa
+        if not self.transformed_data_path or not self.transformed_data_path.exists():
+            logger.error("Load phase failed - no clean data found. Did Transform phase complete?")
+            return False
+        
+        loader = DataLoader(database_engine=self.database_engine, database_name=self.database)
+        
+        success = loader.push_to_sql(csv_file_path=self.transformed_data_path, table_name='stg_loan')
+        
+        return success
+        
 
     def run(self) -> bool:
         """
@@ -148,8 +179,11 @@ class ELTPipeline:
 
         if not self.transform():
             return False
+        if not self.load():
+            return False
 
         logger.info("=" * 60)
         logger.info("ELT Pipeline completed successfully!")
         logger.info("=" * 60)
         return True
+
