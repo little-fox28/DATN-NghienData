@@ -1,0 +1,20 @@
+Text Dat
+2 dữ liệu nói về cái gì: 
+1.Phân khúc khách hàng mở thẻ tín dụng 
+2.Khảo sát của các developer về việc sử dụng AI trong công việc và đời sống và những ngôn ngữ lập trình 
+Giữa 2 dữ liệu này thích dữ liệu nào hơn:
+thích cái 2 hơn 
+Giữa 2 dữ liệu này cái nào sẽ có nhiều hướng rẽ để không bị bí đề tài hơn:
+Cái dữ liệu thứ 2 nhiều hướng rẽ hơn:
+Developers: Thông tin  học, kỹ năng, ngôn ngữ lập trình, công cụ.
+AI & Tools: Cách lập trình viên sử dụng AI, công cụ hỗ trợ lập trình, và những khó khăn gặp phải.
+Work & Career: Công việc, mức lương, môi trường làm việc, xu hướng nghề nghiệp.
+Education & Learning: Cách mọi người học lập trình, nguồn tài liệu, khóa học, chứng chỉ.
+Với lại có thể phân tích sâu, nhiều vcl
+Cái dữ liệu thứ 1 thì 
+Phân tích khả năng khách hàng vỡ nợ,phân tích hồ sơ khách hàng, khoản vay 
+Điểm tín dụng, lãi suất, rủi ro, nợ xấu...
+Công việc bla bla bla
+
+Giữa 2 dữ liệu này dữ liệu nào nằm trong khả năng làm của bản thân:
+Dữ liệu developer hay vcl tôi rất thích ráng mà làm thâu 

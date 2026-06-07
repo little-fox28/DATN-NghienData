@@ -1,0 +1,59 @@
+- Stack Overflow: 
+ + Dữ liệu nói khảo sát lập trình viên hàng năm
+ + Nội dung khảo sát tập trung phân tích xu hướng sử dụng của hàng trăm loại công nghệ, bao gồm cả những lĩnh vực mới nổi như trí tuệ nhân tạo (AI) và các mô hình ngôn ngữ lớn
+
+- Credit Risk:
++ Dữ liệu này nói về fintech/bank( đánh giá rủi ro vay tiền / dự đoán khách hàng có bị “default” (không trả được nợ) hay không.)
+
++ Phân tích sâu:
+ 1. Thông tin cá nhân khách hàng
+ 2. Tình hình tài chính
+ 3. Lịch sử tín dụng
+ 4. Thông tin khoản vay
+ 5. Công việc tài sản
+
++ Về nghiệp vụ:
+- Luồng nghiệp vụ thực tế của data này
+Bước 1 — Khách hàng đăng ký vay:
+Khách nhập:
+tuổi
+lương
+nghề nghiệp
+mục đích vay
+số tiền muốn vay
+thời gian vay
+
+Bước 2- Hệ thống kiểm tra hồ sơ tín dụng
+Ngân hàng sẽ check:
+từng nợ xấu chưa
+trả chậm bao nhiêu lần
+dùng thẻ tín dụng nhiều không
+đang gánh bao nhiêu nợ
+
+Bước 3 — Tính khả năng trả nợ
+Đây là phần quan trọng nhất nghiệp vụ.
+Ví dụ:
+
+Case tốt
+lương: 50 triệu
+vay: 100 triệu
+chưa từng nợ xấu
+DTI thấp
+=> khả năng duyệt cao.
+
+Case xấu
+lương: 8 triệu
+vay: 300 triệu
+từng default
+trả trễ nhiều lần
+=> reject.
+
+
+Bước 4 — Chấm điểm tín dụng (Credit Scoring)
+Hệ thống sẽ tạo:
+risk score
+loan grade
+
++ Giữa 2 dữ liệu này nằm trong bản thân:
+- Stack Overflow: Dữ liệu nhiều phân tích khó, gồm nhiều năm
+- Credit Risk: Dữ liệu sạch sẵn kiểm tra sơ qua kiểu dữ liệu bộ data
