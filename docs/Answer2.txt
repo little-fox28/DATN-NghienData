@@ -1,0 +1,20 @@
+1.Loại người vay nào có khả năng nợ quá hạn cao hơn?
+-Khi một khách hàng có đủ 3 yếu tố cùng lúc, rủi ro tăng theo cấp số nhân:
+-Thứ nhất, xếp hạng Grade D–G — hệ thống đã cảnh báo đây là nhóm nguy hiểm, với Grade G lên đến 98% vỡ nợ.
+-Thứ hai, đang thuê nhà (RENT) — không có tài sản neo buộc, gánh thêm tiền nhà cố định hàng tháng. Khi có sự cố như mất việc hay ốm đau, họ không còn tiền trả nợ.
+- Thứ ba, có vết nợ xấu cũ — người từng trốn nợ có tỷ lệ tái phạm gần gấp đôi người bình thường (37.8% so với ~21%)
+2.Các mục đích vay cụ thể (giáo dục, y tế, cá nhân, hợp nhất nợ) có mang lại rủi ro cao hơn không?
+- Debt Consolidation (gom nợ) — rủi ro cao nhất. Người vay đã đang chìm trong nợ trước khi nộp hồ sơ. Khoản vay mới chỉ mua thêm thời gian, không giải quyết gốc rễ.
+- Medical (y tế) — rủi ro cao. Vay trong tình trạng khủng hoảng bất ngờ, chi phí điều trị tiếp tục phát sinh, thu nhập có thể bị gián đoạn do ốm đau. Tỷ lệ vỡ nợ gần 28%.
+- Personal (cá nhân) — rủi ro trung bình. Mục đích mơ hồ, khó kiểm soát dòng tiền sau khi giải ngân.
+- Education (giáo dục) — rủi ro trung bình. Có khoảng trống thời gian nguy hiểm: vay bây giờ nhưng thu nhập để trả chỉ đến sau khi tốt nghiệp và có việc làm.
+- Home Improvement (sửa nhà) — rủi ro thấp hơn. Có tài sản thực, mục tiêu cụ thể, dòng tiền dễ kiểm soát hơn.
+- Venture (kinh doanh) — rủi ro thấp nhất. Tiền được dùng để tạo ra thu nhập mới, chỉ 14% vỡ nợ.
+3.Tỷ lệ khoản vay trên thu nhập và tỷ lệ nợ trên thu nhập liên quan như thế nào đến việc hoàn trả?
+- LTI cao làm cho khoảng thời gian rủi ro kéo dài hơn — càng vay nhiều so với thu nhập, càng mất nhiều năm để thoát khỏi khoản nợ, và trong suốt thời gian đó đều có thể xảy ra sự cố.
+- DTI ảnh hưởng trực tiếp hơn vì nó quyết định mỗi tháng người đó còn lại bao nhiêu tiền sau khi trả nợ.
+- DTI 20% → còn 80% thu nhập để sống và dự phòng → hoàn trả dễ dàng, ít rủi ro trễ hạn.
+- DTI 40% → còn 60% → bắt đầu căng, nhưng vẫn có vùng đệm nếu có chi phí phát sinh.
+- DTI 55–60% → chỉ còn 40–45% thu nhập cho toàn bộ chi phí sống — ăn, đi lại, điện nước, y tế. Gần như không thể duy trì hoàn trả đều đặn nếu có bất kỳ biến động nhỏ nào.
+- Đây là lý do DTI liên quan trực tiếp đến tần suất trễ hạn — không phải người ta không muốn trả, mà là không còn tiền để trả.
+4.Loại hình việc làm hoặc việc sở hữu nhà có tạo ra sự khác biệt không?
