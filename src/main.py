@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 
-from src.elt.pipeline import ELTPipeline
+
+from src.etl.pipeline import ELTPipeline
 from src.utils.logger import get_logger
 
 # Load environment variables from .env file
