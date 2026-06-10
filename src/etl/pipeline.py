@@ -150,7 +150,8 @@ class ELTPipeline:
     def load(self) -> bool:
         """
         Execute the Load phase.
-        Pushes the clean dataset (df_clean.csv) to the SQL Server database.
+        Pushes the clean dataset to the SQL Server database (Staging)
+        and triggers the Stored Procedure to distribute data into Fact & Dim tables.
         """
         logger.info("=" * 60)
         logger.info("Starting ELT Pipeline - Load Phase")
@@ -161,9 +162,15 @@ class ELTPipeline:
             logger.error("Load phase failed - no clean data found. Did Transform phase complete?")
             return False
         
-        loader = DataLoader(database_engine=self.database_engine, database_name=self.database)
+        # Khởi tạo DataLoader và chỉ truyền vào Engine kết nối
+        loader = DataLoader(engine=self.database_engine)
         
-        success = loader.push_to_sql(csv_file_path=self.transformed_data_path, table_name='stg_loan')
+        # Kích hoạt quy trình siêu tự động hóa: Đẩy lên Staging và chia bài vào Star Schema
+        success = loader.load_to_staging_and_transform(
+            csv_file_path=self.transformed_data_path, 
+            staging_table='stg_loan',
+            sp_name='sp_load_star_schema'
+        )
         
         return success
         

@@ -1,0 +1,33 @@
+IF OBJECT_ID('stg_loan', 'U') IS NOT NULL DROP TABLE stg_loan;
+
+CREATE TABLE stg_loan (
+    client_id VARCHAR(50),
+    person_age FLOAT,
+    person_income FLOAT,
+    person_home_ownership VARCHAR(50),
+    person_emp_length FLOAT,
+    loan_intent VARCHAR(50),
+    loan_grade VARCHAR(10),
+    loan_amnt FLOAT,
+    loan_int_rate FLOAT,
+    loan_status INT,
+    loan_percent_income FLOAT,
+    cb_person_default_on_file VARCHAR(10),
+    cb_person_cred_hist_length FLOAT,
+    gender VARCHAR(20),
+    marital_status VARCHAR(50),
+    education_level VARCHAR(50),
+    country VARCHAR(50),
+    state VARCHAR(50),
+    city VARCHAR(100),
+    city_latitude FLOAT,
+    city_longitude FLOAT,
+    employment_type VARCHAR(50),
+    loan_term_months INT,
+    loan_to_income_ratio FLOAT,
+    other_debt FLOAT,
+    debt_to_income_ratio FLOAT,
+    open_accounts INT,
+    credit_utilization_ratio FLOAT,
+    past_delinquencies INT
+);

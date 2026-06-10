@@ -1,39 +1,55 @@
 import pandas as pd
 from pathlib import Path
+from sqlalchemy import text
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 class DataLoader:
-    def __init__(self, database_engine, database_name: str):
+    def __init__(self, engine):
         """
-        Nhận động cơ kết nối và tên Database từ Pipeline truyền sang.
+        Nhận động cơ kết nối (engine) từ Pipeline truyền sang.
+        Lưu ý: Không cần truyền database_name nữa vì engine đã ngầm chứa thông tin đó.
         """
-        self.engine = database_engine
-        self.database_name = database_name
+        self.engine = engine
 
-    def push_to_sql(self, csv_file_path: Path, table_name: str = 'stg_loan') -> bool:
+    def load_to_staging_and_transform(self, csv_file_path: Path, staging_table: str = 'stg_loan', sp_name: str = 'load_star_schema') -> bool:
         """
-        Thực thi việc đẩy dữ liệu từ file CSV lên SQL Server.
+        Thực thi Phase 2.2 (Load to Staging) và Phase 2.3 (In-Database Transform) liên hoàn.
         """
         try:
-            logger.info(f"Reading clean data from {csv_file_path}...")
+            logger.info(f"Đang đọc dữ liệu sạch từ file: {csv_file_path}...")
             df_clean = pd.read_csv(csv_file_path)
-            
-            logger.info(f"Pushing {len(df_clean)} rows to table '{table_name}' in Database '{self.database_name}'...")
 
-            # Đẩy dữ liệu lên Database
-            df_clean.to_sql(
-                name=table_name,      
-                con=self.engine,           
-                if_exists='replace',  
-                index=False,          
-                chunksize=1000        
-            )
+            if df_clean.empty:
+                logger.warning("File CSV không có dữ liệu để nạp!")
+                return False
 
-            logger.info(f"Load phase successful. All clean data loaded to '{table_name}'.")
+            # Dùng engine.begin() để mở Transaction. Lỗi giữa chừng sẽ tự động Rollback (hủy bỏ)
+            with self.engine.begin() as conn:
+                
+                # Bước 1: Dọn sạch bảng đệm (Staging) của lần chạy trước (Thay vì dùng replace)
+                logger.info(f"Dọn rác bảng đệm: TRUNCATE TABLE {staging_table}...")
+                conn.execute(text(f"TRUNCATE TABLE {staging_table}"))
+
+                # Bước 2: Nạp lô dữ liệu mới vào bảng đệm
+                logger.info(f"Bắt đầu đẩy {len(df_clean)} dòng vào {staging_table}...")
+                df_clean.to_sql(
+                    name=staging_table,
+                    con=conn,
+                    if_exists='append',   # BẮT BUỘC LÀ 'append' để giữ nguyên cấu trúc bảng đã tạo
+                    index=False,
+                    chunksize=1000        # Chia nhỏ mỗi lần nạp 1000 dòng để không tràn RAM
+                )
+                logger.info(f"Đẩy dữ liệu vào {staging_table} thành công.")
+
+                # Bước 3: Kích hoạt Stored Procedure phân bổ dữ liệu vào Star Schema
+                logger.info(f"Kích hoạt SQL Server xử lý Star Schema: EXEC {sp_name}...")
+                conn.execute(text(f"EXEC {sp_name}"))
+                logger.info("Quá trình phân bổ dữ liệu vào Fact và Dim hoàn tất!")
+
             return True
 
         except Exception as e:
-            logger.error(f"Unexpected error during load phase: {e}", exc_info=True)
+            logger.error(f"Lỗi nghiêm trọng trong quá trình Load dữ liệu: {e}", exc_info=True)
             return False
