@@ -24,13 +24,13 @@ class ELTPipeline:
     PROCESSED_DATA_DIR = "data/processed"
     TRANSFORMED_FILE = "transformed.csv"
 
-    def __init__(self, server: str, database: str, raw_data_dir: str = RAW_DATA_DIR, processed_data_dir: str = PROCESSED_DATA_DIR) -> None:
+    def __init__(self, server: str = None, database: str = None, raw_data_dir: str = RAW_DATA_DIR, processed_data_dir: str = PROCESSED_DATA_DIR) -> None:
         """
         Initialize the ELT pipeline.
 
         Args:
             server (str): SQL Server name.
-            database (str): Database name
+            database (str): Database name.
             raw_data_dir (str): Directory for storing raw data.
             processed_data_dir (str): Directory for storing processed/clean data.   
         """
@@ -39,9 +39,12 @@ class ELTPipeline:
         # Database connection parameters
         self.server = server
         self.database = database
-        # Initialize SQL Server connector and engine
-        self.sql_connector = SQLServerConnector(server=self.server, database=self.database)
-        self.database_engine = self.sql_connector.get_engine()
+        # Initialize SQL Server connector and engine only when DB config is provided
+        self.sql_connector = None
+        self.database_engine = None
+        if self.server and self.database:
+            self.sql_connector = SQLServerConnector(server=self.server, database=self.database)
+            self.database_engine = self.sql_connector.get_engine()
 
         self.raw_data_path: Optional[Path] = None
         self.transformed_data_path: Optional[Path] = None
@@ -178,6 +181,7 @@ class ELTPipeline:
     def run(self) -> bool:
         """
         Execute the complete ELT pipeline.
+        Skips Load phase if no database configuration is provided.
         """
         logger.info("Initializing ELT Pipeline")
 
@@ -186,8 +190,12 @@ class ELTPipeline:
 
         if not self.transform():
             return False
-        if not self.load():
-            return False
+
+        if self.server and self.database:
+            if not self.load():
+                return False
+        else:
+            logger.info("No database configuration provided. Skipping Load phase.")
 
         logger.info("=" * 60)
         logger.info("ELT Pipeline completed successfully!")

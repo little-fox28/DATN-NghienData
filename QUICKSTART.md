@@ -49,12 +49,20 @@ pip install -r requirements.txt
 
 ## 🚀 Running the Pipeline
 
-To execute the complete pipeline (Extract -> Monitor -> Transform):
+To execute the complete pipeline (Extract -> Monitor -> Transform -> Load):
 
 ```bash
 # Set PYTHONPATH to root and run main
 $env:PYTHONPATH = "."
 python -m src.main
+```
+
+To run the pipeline in standalone mode (**Extract & Transform only**, without writing to the Database):
+
+```bash
+# Set PYTHONPATH to root and run main with --skip-db
+$env:PYTHONPATH = "."
+python -m src.main --skip-db
 ```
 
 ---
@@ -162,12 +170,20 @@ pip install -r requirements.txt
 
 ## 🚀 Khởi chạy pipeline
 
-Để thực hiện các quy trình (Trích xuất -> Giám sát -> Chuyển đổi):
+Để thực hiện quy trình đầy đủ (Trích xuất -> Giám sát -> Chuyển đổi -> Tải vào Database):
 
 ```bash
 # Set PYTHONPATH to root and run main
 $env:PYTHONPATH = "."
 python -m src.main
+```
+
+Để chạy pipeline ở chế độ độc lập (**Extract & Transform only**, không ghi vào Database):
+
+```bash
+# Set PYTHONPATH to root và chạy main với tham số --skip-db
+$env:PYTHONPATH = "."
+python -m src.main --skip-db
 ```
 
 ---
