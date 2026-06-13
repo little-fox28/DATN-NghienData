@@ -18,23 +18,20 @@ def main() -> None:
     Creates a pipeline instance and executes it with appropriate logging.
     """
     try:
-        setup_infrastructure() 
-        # 1. Lấy thông tin Server và Database một cách bảo mật từ file .env
-        server = os.getenv("DB_SERVER")
-        database = os.getenv("DB_NAME")
-
-
-
-        # Kiểm tra an toàn: Nếu biến môi trường trống thì báo lỗi và dừng chương trình
-        if not server or not database:
-            logger.error("Thiếu thông tin DB_SERVER hoặc DB_NAME trong file .env!")
+        # 1. INITIALIZE INFRASTRUCTURE (DB, Tables, Stored Procedures)
+        logger.info("Verifying and setting up database infrastructure...")
+        is_setup_success = setup_infrastructure() 
+        
+        # SECURITY & LOGIC CHECK: Abort immediately if DB setup fails
+        if not is_setup_success:
+            logger.error("Pipeline execution aborted due to infrastructure setup failure. ")
             return
 
-        logger.info(f"Đã nhận cấu hình đích: Server='{server}', Database='{database}'")
+        logger.info("Infrastructure is fully operational. Initializing ELT Pipeline...")
 
-        # 2. Khởi tạo cỗ máy Pipeline và truyền thông số Database vào
-        
-        pipeline = ELTPipeline(server=server, database=database)
+        # 2. INITIALIZE AND RUN PIPELINE
+        # Note: ELTPipeline now handles strict SQL Server Auth automatically inside its constructor.
+        pipeline = ELTPipeline()
         success = pipeline.run()
 
         if success:

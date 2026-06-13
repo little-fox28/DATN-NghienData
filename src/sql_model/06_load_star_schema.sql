@@ -55,7 +55,7 @@ BEGIN
         s.loan_to_income_ratio,
         s.debt_to_income_ratio,
         s.credit_utilization_ratio,
-        s.cb_person_cred_hist_length,
+        s.person_emp_length,
         s.past_delinquencies,
         s.other_debt,
         s.open_accounts,

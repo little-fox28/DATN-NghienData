@@ -1,6 +1,7 @@
+import os
 from pathlib import Path
+import pandas as pd
 from typing import Optional
-
 from .extract.fetch_data import download_kaggle_file
 from .extract.monitor_data import CreditDataValidator
 from .transform.convert_xls_to_csv import convert_xls_to_csv
@@ -24,7 +25,7 @@ class ELTPipeline:
     PROCESSED_DATA_DIR = "data/processed"
     TRANSFORMED_FILE = "transformed.csv"
 
-    def __init__(self, server: str, database: str, raw_data_dir: str = RAW_DATA_DIR, processed_data_dir: str = PROCESSED_DATA_DIR) -> None:
+    def __init__(self, raw_data_dir: str = RAW_DATA_DIR, processed_data_dir: str = PROCESSED_DATA_DIR) -> None:
         """
         Initialize the ELT pipeline.
 
@@ -37,10 +38,21 @@ class ELTPipeline:
         self.raw_data_dir = raw_data_dir
         self.processed_data_dir = processed_data_dir
         # Database connection parameters
-        self.server = server
-        self.database = database
+        self.server = os.getenv("DB_SERVER")
+        self.database = os.getenv("DB_NAME")
+        self.user = os.getenv("DB_USER")
+        self.password = os.getenv("DB_PASS")
+        if not self.server or not self.database or not self.user or not self.password:
+            logger.error("Missing database credentials in .env. Pipeline initialization aborted.")
+            raise ValueError("Strict SQL Server Authentication requires DB_SERVER, DB_NAME, DB_USER, and DB_PASS.")
+
         # Initialize SQL Server connector and engine
-        self.sql_connector = SQLServerConnector(server=self.server, database=self.database)
+        self.sql_connector = SQLServerConnector(
+            server=self.server, 
+            database=self.database,
+            user=self.user,
+            password=self.password
+        )
         self.database_engine = self.sql_connector.get_engine()
 
         self.raw_data_path: Optional[Path] = None
@@ -79,66 +91,43 @@ class ELTPipeline:
 
             logger.info(f"Scanning raw data: {file_to_scan}")
             if file_to_scan.suffix.lower() == '.csv':
-                df = pd.read_csv(file_to_scan)
+                df_raw = pd.read_csv(file_to_scan)
             else:
-                df = pd.read_excel(file_to_scan, engine='xlrd' if file_to_scan.suffix.lower() == '.xls' else None)
+                df_raw = pd.read_excel(file_to_scan, engine='xlrd' if file_to_scan.suffix.lower() == '.xls' else None)
 
-            validator = CreditDataValidator()
-            validator.report_issues(df)
+            if df_raw.empty:
+                logger.error("Extracted raw data is empty.")
+                return None
 
-            logger.info("Extract phase completed successfully.")
-            return True
+            logger.info("Extract phase completed successfully. Data passed to RAM.")
+            return df_raw
 
         except Exception as e:
             logger.error(f"Unexpected error during extract phase: {e}", exc_info=True)
             return False
 
-    def transform(self) -> bool:
+    def transform(self, df_raw: pd.DataFrame) -> bool:
         """
         Execute the Transform phase.
-        Converts XLS to CSV (if needed) and segregates data into clean/quarantine (Feature 2).
+        Receives raw data directly from RAM to avoid redundant disk I/O.
+        Validates, segregates into clean/quarantine, and saves the output.
         """
         logger.info("=" * 60)
         logger.info("Starting ELT Pipeline - Transform Phase")
         logger.info("=" * 60)
 
-        if not self.raw_data_path:
-            logger.error("Transform phase failed - no raw data path available.")
+        if df_raw is None or df_raw.empty:
+            logger.error("Transform phase failed - no raw data provided in memory.")
             return False
 
         try:
-            import pandas as pd
-            
-            # 1. Identify input file
-            input_file = self.raw_data_path
-            if input_file.is_dir():
-                files = list(input_file.glob("*.csv")) + list(input_file.glob("*.xls"))
-                if not files:
-                    logger.error("No data files found for transformation.")
-                    return False
-                input_file = files[0]
-
-            # 2. Check for bypass: If already CSV, don't call conversion
-            if input_file.suffix.lower() == '.csv':
-                logger.info(f"Bypassing conversion: {input_file.name} is already in CSV format.")
-                working_csv = input_file
-            else:
-                interim_csv = Path(self.raw_data_dir) / self.TRANSFORMED_FILE
-                success = convert_xls_to_csv(
-                    input_path=str(input_file),
-                    output_path=str(interim_csv)
-                )
-                if not success:
-                    logger.error("Transform phase failed during XLS to CSV conversion")
-                    return False
-                working_csv = interim_csv
-
-            # 3. Segregate and Save to data/processed (Feature 2)
-            logger.info(f"Loading data from {working_csv} for segregation...")
-            df = pd.read_csv(working_csv)
+            logger.info("Executing Data Quality Validation and Segregation...")
             validator = CreditDataValidator()
-            df_clean, _ = validator.segregate_and_save(df, output_dir=self.processed_data_dir)
+            
+            # Run Data Quality checks and split data ONCE
+            df_clean, _ = validator.segregate_and_save(df_raw, output_dir=self.processed_data_dir)
 
+            # Store the path of the clean file for the Load phase
             self.transformed_data_path = Path(self.processed_data_dir) / "df_clean.csv"
             logger.info(f"Transform phase successful. Clean data saved at: {self.transformed_data_path}")
             return True
@@ -157,15 +146,15 @@ class ELTPipeline:
         logger.info("Starting ELT Pipeline - Load Phase")
         logger.info("=" * 60)
 
-        # Kiểm tra xem file sạch đã được tạo ở bước Transform chưa
+        # Check if the clean file was generated in the Transform phase
         if not self.transformed_data_path or not self.transformed_data_path.exists():
             logger.error("Load phase failed - no clean data found. Did Transform phase complete?")
             return False
         
-        # Khởi tạo DataLoader và chỉ truyền vào Engine kết nối
+        # Initialize DataLoader and inject the connection Engine
         loader = DataLoader(engine=self.database_engine)
         
-        # Kích hoạt quy trình siêu tự động hóa: Đẩy lên Staging và chia bài vào Star Schema
+        # Trigger the automated process: Load to Staging and distribute to Star Schema
         success = loader.load_to_staging_and_transform(
             csv_file_path=self.transformed_data_path, 
             staging_table='stg_loan',
@@ -179,18 +168,28 @@ class ELTPipeline:
         """
         Execute the complete ELT pipeline.
         """
-        logger.info("Initializing ELT Pipeline")
+        logger.info("INITIATING ELT PIPELINE")
 
-        if not self.extract():
+        # PHASE 1: EXTRACT (Load data directly to RAM)
+        df_raw = self.extract()
+        
+        # Nếu df_raw bị rỗng hoặc lỗi (trả về False/None) thì dừng luôn
+        if df_raw is None or isinstance(df_raw, bool):
+            logger.error("Pipeline aborted at Extract Phase.")
             return False
 
-        if not self.transform():
+        # PHASE 2: TRANSFORM (Truyền df_raw vào đây để không phải đọc file 2 lần)
+        if not self.transform(df_raw):
+            logger.error("Pipeline aborted at Transform Phase.")
             return False
+            
+        # PHASE 3: LOAD (Push clean data to SQL Server & build Star Schema)
         if not self.load():
+            logger.error("Pipeline aborted at Load Phase.")
             return False
 
         logger.info("=" * 60)
-        logger.info("ELT Pipeline completed successfully!")
+        logger.info("ELT PIPELINE COMPLETED SUCCESSFULLY!")
         logger.info("=" * 60)
         return True
 
