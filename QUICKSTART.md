@@ -54,7 +54,9 @@ To execute the complete pipeline (Extract -> Monitor -> Transform):
 ```bash
 # Set PYTHONPATH to root and run main
 $env:PYTHONPATH = "."
-python -m src.main
+python -m src.maingit checkout --ours "docs/Báo Cáo NghienData.docx"
+git add "docs/Báo Cáo NghienData.docx"
+git commit -m "Resolve merge conflict"
 ```
 
 ---
