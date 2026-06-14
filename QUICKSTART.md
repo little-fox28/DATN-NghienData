@@ -7,7 +7,7 @@ Welcome to the **Credit Risk Data Engineering Project**. This repository contain
 ## 🛠 Prerequisites
 
 Before you begin, ensure you have the following installed:
-- **Python 3.10+**
+- **Python 3.11+**
 - **Git**
 - **Kaggle Account** (for data extraction)
 
@@ -90,24 +90,28 @@ Valid records are saved to `data/processed/df_clean.csv`, while invalid records 
 The pipeline intelligently detects if data is already in CSV format to bypass redundant conversion steps, saving time and resources.
 
 ### 🔌 4. Seamless Database Integration (Load Phase)
-# Bước 1: Cấu hình .env
+
+**Step 1: Configure the `.env` file**
+Create or update the `.env` file in the root directory with your SQL Server credentials:
+
+```env
+# Your SQL Server instance name
+DB_SERVER=Your_Server_Name
+# Default database name for SQL Server connection
 ```bash
-DB_SERVER=Tên auth của bạn
-- đặt tên Database mặc định để kết nối đến SQL Server 
 DB_NAME=CreditRiskDB
 ```
-- CẤU HÌNH BẢO MẬT KẾT NỐI (CHỌN 1 TRONG 2)
-- CÁCH 2: Dùng SQL Server Auth (Nhập User và Password vào đây)
+# Strict SQL Server Authentication credentials
 ```bash
 DB_USER=sa
-DB_PASS=MatKhauCuaBan123
+DB_PASS=YourPassword123
 ```
-# Bước 2: Chạy
-- khởi động tạo bảng
+**Step 2: Execute the Pipeline**
+- Initialize the infrastructure
 ```bash
 python -m src.utils.setup_db
 ```
-- đổ dữ liệu vào
+- Run the ELT pipeline
 ```bash
 python -m src.main
 ```
@@ -193,7 +197,7 @@ python -m src.main --skip-db
 - `src/elt/extract/`: Logic thu thập dữ liệu và **Trình quét chất lượng dữ liệu**.
 - `src/elt/transform/`: Chuyển đổi XLS sang CSV và phân tách dữ liệu.
 - `data/raw/`: Tệp gốc được tải xuống từ Kaggle.
-- `data/processed/`: dữ liệu đã được làm xạch và xác thực được lưu tại (`df_clean.csv`).
+- `data/processed/`: dữ liệu đã được làm sạch và xác thực được lưu tại (`df_clean.csv`).
 - `docs/`: Các báo cáo chất lượng được tự động hoá lưu tại (`data_issuses.txt`).
 - `tests/`: Kiểm thử và tích hợp.
 
@@ -215,7 +219,7 @@ Pipeline có khả năng tự động nhận diện nếu dữ liệu đã ở �
 ## 🤝 Đóng góp
 - Tuân thủ các **OOP (Object-Oriented Programming)** đã được xây dựng tại thư mục `src/`.
 - Đảm bảo cập nhật toàn bộ quy tắc nghiệp vụ trong `CreditDataValidator` nếu có yêu cầu thay đổi.
-- ALuôn kiêm tra file  `docs/data_issuses.txt` sau mỗi làn chạy để có thể theo dõi tình trạng chất lượng dữ liệu.
+- Luôn kiểm tra file  `docs/data_issuses.txt` sau mỗi lần chạy để có thể theo dõi tình trạng chất lượng dữ liệu.
 
 ---
 **Zui zẻ nha!** 📈

@@ -1,136 +1,135 @@
 import os
+import re
 import urllib.parse
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 from src.utils.logger import get_logger
 
-# Tải biến môi trường từ file .env
+# Load environment variables
 load_dotenv()
 logger = get_logger(__name__)
 
 def build_connection_string(server: str, database: str, user: str, password: str) -> str:
     """
-    Hàm hỗ trợ tự động cấu hình chuỗi kết nối (Connection String).
-    - Nếu có điền DB_USER và DB_PASS: Dùng SQL Server Authentication.
-    - Nếu để trống: Tự động lùi về Windows Authentication (Trusted_Connection).
+    Builds the SQL Server connection string enforcing SQL Server Authentication.
+    Windows Authentication fallback has been completely removed for security reasons.
     """
-    if user and password:
-        return urllib.parse.quote_plus(
-            f'DRIVER={{ODBC Driver 17 for SQL Server}};'
-            f'SERVER={server};'
-            f'DATABASE={database};'
-            f'UID={user};'
-            f'PWD={password};'
-            f'TrustServerCertificate=yes;'
-        )
-    else:
-        return urllib.parse.quote_plus(
-            f'DRIVER={{ODBC Driver 17 for SQL Server}};'
-            f'SERVER={server};'
-            f'DATABASE={database};'
-            f'Trusted_Connection=yes;'
-            f'TrustServerCertificate=yes;'
-        )
+    if not user or not password:
+        logger.error("Database credentials missing. Strict SQL Server Authentication required.")
+        raise ValueError("Missing DB_USER or DB_PASS in environment variables.")
 
-def setup_infrastructure() -> None:
-    # 1. ĐỌC CẤU HÌNH TỪ FILE .ENV
+    return urllib.parse.quote_plus(
+        f'DRIVER={{ODBC Driver 17 for SQL Server}};'
+        f'SERVER={server};'
+        f'DATABASE={database};'
+        f'UID={user};'
+        f'PWD={password};'
+        f'TrustServerCertificate=yes;'
+    )
+
+def setup_infrastructure() -> bool:
+    """
+    Initializes the database and executes schema files (00 -> 06).
+    Returns True if successful, False if an error occurs.
+    """
+    # 1. READ CONFIGURATION FROM .ENV
     server = os.getenv("DB_SERVER")
     target_db = os.getenv("DB_NAME")
     db_user = os.getenv("DB_USER")
     db_pass = os.getenv("DB_PASS")
 
-    if not server or not target_db:
-        logger.error("Thiếu cấu hình DB_SERVER hoặc DB_NAME trong file .env!")
-        return
+    if not server or not target_db or not db_user or not db_pass:
+        logger.error("Initialization aborted: Missing DB_SERVER, DB_NAME, DB_USER, or DB_PASS in .env file!")
+        return False
 
     logger.info("=" * 60)
-    logger.info("GIAI ĐOẠN 1: TỰ ĐỘNG KHỞI TẠO HẠ TẦNG DB & SCHEMA VỚI CẤU TRÚC ĐA FILE")
+    logger.info("PHASE 1: AUTOMATED DB & SCHEMA INFRASTRUCTURE INITIALIZATION")
     logger.info("=" * 60)
 
-    # 2. KẾT NỐI VÀO DATABASE HỆ THỐNG 'MASTER' ĐỂ KIỂM TRA & TẠO DATABASE MỚI
-    # Bật isolation_level="AUTOCOMMIT" để giải phóng transaction block khi chạy lệnh CREATE DATABASE
+    # 2. CONNECT TO 'MASTER' DATABASE TO CREATE TARGET DATABASE
+    # isolation_level="AUTOCOMMIT" is required to run CREATE DATABASE outside a transaction block
     master_params = build_connection_string(server, 'master', db_user, db_pass)
     master_engine = create_engine(f"mssql+pyodbc:///?odbc_connect={master_params}", isolation_level="AUTOCOMMIT")
 
     try:
         with master_engine.connect() as conn:
-            # Kiểm tra xem Database mục tiêu đã tồn tại trong hệ thống chưa (Idempotency)
+            # Check for idempotency: Ensure DB exists before creating
             db_exists = conn.execute(
-                text(f"SELECT 1 FROM sys.databases WHERE name = :db_name"), 
+                text("SELECT 1 FROM sys.databases WHERE name = :db_name"), 
                 {"db_name": target_db}
             ).scalar()
             
             if not db_exists:
-                logger.info(f"Database '{target_db}' chưa tồn tại. Tiến hành khởi tạo...")
+                logger.info(f"Database '{target_db}' does not exist. Initializing creation...")
                 conn.execute(text(f"CREATE DATABASE {target_db}"))
-                logger.info(f"Tạo thành công cơ sở dữ liệu: '{target_db}'")
+                logger.info(f"Successfully created database: '{target_db}'")
             else:
-                logger.info(f" Database '{target_db}' đã tồn tại sẵn. Bỏ qua bước tạo mới.")
+                logger.info(f"Database '{target_db}' already exists. Skipping creation step.")
     except Exception as e:
-        logger.error(f"Thất bại khi khởi tạo Database hệ thống: {e}")
-        return
+        logger.error(f"Failed to initialize system database: {e}")
+        return False
 
-    # 3. QUÉT THƯ MỤC SQL_MODELS VÀ THỰC THI TUẦN TỰ FILE TỪ 00 -> 06
+    # 3. SCAN DIRECTORIES AND EXECUTE SQL FILES SEQUENTIALLY
     target_params = build_connection_string(server, target_db, db_user, db_pass)
     target_engine = create_engine(f"mssql+pyodbc:///?odbc_connect={target_params}")
-    # 1. Lấy tọa độ gốc của toàn bộ dự án
+    
+    # Resolve absolute path to project root
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
     
     schema_folder = None
-    logger.info(f"Đang bật Radar quét toàn bộ thư mục: {project_root} ...")
+    logger.info(f"Scanning for SQL schema directory starting from: {project_root}")
 
-    # 2. Bật Radar dò tìm file SQL
+    # Radar scan for the specific schema directory
     for root_dir, dirs, files in os.walk(project_root):
         if "00_stg_loan.sql" in files:
-            schema_folder = root_dir  # Bắt được mục tiêu, lưu lại đường dẫn thật!
+            schema_folder = root_dir
             break
 
-    # 3. Kiểm tra kết quả dò tìm
     if not schema_folder:
-        logger.error(f"TUYỆT VỌNG: Không tìm thấy file '00_stg_loan.sql' ở bất kỳ đâu!")
-        return
+        logger.error("CRITICAL ERROR: Could not locate '00_stg_loan.sql' in the project directory!")
+        return False
 
-    logger.info(f"Đã dò trúng mục tiêu! Tên thật sự của thư mục SQL là: {schema_folder}")
-
-    if not os.path.exists(schema_folder):
-        logger.error(f"Không tìm thấy thư mục chứa các file thiết kế: {schema_folder}/")
-        return
+    logger.info(f"Target directory located: {schema_folder}")
 
     try:
-        # Nhặt toàn bộ file .sql có trong thư mục và sắp xếp theo bảng chữ cái/chữ số (00 -> 06)
+        # Collect and sort .sql files (00 -> 06)
         sql_files = sorted([f for f in os.listdir(schema_folder) if f.endswith('.sql')])
         
         if not sql_files:
-            logger.warning(f"Thư mục '{schema_folder}' đang trống. Không tìm thấy tệp .sql nào để khởi tạo.")
-            return
+            logger.warning(f"Directory '{schema_folder}' is empty. No .sql files found for initialization.")
+            return False
 
-        logger.info(f"Tìm thấy {len(sql_files)} file cấu trúc. Bắt đầu nạp tuần tự...")
+        logger.info(f"Found {len(sql_files)} schema files. Commencing sequential execution...")
 
-        # Mở kết nối vào Database vừa được setup sạch sẽ
+        # Connect to the newly configured target database
         with target_engine.connect() as conn:
             for file_name in sql_files:
                 file_path = os.path.join(schema_folder, file_name)
-                logger.info(f"Đang thực thi: {file_name}")
+                logger.info(f"Executing script: {file_name}")
                 
                 with open(file_path, 'r', encoding='utf-8') as f:
                     sql_script = f.read()
 
-                # Tách lô lệnh bằng từ khóa 'GO' (vì SQLAlchemy không hỗ trợ chạy hàng loạt cụm GO của SQL Server)
-                statements = sql_script.split('GO')
+                # SAFE GO SPLITTER (Regex): Matches 'GO' only when it is on its own line (case-insensitive)
+                # This prevents breaking SQL syntax if a column is named 'DimGovernment' or inside a '-- GO TO' comment.
+                statements = re.split(r'(?i)^\s*GO\s*$', sql_script, flags=re.MULTILINE)
+                
                 for statement in statements:
-                    if statement.strip():  # Loại bỏ khoảng trắng hoặc dòng trống thừa thãi
+                    if statement.strip():  # Skip empty or whitespace-only blocks
                         conn.execute(text(statement))
             
-            # Lưu lại toàn bộ thay đổi (Tạo các bảng tĩnh và Stored Procedure) vào hệ thống
+            # Commit all structural changes and Stored Procedures
             conn.commit()
             logger.info("=" * 60)
-            logger.info("Xây dựng thành công toàn bộ Vỏ bảng và Stored Procedure!")
-            logger.info("Hạ tầng đã sẵn sàng. Bạn có thể kích hoạt file main.py để đổ dữ liệu.")
+            logger.info("Schema tables and Stored Procedures successfully built!")
+            logger.info("Infrastructure is ready. You may now trigger main.py for data ingestion.")
             logger.info("=" * 60)
+            return True
             
     except Exception as e:
-        logger.error(f"Lỗi nghiêm trọng khi nạp cấu trúc Schema: {e}", exc_info=True)
+        logger.error(f"Fatal error while executing Schema scripts: {e}", exc_info=True)
+        return False
 
 if __name__ == "__main__":
     setup_infrastructure()

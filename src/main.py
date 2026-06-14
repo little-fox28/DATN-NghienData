@@ -27,26 +27,20 @@ def main() -> None:
 
     try:
         if args.skip_db:
-            logger.info("Chế độ chạy độc lập: Bỏ qua Database Load (--skip-db).")
-            pipeline = ELTPipeline()
+            logger.info("Chế độ chạy độc lập: Bỏ qua Database Setup và Load (--skip-db).")
+            pipeline = ELTPipeline(skip_db=True)
         else:
             logger.info("Chế độ chạy đầy đủ: Thiết lập và Load vào Database.")
-            setup_infrastructure() 
+            is_setup_success = setup_infrastructure() 
             
-            # 1. Lấy thông tin Server và Database một cách bảo mật từ file .env
-            server = os.getenv("DB_SERVER")
-            database = os.getenv("DB_NAME")
-
-            # Kiểm tra an toàn: Nếu biến môi trường trống thì báo lỗi và dừng chương trình
-            if not server or not database:
-                logger.error("Thiếu thông tin DB_SERVER hoặc DB_NAME trong file .env!")
+            # SECURITY & LOGIC CHECK: Abort immediately if DB setup fails
+            if not is_setup_success:
+                logger.error("Pipeline execution aborted due to infrastructure setup failure.")
                 return
 
-            logger.info(f"Đã nhận cấu hình đích: Server='{server}', Database='{database}'")
+            logger.info("Infrastructure is fully operational. Initializing ELT Pipeline...")
+            pipeline = ELTPipeline(skip_db=False)
 
-            # 2. Khởi tạo cỗ máy Pipeline và truyền thông số Database vào
-            pipeline = ELTPipeline(server=server, database=database)
-            
         success = pipeline.run()
 
         if success:

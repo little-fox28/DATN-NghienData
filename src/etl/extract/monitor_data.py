@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from pathlib import Path
 from typing import Tuple, List, Dict, Any
 from src.utils.logger import get_logger
@@ -139,13 +138,17 @@ class CreditDataValidator:
         Feature 1: Scans data and generates a structured Data Quality Scan Report.
         Typically used during the Extract process.
         """
+        report_file = Path(report_path)
+        if report_file.exists():
+            logger.info(f"Quality report already exists at {report_path}. Skipping scan to optimize performance.")
+            return True
+
         logger.info(f"Scanning {len(df)} records for issues...")
 
         try:
             results_df, passed_all = self._get_validation_results(df)
             df_quarantine = df[~passed_all].copy()
 
-            report_file = Path(report_path)
             report_file.parent.mkdir(parents=True, exist_ok=True)
 
             with open(report_file, mode="w", encoding="utf-8") as f:
