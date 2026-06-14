@@ -34,7 +34,7 @@ class ELTPipeline:
         self.raw_data_dir = raw_data_dir
         self.processed_data_dir = processed_data_dir
         self.raw_data_path: Optional[Path] = None
-        self.transformed_data_path: Optional[Path] = None
+        self.transformed_data_path: Optional[Path] = Path("data/output") / "df_output.csv"
 
     def extract(self) -> bool:
         """
@@ -129,7 +129,7 @@ class ELTPipeline:
             validator = CreditDataValidator()
             df_clean, _ = validator.segregate_and_save(df, output_dir=self.processed_data_dir)
 
-            self.transformed_data_path = Path(self.processed_data_dir) / "df_clean.csv"
+            self.transformed_data_path = Path("data/output") / "df_output.csv"
             logger.info(f"Transform phase successful. Clean data saved at: {self.transformed_data_path}")
             return True
 

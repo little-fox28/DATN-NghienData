@@ -1,5 +1,5 @@
 ================================================================================
-DATA QUALITY SCAN REPORT - 2026-06-05 13:40:11
+DATA QUALITY SCAN REPORT 
 ================================================================================
 
 EXECUTIVE SUMMARY:
@@ -7,6 +7,15 @@ EXECUTIVE SUMMARY:
 Total Records Scanned: 32581
 Issues Found:          4888
 Issue Rate:            15.00%
+
+DATA QUALITY STATUS BREAKDOWN:
+  - PASS:      27693 records (85.00%)
+  - WARNING:    4882 records (14.98%)
+  - CRITICAL:      6 records (0.02%)
+
+OUTPUT DATASET SUMMARY:
+  - Output Records (PASS + WARNING):  32575 records (99.98%)
+  - Destination File:               data/output/df_output.csv
 
 DETAILED FINDINGS:
 ------------------
