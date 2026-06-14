@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 
+
 from src.etl.pipeline import ELTPipeline
 from src.utils.logger import get_logger
 import os
