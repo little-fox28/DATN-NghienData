@@ -204,6 +204,15 @@ class CreditDataValidator:
                 f.write(f"  - PASS:     {pass_count:6} records ({(pass_count / total_records * 100):.2f}%)\n")
                 f.write(f"  - WARNING:  {warning_count:6} records ({(warning_count / total_records * 100):.2f}%)\n")
                 f.write(f"  - CRITICAL: {critical_count:6} records ({(critical_count / total_records * 100):.2f}%)\n\n")
+
+                f.write("RULE VIOLATION BREAKDOWN:\n")
+                for rule in self.rules:
+                    rule_id = rule["id"]
+                    failed_count = int((~results_df[rule_id]).sum())
+                    if failed_count > 0:
+                        f.write(f"  - {rule_id}: {failed_count} records ({(failed_count / total_records * 100):.2f}%)\n")
+                f.write("\n")
+
                 f.write("OUTPUT DATASET SUMMARY:\n")
                 f.write(f"  - Output Records (PASS + WARNING): {clean_count:6} records ({(clean_count / total_records * 100):.2f}%)\n")
                 f.write(f"  - Destination File:               data/output/df_output.csv\n\n")
