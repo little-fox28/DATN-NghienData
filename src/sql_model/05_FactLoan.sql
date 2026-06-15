@@ -18,7 +18,8 @@ BEGIN
         PastDelinquencies INT,
         OtherDebt FLOAT,
         OpenAccounts INT,
-        LoanStatus INT
+        LoanStatus INT,
+        DataQualityStatus VARCHAR(20)
     );
 END;
 GO
