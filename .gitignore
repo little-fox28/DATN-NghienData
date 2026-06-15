@@ -1,7 +1,10 @@
 # data
 data/raw
 data/processed
-data/output
+data/outputs
+
+# docs
+docs/data_issuses.txt
 
 # Python bytecode
 __pycache__/

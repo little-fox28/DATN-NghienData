@@ -1,9 +1,10 @@
 from dotenv import load_dotenv
 
-from src.etl.pipeline import ETLPipeline
-from src.utils.logger import get_logger
-from src.utils.setup_db import setup_infrastructure
 
+from src.etl.pipeline import ELTPipeline
+from src.utils.logger import get_logger
+import os
+from src.utils.setup_db import setup_infrastructure
 # Load environment variables from .env file
 load_dotenv()
 
@@ -22,15 +23,16 @@ def main() -> None:
         logger.info("Verifying and setting up database infrastructure...")
         is_setup_success = setup_infrastructure() 
         
-        # Abort immediately if DB setup fails
+        # SECURITY & LOGIC CHECK: Abort immediately if DB setup fails
         if not is_setup_success:
-            logger.error("Pipeline execution aborted due to infrastructure setup failure.")
+            logger.error("Pipeline execution aborted due to infrastructure setup failure. ")
             return
 
-        logger.info("Infrastructure is fully operational. Initializing ETL Pipeline...")
+        logger.info("Infrastructure is fully operational. Initializing ELT Pipeline...")
 
         # 2. INITIALIZE AND RUN PIPELINE
-        pipeline = ETLPipeline()
+        # Note: ELTPipeline now handles strict SQL Server Auth automatically inside its constructor.
+        pipeline = ELTPipeline()
         success = pipeline.run()
 
         if success:
@@ -39,8 +41,7 @@ def main() -> None:
             logger.error("Pipeline execution completed with status: FAILED ❌")
 
     except Exception as e:
-        logger.error(f"Critical system error: {e}", exc_info=True)
-
-
+        logger.error(f"Đã xảy ra lỗi hệ thống nghiêm trọng: {e}", exc_info=True)
+    
 if __name__ == "__main__":
     main()

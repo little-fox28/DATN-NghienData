@@ -29,6 +29,5 @@ CREATE TABLE stg_loan (
     debt_to_income_ratio FLOAT,
     open_accounts INT,
     credit_utilization_ratio FLOAT,
-    past_delinquencies INT,
-    status VARCHAR(50)
+    past_delinquencies INT
 );
