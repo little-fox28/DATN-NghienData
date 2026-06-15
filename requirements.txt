@@ -2,3 +2,5 @@ python-dotenv
 kaggle
 pandas
 xlrd # read data and formatting information from Excel files
+sqlalchemy
+pyodbc

@@ -1,4 +1,4 @@
-# 🚀 Credit Risk ELT Pipeline - Quickstart Guide
+# 🚀 Credit Risk ELT Pipeline - Quickstart Guide (English ver)
 
 Welcome to the **Credit Risk Data Engineering Project**. This repository contains a production-ready ELT (Extract, Load, Transform) pipeline designed to ingest, validate, and process credit risk datasets for downstream machine learning.
 
@@ -64,8 +64,7 @@ python -m src.main
 - `src/elt/extract/`: Data ingestion logic and the **Data Quality Scanner**.
 - `src/elt/transform/`: XLS to CSV conversion and data segregation.
 - `data/raw/`: Original files downloaded from Kaggle.
-- `data/processed/`: Segmented data files (`df_pass.csv`, `df_warning.csv`, `df_critical.csv`).
-- `data/output/`: Cleaned and validated output dataset (`df_output.csv`).
+- `data/processed/`: Cleaned and validated datasets (`df_clean.csv`).
 - `docs/`: Automated quality reports (`data_issuses.txt`).
 - `tests/`: Unit and integration tests.
 
@@ -77,13 +76,37 @@ python -m src.main
 The pipeline automatically scans raw data for business rule violations (Age, Income, Ratios, etc.) and generates a professional report in `docs/data_issuses.txt`.
 
 ### 🛡️ 2. Data Segregation (Transform Phase)
-Valid records (PASS + WARNING) are saved to `data/output/df_output.csv`, while other tier-based data subsets are saved to `df_pass.csv`, `df_warning.csv`, and `df_critical.csv` under `data/processed/`.
+Valid records are saved to `data/processed/df_clean.csv`, while invalid records are quarantined in `df_quarantine.csv` with detailed violation notes for debugging.
 
 ### ⚡ 3. Smart Conversion
 The pipeline intelligently detects if data is already in CSV format to bypass redundant conversion steps, saving time and resources.
 
----
+### 🔌 4. Seamless Database Integration (Load Phase)
 
+**Step 1: Configure the `.env` file**
+Create or update the `.env` file in the root directory with your SQL Server credentials:
+
+```env
+# Your SQL Server instance name
+DB_SERVER=Your_Server_Name
+# Default database name for SQL Server connection
+```bash
+DB_NAME=CreditRiskDB
+```
+# Strict SQL Server Authentication credentials
+```bash
+DB_USER=sa
+DB_PASS=YourPassword123
+```
+**Step 2: Execute the Pipeline**
+- Initialize the infrastructure
+```bash
+python -m src.utils.setup_db
+```
+- Run the ELT pipeline
+```bash
+python -m src.main
+```
 ## 🤝 Contributing
 - Follow the **OOP (Object-Oriented Programming)** style established in the `src/` directory.
 - Ensure all business rules are updated in `CreditDataValidator` if requirements change.
@@ -143,20 +166,12 @@ pip install -r requirements.txt
 
 ## 🚀 Khởi chạy pipeline
 
-Để thực hiện quy trình đầy đủ (Trích xuất -> Giám sát -> Chuyển đổi -> Tải vào Database):
+Để thực hiện các quy trình (Trích xuất -> Giám sát -> Chuyển đổi):
 
 ```bash
 # Set PYTHONPATH to root and run main
 $env:PYTHONPATH = "."
 python -m src.main
-```
-
-Để chạy pipeline ở chế độ độc lập (**Extract & Transform only**, không ghi vào Database):
-
-```bash
-# Set PYTHONPATH to root và chạy main với tham số --skip-db
-$env:PYTHONPATH = "."
-python -m src.main --skip-db
 ```
 
 ---
@@ -166,8 +181,7 @@ python -m src.main --skip-db
 - `src/elt/extract/`: Logic thu thập dữ liệu và **Trình quét chất lượng dữ liệu**.
 - `src/elt/transform/`: Chuyển đổi XLS sang CSV và phân tách dữ liệu.
 - `data/raw/`: Tệp gốc được tải xuống từ Kaggle.
-- `data/processed/`: dữ liệu phân tách theo phân loại lỗi (`df_pass.csv`, `df_warning.csv`, `df_critical.csv`).
-- `data/output/`: dữ liệu đã làm sạch hoàn chỉnh dùng để phân tích (`df_output.csv`).
+- `data/processed/`: dữ liệu đã được làm sạch và xác thực được lưu tại (`df_clean.csv`).
 - `docs/`: Các báo cáo chất lượng được tự động hoá lưu tại (`data_issuses.txt`).
 - `tests/`: Kiểm thử và tích hợp.
 
@@ -179,7 +193,7 @@ python -m src.main --skip-db
 Pipeline tự động quét dữ liệu thô để phát hiện các trường hợp vi phạm quy tắc nghiệp vụ (Tuổi, Thu nhập, Tỷ lệ, v.v.) và tạo báo cáo chất lượng trong `docs/data_issuses.txt`.
 
 ### 🛡️ 2. Phân tách dữ liệu (Giai đoạn Transform)
-Các bản ghi hợp lệ (PASS + WARNING) sẽ được lưu vào `data/output/df_output.csv`, trong khi các tệp phân tách chi tiết hơn sẽ được ghi nhận tại `df_pass.csv`, `df_warning.csv` và `df_critical.csv` thuộc thư mục `data/processed/`.
+Các bản ghi hợp lệ sẽ được lưu vào `data/processed/df_clean.csv`, Trong khi các bản ghi không hợp lệ sẽ được lưu cách ly trong  `df_quarantine.csv` với ghi chú chi tiết về các lỗi vi phạm để hỗ trợ sửa lỗi.
 
 ### ⚡ 3. Chuyển đổi thông minh
 Pipeline có khả năng tự động nhận diện nếu dữ liệu đã ở định dạng CSV để bỏ qua các bước chuyển đổi không cần thiết, và giúp tiết kiệm thời gian và tài nguyên.
@@ -189,7 +203,8 @@ Pipeline có khả năng tự động nhận diện nếu dữ liệu đã ở �
 ## 🤝 Đóng góp
 - Tuân thủ các **OOP (Object-Oriented Programming)** đã được xây dựng tại thư mục `src/`.
 - Đảm bảo cập nhật toàn bộ quy tắc nghiệp vụ trong `CreditDataValidator` nếu có yêu cầu thay đổi.
-- ALuôn kiêm tra file  `docs/data_issuses.txt` sau mỗi làn chạy để có thể theo dõi tình trạng chất lượng dữ liệu.
+- Luôn kiểm tra file  `docs/data_issuses.txt` sau mỗi làn chạy để có thể theo dõi tình trạng chất lượng dữ liệu.
 
 ---
 **Zui zẻ nha!** 📈
+
