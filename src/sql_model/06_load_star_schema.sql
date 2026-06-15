@@ -41,7 +41,7 @@ BEGIN
         CustomerKey, LocationKey, PurposeKey, GradeKey,
         LoanAmount, InterestRate, LoanTerm, LoanPercentIncome,
         LoanToIncomeRatio, DebtToIncomeRatio, CreditUtilization,
-        PersonEmpLength, PastDelinquencies, OtherDebt, OpenAccounts, LoanStatus
+        PersonEmpLength, PastDelinquencies, OtherDebt, OpenAccounts, LoanStatus, Status
     )
     SELECT 
         s.client_id,
@@ -59,7 +59,8 @@ BEGIN
         s.past_delinquencies,
         s.other_debt,
         s.open_accounts,
-        s.loan_status
+        s.loan_status,
+        s.status
     FROM stg_loan s
     LEFT JOIN DimCustomer c ON s.client_id = c.client_id
     LEFT JOIN DimLocation dl ON ISNULL(s.country,'') = ISNULL(dl.Country,'') 

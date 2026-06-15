@@ -1,7 +1,7 @@
 # data
 data/raw
 data/processed
-data/outputs
+data/output
 
 # docs
 docs/data_issuses.txt
