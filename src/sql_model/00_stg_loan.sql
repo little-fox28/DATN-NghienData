@@ -30,5 +30,5 @@ CREATE TABLE stg_loan (
     open_accounts INT,
     credit_utilization_ratio FLOAT,
     past_delinquencies INT,
-    status VARCHAR(20)
+    status VARCHAR(50)
 );

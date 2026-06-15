@@ -1,6 +1,6 @@
 # DATN - Phân tích rủi ro tài chính
 
-## Cai dat moi truong
+## Cài đặt môi trường
 
 > Yêu cầu: **Python 3.10+** đã được cài sẵn trên máy
 
