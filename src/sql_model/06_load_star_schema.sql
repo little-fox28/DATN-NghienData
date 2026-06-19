@@ -4,8 +4,27 @@ BEGIN
     SET NOCOUNT ON;
     TRUNCATE TABLE FactLoan;
     -- BƯỚC 1: CẬP NHẬT DIM CUSTOMER 
-    INSERT INTO DimCustomer (client_id, person_age, person_income, person_home_ownership, gender, marital_status, education_level, employment_type, cb_person_default_on_file)
-    SELECT client_id, MAX(person_age), MAX(person_income), MAX(person_home_ownership), MAX(gender), MAX(marital_status), MAX(education_level), MAX(employment_type), MAX(cb_person_default_on_file)
+    INSERT INTO DimCustomer(
+      client_id, 
+      person_age, 
+      person_income, 
+      person_home_ownership,
+      gender, 
+      marital_status, 
+      education_level, 
+      employment_type,
+      cb_person_cred_hist_length,
+      cb_person_default_on_file)
+    SELECT 
+      client_id, 
+      MAX(person_age), 
+      MAX(person_income), 
+      MAX(person_home_ownership), 
+      MAX(gender), MAX(marital_status), 
+      MAX(education_level), 
+      MAX(employment_type), 
+      MAX(cb_person_cred_hist_length),
+      MAX(cb_person_default_on_file)
     FROM stg_loan
     WHERE client_id IS NOT NULL 
       AND client_id NOT IN (SELECT client_id FROM DimCustomer)
@@ -44,7 +63,7 @@ BEGIN
         PersonEmpLength, PastDelinquencies, OtherDebt, OpenAccounts, LoanStatus, Status
     )
     SELECT 
-        s.client_id,
+        c.CustomerKey,
         dl.LocationKey,
         dp.PurposeKey,
         dg.GradeKey,
