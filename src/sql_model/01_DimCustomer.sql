@@ -8,7 +8,8 @@ BEGIN
         gender VARCHAR(20),
         marital_status VARCHAR(50),
         education_level VARCHAR(50),
-        employment_type VARCHAR(50)
+        employment_type VARCHAR(50),
+        cb_person_default_on_file VARCHAR(50)
     );
 END;
 GO
