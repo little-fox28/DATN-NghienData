@@ -21,3 +21,6 @@ Khảo sát hiện trạng và đặc tả yêu cầu hệ thống
 Nghiệp vụ Ngân hàng
 Tối ưu hóa các trường dữ liệu cho báo cáo
 Cập nhập thêm 10 rules cho dataset
+22/06/2026
+file excel giải thích nghĩa của từng trường + công thức + tiếng việt 
+giờ mình sẽ làm slide dựa trên những gì đã làm, để biết được mình cần nói những insigh gì, từ đó sẽ lên dashboard
