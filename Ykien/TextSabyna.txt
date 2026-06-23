@@ -24,3 +24,8 @@ Cập nhập thêm 10 rules cho dataset
 22/06/2026
 file excel giải thích nghĩa của từng trường + công thức + tiếng việt 
 giờ mình sẽ làm slide dựa trên những gì đã làm, để biết được mình cần nói những insigh gì, từ đó sẽ lên dashboard
+23/06/2026
+Tạo bộ câu hỏi Business Analyst cho phần Dictionary giải thích dự đoán ai sẽ quỵt nợ? Ai có thể tạo thẻ tín dụng dựa trên tiêu chí nào?
+Tại sao lại dùng tiêu chí đó? => bảo vệ luận điểm của mình bẳng cách nào?
+=> Tập trung khai thác insigh để tạo ra nhiều câu hỏi => training câu hỏi cho các bạn khác trả lời
+Tính điểm cá nhân, nếu thành viên không trả lời được câu hỏi cũng sẽ rớt tốt nghiệp
