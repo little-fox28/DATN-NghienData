@@ -122,6 +122,11 @@ class CreditDataValidator:
         Feature 1: Scans data and generates a structured Data Quality Scan Report.
         Typically used during the Extract process.
         """
+        report_file = Path(report_path)
+        if report_file.exists():
+            logger.info(f"Quality report already exists at {report_path}. Skipping scan to optimize performance.")
+            return True
+
         logger.info(f"Scanning {len(df)} records for issues...")
 
         try:
@@ -129,7 +134,6 @@ class CreditDataValidator:
             status_series = self.calculate_status(df, results_df)
             df_quarantine = df[~passed_all].copy()
 
-            report_file = Path(report_path)
             report_file.parent.mkdir(parents=True, exist_ok=True)
 
             with open(report_file, mode="w", encoding="utf-8") as f:
