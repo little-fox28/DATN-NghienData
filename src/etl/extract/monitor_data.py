@@ -1,103 +1,25 @@
+import json
 import pandas as pd
+import numpy as np
 from pathlib import Path
-from typing import Tuple, List, Dict, Any
+from typing import Tuple, Dict, Any
 
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-RULES = [
-    {
-        "id": "R1_AGE",
-        "desc": "Age must be between 18 and 85 (Critical Field)",
-        "severity": "critical",
-        "check": lambda df: df["person_age"].between(18, 85),
-    },
-    {
-        "id": "R2_EXPERIENCE",
-        "desc": "Employment length cannot exceed (Age - 16) - Tolerates Missing",
-        "severity": "warning",
-        "check": lambda df: df["person_emp_length"].isna()
-        | (df["person_emp_length"] <= (df["person_age"] - 16)),
-    },
-    {
-        "id": "R3_CREDIT_HIST",
-        "desc": "Credit history length cannot exceed (Age - 18) - Tolerates Missing",
-        "severity": "warning",
-        "check": lambda df: df["cb_person_cred_hist_length"].isna()
-        | (df["cb_person_cred_hist_length"] <= (df["person_age"] - 18)),
-    },
-    {
-        "id": "R4_FINANCIALS",
-        "desc": "Income and Loan amount must be > 0 (Critical Fields)",
-        "severity": "critical",
-        "check": lambda df: (df["person_income"] > 0) & (df["loan_amnt"] > 0),
-    },
-    {
-        "id": "R5_UTILIZATION",
-        "desc": "Credit utilization ratio must be between 0 and 1 - Tolerates Missing",
-        "severity": "warning",
-        "check": lambda df: df["credit_utilization_ratio"].isna()
-        | df["credit_utilization_ratio"].between(0, 1),
-    },
-    {
-        "id": "R6_RATIO_SYNC",
-        "desc": "Calculated loan-to-income ratio mismatch (> 0.01 error) - Tolerates Missing",
-        "severity": "warning",
-        "check": lambda df: df["loan_to_income_ratio"].isna()
-        | (
-            (df["loan_amnt"] / df["person_income"] - df["loan_to_income_ratio"]).abs()
-            <= 0.01
-        ),
-    },
-    {
-        "id": "R7_DTI_LOGIC",
-        "desc": "Debt-to-income ratio must be >= loan percent income - Tolerates Missing",
-        "severity": "warning",
-        "check": lambda df: df["debt_to_income_ratio"].isna()
-        | df["loan_percent_income"].isna()
-        | (df["debt_to_income_ratio"] >= df["loan_percent_income"]),
-    },
-    {
-        "id": "R8_DEFAULT_DELINQUENCY",
-        "desc": "If default on file is Y, past delinquencies must be > 0 - Tolerates Missing",
-        "severity": "warning",
-        "check": lambda df: df["cb_person_default_on_file"].isna()
-        | df["past_delinquencies"].isna()
-        | ~((df["cb_person_default_on_file"] == "Y") & (df["past_delinquencies"] == 0)),
-    },
-    {
-        "id": "R9_UTILIZATION_ACCOUNTS",
-        "desc": "Cannot have >0 utilization ratio with 0 open accounts - Tolerates Missing",
-        "severity": "warning",
-        "check": lambda df: df["credit_utilization_ratio"].isna()
-        | df["open_accounts"].isna()
-        | ~((df["credit_utilization_ratio"] > 0) & (df["open_accounts"] == 0)),
-    },
-    {
-        "id": "R10_TOTAL_DEBT_SYNC",
-        "desc": "If other_debt is 0, DTI must equal loan_percent_income - Tolerates Missing",
-        "severity": "warning",
-        "check": lambda df: df["other_debt"].isna()
-        | df["debt_to_income_ratio"].isna()
-        | df["loan_percent_income"].isna()
-        | ~(
-            (df["other_debt"] == 0)
-            & ((df["debt_to_income_ratio"] - df["loan_percent_income"]).abs() > 0.01)
-        ),
-    },
-    {
-        "id": "R11_GEO_BOUNDS",
-        "desc": "Latitude must be [-90, 90] and Longitude must be [-180, 180] - Tolerates Missing",
-        "severity": "warning",
-        "check": lambda df: df["city_latitude"].isna()
-        | df["city_longitude"].isna()
-        | (
-            df["city_latitude"].between(-90, 90)
-            & df["city_longitude"].between(-180, 180)
-        ),
-    },
-]
+
+def load_rules() -> list:
+    rules_path = Path(__file__).parent / "DQ_rules.json"
+    try:
+        with open(rules_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        logger.error(f"Failed to load DQ rules from {rules_path}: {e}")
+        return []
+
+
+RULES = load_rules()
 
 
 class CreditDataValidator:
@@ -112,20 +34,54 @@ class CreditDataValidator:
         """
         self.rules = RULES
 
+    def _prepare_validation_df(self, df):
+        validated_df = df.copy()
+        # Prevent ZeroDivisionError for R6
+        validated_df["calc_loan_to_income"] = np.where(
+            validated_df["person_income"] > 0,
+            validated_df["loan_amnt"] / validated_df["person_income"],
+            np.nan
+        )
+        return validated_df
+
     def _get_validation_results(
         self, df: pd.DataFrame
     ) -> Tuple[pd.DataFrame, pd.Series]:
         """
         Internal method to apply rules vectorially and return the mask of passed records.
         """
+        df_prepared = self._prepare_validation_df(df)
         results_df = pd.DataFrame(
-            {rule["id"]: self._apply_rule(df, rule) for rule in self.rules}
+            {rule["id"]: self._apply_rule(df_prepared, rule) for rule in self.rules}
         )
         passed_all = results_df.all(axis=1)
         return results_df, passed_all
 
     def _apply_rule(self, df: pd.DataFrame, rule: Dict[str, Any]) -> pd.Series:
         try:
+            # Step 1: Apply fallback computation (fill_expr) if field is null
+            # If computation also yields NaN, the check will fail → record marked critical
+            if "fill_target" in rule and "fill_expr" in rule:
+                df = df.copy()
+                fill_target = rule["fill_target"]
+                null_mask = df[fill_target].isna()
+                if null_mask.any():
+                    computed = eval(rule["fill_expr"], {"df": df, "np": np})
+                    if hasattr(computed, "__len__"):
+                        df.loc[null_mask, fill_target] = pd.Series(computed, index=df.index)[null_mask]
+                    else:
+                        df.loc[null_mask, fill_target] = computed
+                    filled_count = null_mask.sum() - df[fill_target].isna().sum()
+                    if filled_count > 0:
+                        logger.info(
+                            f"[{rule['id']}] Auto-filled {filled_count} missing '{fill_target}' "
+                            f"value(s) via fallback computation."
+                        )
+
+            # Step 2: Run the check expression
+            check_expr = rule["check"]
+            if isinstance(check_expr, str):
+                return eval(check_expr, {"df": df, "np": np}).fillna(False).astype(bool)
             return rule["check"](df).fillna(False).astype(bool)
         except Exception as e:
             logger.error(f"Error applying rule {rule['id']}: {e}")
@@ -208,6 +164,15 @@ class CreditDataValidator:
                 f.write(f"  - PASS:     {pass_count:6} records ({(pass_count / total_records * 100):.2f}%)\n")
                 f.write(f"  - WARNING:  {warning_count:6} records ({(warning_count / total_records * 100):.2f}%)\n")
                 f.write(f"  - CRITICAL: {critical_count:6} records ({(critical_count / total_records * 100):.2f}%)\n\n")
+
+                f.write("RULE VIOLATION BREAKDOWN:\n")
+                for rule in self.rules:
+                    rule_id = rule["id"]
+                    failed_count = int((~results_df[rule_id]).sum())
+                    if failed_count > 0:
+                        f.write(f"  - {rule_id}: {failed_count} records ({(failed_count / total_records * 100):.2f}%)\n")
+                f.write("\n")
+
                 f.write("OUTPUT DATASET SUMMARY:\n")
                 f.write(f"  - Output Records (PASS + WARNING): {clean_count:6} records ({(clean_count / total_records * 100):.2f}%)\n")
                 f.write(f"  - Destination File:               data/output/df_output.csv\n\n")
