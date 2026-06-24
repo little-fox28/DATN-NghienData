@@ -8,10 +8,11 @@ from .transform.convert_xls_to_csv import convert_xls_to_csv
 from src.utils.logger import get_logger
 from src.utils.connector import SQLServerConnector
 from src.etl.load import DataLoader
+
 logger = get_logger(__name__)
 
 
-class ELTPipeline:
+class ETLPipeline:
     """
     Manages the Extract-Load-Transform pipeline.
 
@@ -27,7 +28,7 @@ class ELTPipeline:
 
     def __init__(self, raw_data_dir: str = RAW_DATA_DIR, processed_data_dir: str = PROCESSED_DATA_DIR, skip_db: bool = False) -> None:
         """
-        Initialize the ELT pipeline.
+        Initialize the ETL pipeline.
 
         Args:
             raw_data_dir (str): Directory for storing raw data.
@@ -61,7 +62,7 @@ class ELTPipeline:
             self.database_engine = self.sql_connector.get_engine()
 
         self.raw_data_path: Optional[Path] = None
-        self.transformed_data_path: Optional[Path] = None
+        self.transformed_data_path: Optional[Path] = Path("data/output") / "df_output.csv"
 
     def extract(self) -> bool:
         """
@@ -69,7 +70,7 @@ class ELTPipeline:
         Downloads the dataset and scans for quality issues.
         """
         logger.info("=" * 60)
-        logger.info("Starting ELT Pipeline - Extract Phase")
+        logger.info("Starting ETL Pipeline - Extract Phase")
         logger.info("=" * 60)
 
         try:
@@ -123,7 +124,7 @@ class ELTPipeline:
         Validates, segregates into clean/quarantine, and saves the output.
         """
         logger.info("=" * 60)
-        logger.info("Starting ELT Pipeline - Transform Phase")
+        logger.info("Starting ETL Pipeline - Transform Phase")
         logger.info("=" * 60)
 
         if df_raw is None or df_raw.empty:
@@ -137,15 +138,14 @@ class ELTPipeline:
             # Run Data Quality checks and split data ONCE
             df_clean, _ = validator.segregate_and_save(df_raw, output_dir=self.processed_data_dir)
 
-            # Store the path of the clean file for the Load phase
-            self.transformed_data_path = Path(self.processed_data_dir) / "df_clean.csv"
+            self.transformed_data_path = Path("data/output") / "df_output.csv"
             logger.info(f"Transform phase successful. Clean data saved at: {self.transformed_data_path}")
             return True
 
         except Exception as e:
             logger.error(f"Unexpected error during transform phase: {e}", exc_info=True)
             return False
-        
+
     def load(self) -> bool:
         """
         Execute the Load phase.
@@ -153,7 +153,7 @@ class ELTPipeline:
         and triggers the Stored Procedure to distribute data into Fact & Dim tables.
         """
         logger.info("=" * 60)
-        logger.info("Starting ELT Pipeline - Load Phase")
+        logger.info("Starting ETL Pipeline - Load Phase")
         logger.info("=" * 60)
 
         # Check if the clean file was generated in the Transform phase
@@ -172,7 +172,6 @@ class ELTPipeline:
         )
         
         return success
-        
 
     def run(self) -> bool:
         """
@@ -206,4 +205,3 @@ class ELTPipeline:
         logger.info("ELT PIPELINE COMPLETED SUCCESSFULLY!")
         logger.info("=" * 60)
         return True
-

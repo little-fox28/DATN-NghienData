@@ -4,8 +4,27 @@ BEGIN
     SET NOCOUNT ON;
     TRUNCATE TABLE FactLoan;
     -- BƯỚC 1: CẬP NHẬT DIM CUSTOMER 
-    INSERT INTO DimCustomer (client_id, person_age, person_income, person_home_ownership, gender, marital_status, education_level, employment_type)
-    SELECT client_id, MAX(person_age), MAX(person_income), MAX(person_home_ownership), MAX(gender), MAX(marital_status), MAX(education_level), MAX(employment_type)
+    INSERT INTO DimCustomer(
+      client_id, 
+      person_age, 
+      person_income, 
+      person_home_ownership,
+      gender, 
+      marital_status, 
+      education_level, 
+      employment_type,
+      cb_person_cred_hist_length,
+      cb_person_default_on_file)
+    SELECT 
+      client_id, 
+      MAX(person_age), 
+      MAX(person_income), 
+      MAX(person_home_ownership), 
+      MAX(gender), MAX(marital_status), 
+      MAX(education_level), 
+      MAX(employment_type), 
+      MAX(cb_person_cred_hist_length),
+      MAX(cb_person_default_on_file)
     FROM stg_loan
     WHERE client_id IS NOT NULL 
       AND client_id NOT IN (SELECT client_id FROM DimCustomer)
@@ -41,10 +60,10 @@ BEGIN
         CustomerKey, LocationKey, PurposeKey, GradeKey,
         LoanAmount, InterestRate, LoanTerm, LoanPercentIncome,
         LoanToIncomeRatio, DebtToIncomeRatio, CreditUtilization,
-        PersonEmpLength, PastDelinquencies, OtherDebt, OpenAccounts, LoanStatus
+        PersonEmpLength, PastDelinquencies, OtherDebt, OpenAccounts, LoanStatus, Status
     )
     SELECT 
-        s.client_id,
+        c.CustomerKey,
         dl.LocationKey,
         dp.PurposeKey,
         dg.GradeKey,
@@ -59,7 +78,8 @@ BEGIN
         s.past_delinquencies,
         s.other_debt,
         s.open_accounts,
-        s.loan_status
+        s.loan_status,
+        s.status
     FROM stg_loan s
     LEFT JOIN DimCustomer c ON s.client_id = c.client_id
     LEFT JOIN DimLocation dl ON ISNULL(s.country,'') = ISNULL(dl.Country,'') 

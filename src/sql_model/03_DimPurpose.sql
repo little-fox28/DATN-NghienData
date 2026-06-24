@@ -1,8 +1,9 @@
-IF OBJECT_ID('DimLoanPurpose', 'U') IS NULL
-BEGIN
-    CREATE TABLE DimLoanPurpose (
-        PurposeKey INT IDENTITY(1,1) PRIMARY KEY,
-        LoanIntent VARCHAR(50)
-    );
-END;
+IF OBJECT_ID('DimLoanPurpose', 'U') IS NOT NULL
+    DROP TABLE DimLoanPurpose;
+
+CREATE TABLE DimLoanPurpose (
+    PurposeKey TINYINT IDENTITY(1,1) PRIMARY KEY,
+    LoanIntent VARCHAR(50) NOT NULL
+)
+WITH(DATA_COMPRESSION = PAGE);
 GO
