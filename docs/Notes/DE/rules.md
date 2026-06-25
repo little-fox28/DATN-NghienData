@@ -1,7 +1,7 @@
 # DATA QUALITY RULE CATALOG (ĐẶC TẢ CHẤT LƯỢNG DỮ LIỆU)
 **Project Name:** Credit Risk Scoring System & Risk Data Mart  
 **Domain:** Retail Banking / Credit Risk  
-**Document Version:** 1.0.0  
+**Document Version:** 1.1.0  
 **Framework:** DAMA-DMBOK Data Quality Dimensions  
 
 ---
@@ -56,7 +56,7 @@ Tài liệu này áp dụng các chiều chất lượng dữ liệu tiêu chu�
 * **Rule ID:** `R5_UTILIZATION`
 * **Dimension:** Validity
 * **Severity:** WARNING
-* **Business Rationale:** Tỷ lệ tận dụng tín dụng (Credit Utilization) là một giá trị phần trăm, bắt buộc phải nằm trong khoảng từ 0% đến 100%.
+* **Business Rationale:** Tỷ lệ tận dụng tín dụng (Credit Utilization) là một giá trị phần trạng, bắt buộc phải nằm trong khoảng từ 0% đến 100%.
 * **Technical Logic:** `IF credit_utilization_ratio IS NOT NULL THEN credit_utilization_ratio >= 0 AND credit_utilization_ratio <= 1`
 * **Action on Fail:** Flag record (Pass if NULL).
 
@@ -107,3 +107,83 @@ Tài liệu này áp dụng các chiều chất lượng dữ liệu tiêu chu�
 * **Business Rationale:** Tọa độ GPS hợp lệ theo chuẩn quốc tế: Vĩ độ (Latitude) từ -90 đến 90, Kinh độ (Longitude) từ -180 đến 180.
 * **Technical Logic:** `IF city_latitude IS NOT NULL AND city_longitude IS NOT NULL THEN city_latitude BETWEEN -90 AND 90 AND city_longitude BETWEEN -180 AND 180`
 * **Action on Fail:** Flag record (Pass if NULL).
+
+### DQ-R12: Kiểm tra khuyết thiếu tỷ lệ nợ trên thu nhập (DTI Null Check)
+* **Rule ID:** `R12_DTI_NULL`
+* **Dimension:** Completeness
+* **Severity:** CRITICAL
+* **Business Rationale:** Tỷ lệ nợ trên thu nhập (DTI) là chỉ số bắt buộc để phân tích rủi ro tín dụng. Nếu bị khuyết thiếu, hệ thống sẽ cố gắng tính toán lại từ các trường `other_debt` và `person_income`. Nếu không thể tính toán được, bản ghi sẽ bị đánh dấu nghiêm trọng.
+* **Technical Logic:** `debt_to_income_ratio IS NOT NULL` (Sau khi tính toán dự phòng: `(other_debt + loan_amnt) / person_income`)
+* **Action on Fail:** Reject record.
+
+### DQ-R13: Ràng buộc dải giá trị tỷ lệ nợ trên thu nhập (DTI Range Check)
+* **Rule ID:** `R13_DTI_RANGE`
+* **Dimension:** Validity
+* **Severity:** CRITICAL
+* **Business Rationale:** Tỷ lệ nợ trên thu nhập không thể âm.
+* **Technical Logic:** `IF debt_to_income_ratio IS NOT NULL THEN debt_to_income_ratio >= 0`
+* **Action on Fail:** Reject record.
+
+### DQ-R14: Cảnh báo tỷ lệ nợ trên thu nhập bất thường (DTI Abnormal Check)
+* **Rule ID:** `R14_DTI_MAX`
+* **Dimension:** Validity
+* **Severity:** WARNING
+* **Business Rationale:** Tỷ lệ nợ trên thu nhập vượt quá 20 là bất thường, có thể do lỗi nhập liệu đơn vị hoặc bất thường cực đoan cần xem xét.
+* **Technical Logic:** `IF debt_to_income_ratio IS NOT NULL THEN debt_to_income_ratio <= 20`
+* **Action on Fail:** Flag record.
+
+### DQ-R15: Kiểm tra khuyết thiếu thông tin vỡ nợ (Default File Null Check)
+* **Rule ID:** `R15_DEFAULT_NULL`
+* **Dimension:** Completeness
+* **Severity:** CRITICAL
+* **Business Rationale:** Thông tin có lịch sử vỡ nợ hay không là thuộc tính bắt buộc để phân nhóm khách hàng. Nếu bị khuyết thiếu, hệ thống sẽ tự động gán giá trị là 'N' (Không vỡ nợ) nếu số lần nợ quá hạn (`past_delinquencies`) bằng 0. Nếu không thể suy luận, bản ghi bị loại bỏ.
+* **Technical Logic:** `cb_person_default_on_file IS NOT NULL` (Sau khi tính toán dự phòng: `'N'` nếu `past_delinquencies == 0`)
+* **Action on Fail:** Reject record.
+
+### DQ-R16: Định dạng giá trị vỡ nợ (Default File Value Check)
+* **Rule ID:** `R16_DEFAULT_VALUE`
+* **Dimension:** Validity
+* **Severity:** CRITICAL
+* **Business Rationale:** Trường thông tin vỡ nợ chỉ được phép chứa các giá trị chuẩn hóa là 'Y' (Có) hoặc 'N' (Không).
+* **Technical Logic:** `IF cb_person_default_on_file IS NOT NULL THEN cb_person_default_on_file IN ('Y', 'N')`
+* **Action on Fail:** Reject record.
+
+### DQ-R17: Kiểm tra khuyết thiếu xếp hạng khoản vay (Loan Grade Null Check)
+* **Rule ID:** `R17_GRADE_NULL`
+* **Dimension:** Completeness
+* **Severity:** CRITICAL
+* **Business Rationale:** Xếp hạng khoản vay là trường thông tin cốt lõi để phân loại và đánh giá mức độ rủi ro của khoản vay, bắt buộc phải có thông tin và không thể tự tính toán suy luận từ các trường khác.
+* **Technical Logic:** `loan_grade IS NOT NULL`
+* **Action on Fail:** Reject record.
+
+### DQ-R18: Định dạng xếp hạng khoản vay (Loan Grade Value Check)
+* **Rule ID:** `R18_GRADE_VALUE`
+* **Dimension:** Validity
+* **Severity:** CRITICAL
+* **Business Rationale:** Xếp hạng khoản vay phải nằm trong danh mục phân loại chuẩn của ngân hàng từ A đến G.
+* **Technical Logic:** `IF loan_grade IS NOT NULL THEN loan_grade IN ('A', 'B', 'C', 'D', 'E', 'F', 'G')`
+* **Action on Fail:** Reject record.
+
+### DQ-R19: Nhất quán giữa Xếp hạng khoản vay và Tỷ lệ sử dụng hạn mức (Loan Grade vs. Utilization)
+* **Rule ID:** `R19_GRADE_UTILIZATION`
+* **Dimension:** Consistency
+* **Severity:** WARNING
+* **Business Rationale:** Khách hàng được xếp hạng khoản vay mức A (rủi ro thấp nhất) thường có hành vi tài chính tốt và không nên có tỷ lệ sử dụng hạn mức tín dụng quá cao (>= 80%). Nếu vi phạm, cần gắn cờ cảnh báo để kiểm tra lại xếp hạng.
+* **Technical Logic:** `IF loan_grade IS NOT NULL AND credit_utilization_ratio IS NOT NULL THEN NOT (loan_grade == 'A' AND credit_utilization_ratio >= 0.8)`
+* **Action on Fail:** Flag record.
+
+### DQ-R20: Kiểm tra khuyết thiếu số lần nợ quá hạn (Past Delinquencies Null Check)
+* **Rule ID:** `R20_DELINQ_NULL`
+* **Dimension:** Completeness
+* **Severity:** CRITICAL
+* **Business Rationale:** Số lần nợ quá hạn trong quá khứ là chỉ số quan trọng để đánh giá uy tín tín dụng của khách hàng. Nếu bị khuyết thiếu, hệ thống tự động gán giá trị bằng 0 nếu khách hàng không có lịch sử vỡ nợ (`cb_person_default_on_file == 'N'`).
+* **Technical Logic:** `past_delinquencies IS NOT NULL` (Sau khi tính toán dự phòng: `0` nếu `cb_person_default_on_file == 'N'`)
+* **Action on Fail:** Reject record.
+
+### DQ-R21: Ràng buộc số lần nợ quá hạn hợp lệ (Past Delinquencies Range Check)
+* **Rule ID:** `R21_DELINQ_RANGE`
+* **Dimension:** Validity
+* **Severity:** CRITICAL
+* **Business Rationale:** Số lần nợ quá hạn phải là một số nguyên không âm.
+* **Technical Logic:** `IF past_delinquencies IS NOT NULL THEN past_delinquencies >= 0`
+* **Action on Fail:** Reject record.
