@@ -8,7 +8,12 @@ NghienData-DATN/
 ├── data/                   # Khu vực lưu dữ liệu của dự án
 │   └── raw/                # Dữ liệu gốc đầu vào, ví dụ file .xls
 ├── docs/                   # Tài liệu và nội dung tham khảo
-│   └── Ykien/              # Các file ghi nhận ý kiến
+│   ├── 01_reports/         # Báo cáo và tài liệu chính (file Word)
+│   ├── 02_design_assets/   # Sơ đồ thiết kế hệ thống và ERD
+│   ├── 03_team_feedback/   # Ý kiến đóng góp từ các thành viên trong nhóm
+│   ├── 04_qna/             # Câu hỏi và tài liệu chuẩn bị phản biện
+│   ├── 05_data_quality/    # Nhật ký lỗi và chất lượng dữ liệu đầu vào
+│   └── 06_notes/           # Ghi chú kỹ thuật, DE rules
 ├── notebook/               # Notebook thử nghiệm, EDA hoặc ghi chú nhanh
 │   └── .gitkeep
 ├── src/                    # Mã nguồn chính của hệ thống
