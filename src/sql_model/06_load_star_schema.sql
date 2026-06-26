@@ -14,7 +14,9 @@ BEGIN
       education_level, 
       employment_type,
       cb_person_cred_hist_length,
-      cb_person_default_on_file)
+      cb_person_default_on_file,
+      person_emp_length
+      )
     SELECT 
       client_id, 
       MAX(person_age), 
@@ -24,7 +26,8 @@ BEGIN
       MAX(education_level), 
       MAX(employment_type), 
       MAX(cb_person_cred_hist_length),
-      MAX(cb_person_default_on_file)
+      MAX(cb_person_default_on_file),
+      MAX(person_emp_length)
     FROM stg_loan
     WHERE client_id IS NOT NULL 
       AND client_id NOT IN (SELECT client_id FROM DimCustomer)
@@ -60,7 +63,7 @@ BEGIN
         CustomerKey, LocationKey, PurposeKey, GradeKey,
         LoanAmount, InterestRate, LoanTerm, LoanPercentIncome,
         LoanToIncomeRatio, DebtToIncomeRatio, CreditUtilization,
-        PersonEmpLength, PastDelinquencies, OtherDebt, OpenAccounts, LoanStatus, Status
+        PastDelinquencies, OtherDebt, OpenAccounts, LoanStatus, Status
     )
     SELECT 
         c.CustomerKey,
@@ -74,7 +77,6 @@ BEGIN
         s.loan_to_income_ratio,
         s.debt_to_income_ratio,
         s.credit_utilization_ratio,
-        s.person_emp_length,
         s.past_delinquencies,
         s.other_debt,
         s.open_accounts,

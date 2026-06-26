@@ -41,7 +41,7 @@ CREATE TABLE dbo.DimCustomer
     employment_type VARCHAR(20),
     cb_person_default_on_file VARCHAR(5),
     cb_person_cred_hist_length TINYINT,
-
+    person_emp_length TINYINT,
     -- System-versioned columns
     SysStartTime DATETIME2
         GENERATED ALWAYS AS ROW START

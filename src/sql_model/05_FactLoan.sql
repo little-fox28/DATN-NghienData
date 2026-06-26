@@ -15,7 +15,6 @@ CREATE TABLE FactLoan
     LoanToIncomeRatio DECIMAL(9,6),
     DebtToIncomeRatio DECIMAL(9,6),
     CreditUtilization DECIMAL(9,6),
-    PersonEmpLength TINYINT,
     PastDelinquencies TINYINT,
     OtherDebt DECIMAL(15,2),
     OpenAccounts TINYINT,
