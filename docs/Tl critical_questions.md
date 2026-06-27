@@ -98,7 +98,7 @@
 46. Bạn sử dụng kiểm định thống kê (Statistical Test) nào để khẳng định hai biến số liên tục độc lập với nhau?
 - Pearson hoặc Spearman Correlation.
 # 47. Làm sao để biến đổi một biến Categorical có tính thứ bậc (Ordinal) như "Trình độ học vấn" cho mô hình học máy?
-48. Bạn giải thích thế nào nếu thấy tập khách hàng có bằng Thạc sĩ (Master) lại có tỷ lệ vỡ nợ cao hơn người chỉ tốt nghiệp cấp 3? 
+48. Bạn giải thích thế nào nếu thấy tập khách hàng có bằng Thạc sĩ (Master) lại có tỷ lệ vỡ nợ cao hơn người chỉ tốt nghiệp cấp 3?
 49. Tính thời vụ (Seasonality) có tồn tại trong dữ liệu xin vay mượn này không? Bạn kiểm tra bằng cách nào?
 50. Các khoản vay cho mục đích Kinh doanh/Khởi nghiệp (Venture) có rủi ro thực tế cao hơn hay thấp hơn vay Y tế (Medical)?
 51. Biến 'Thời hạn khoản vay' (Loan Term) có mối tương quan thuận hay nghịch với 'Lãi suất khoản vay' (Interest Rate) trong EDA của bạn?
