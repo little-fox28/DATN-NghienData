@@ -79,3 +79,10 @@ Nhóm VÙNG XÁM
 Ví dụ điển hình thứ nhất: Grade B, thu nhập cao, nhưng DTI gần 42% vì đang gánh nhiều khoản nợ nhỏ lẻ song song. Nhìn vào grade thấy ổn, nhìn vào thu nhập thấy tốt — nhưng thực ra dòng tiền đã gần cạn kiệt.
 Ví dụ điển hình thứ hai: Không có vết nợ xấu, lịch sử tín dụng ngắn dưới 2 năm. Hồ sơ trông sạch vì chưa có gì xấu — nhưng thực ra là chưa có đủ dữ liệu để biết họ hành xử thế nào khi gặp khó khăn.
 Ví dụ điển hình thứ ba: Đang trả góp nhà, có việc làm ổn định, nhưng vay thêm để gom nợ. Nghĩa là bên dưới đang có đống nợ lẻ chạy ngầm mà hồ sơ chưa phản ánh đầy đủ.
+9.Đặc trưng nào (thu nhập, lịch sử vỡ nợ, hay mục đích vay) thực sự có ý nghĩa thống kê cao nhất trong việc phân loại nợ xấu?
+Lịch sử vỡ nợ (cb_person_default_on_file) — Có ý nghĩa cao nhất
+Đây là yếu tố hành vi trực tiếp nhất. File đã chỉ ra mức chênh lệch rõ ràng: 37.8% so với ~21% 
+— gần gấp đôi chỉ từ một biến nhị phân. Trong thống kê, một biến tạo ra mức chênh lệch tỷ lệ lớn như vậy với chỉ 2 giá trị thường có ý nghĩa thống kê rất cao (p-value thấp) vì nó phản ánh trực tiếp "bằng chứng hành vi đã xảy ra", không phải suy đoán.
+2. Grade — Cũng cực kỳ mạnh, có thể còn mạnh hơn
+Grade từ A đến G cho thấy biên độ chênh lệch khổng lồ — từ dưới 5% đến 98%. Đây thực ra là biến tổng hợp (composite variable) vì hệ thống chấm điểm grade đã gộp sẵn nhiều yếu tố như thu nhập, DTI, lịch sử tín dụng vào trong đó. 
+Vì vậy về mặt thống kê, grade thường có sức phân loại (predictive power) cao nhất trong các mô hình tín dụng thực tế, vì nó đã "cô đặc" thông tin từ nhiều biến khác.
