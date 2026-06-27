@@ -67,6 +67,14 @@ $env:PYTHONPATH = "."
 python -m src.main --skip-db
 ```
 
+To run the pipeline in standalone mode (**Extract & Transform only**, without writing to the Database):
+
+```bash
+# Set PYTHONPATH to root and run main with --skip-db
+$env:PYTHONPATH = "."
+python -m src.main --skip-db
+```
+
 ---
 
 ## 📂 Project Structure

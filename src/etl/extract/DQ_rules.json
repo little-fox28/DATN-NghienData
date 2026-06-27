@@ -1,0 +1,143 @@
+[
+  {
+    "id": "R1_AGE",
+    "desc": "Kiểm tra độ tuổi (Phải từ 18 đến 85)",
+    "severity": "critical",
+    "check": "df[\"person_age\"].between(18, 85)"
+  },
+  {
+    "id": "R2_EXPERIENCE",
+    "desc": "Số năm làm việc không được vượt quá (Tuổi - 16) - Chấp nhận giá trị khuyết thiếu",
+    "severity": "warning",
+    "check": "df[\"person_emp_length\"].isna() | (df[\"person_emp_length\"] <= (df[\"person_age\"] - 16))"
+  },
+  {
+    "id": "R3_CREDIT_HIST",
+    "desc": "Thời gian lịch sử tín dụng không được vượt quá (Tuổi - 18) - Chấp nhận giá trị khuyết thiếu",
+    "severity": "warning",
+    "check": "df[\"cb_person_cred_hist_length\"].isna() | (df[\"cb_person_cred_hist_length\"] <= (df[\"person_age\"] - 18))"
+  },
+  {
+    "id": "R4_FINANCIALS",
+    "desc": "Thu nhập và Số tiền vay phải lớn hơn 0 (Trường dữ liệu bắt buộc)",
+    "severity": "critical",
+    "check": "(df[\"person_income\"] > 0) & (df[\"loan_amnt\"] > 0)"
+  },
+  {
+    "id": "R5_UTILIZATION",
+    "desc": "Tỷ lệ sử dụng tín dụng phải nằm trong khoảng từ 0 đến 1 - Chấp nhận giá trị khuyết thiếu",
+    "severity": "warning",
+    "check": "df[\"credit_utilization_ratio\"].isna() | df[\"credit_utilization_ratio\"].between(0, 1)"
+  },
+  {
+    "id": "R6_RATIO_SYNC",
+    "desc": "Kiểm tra đồng bộ tỷ lệ nợ trên thu nhập (giữa loan_to_income_ratio và calc_loan_to_income)",
+    "severity": "warning",
+    "check": "df[\"loan_to_income_ratio\"].isna() | df[\"calc_loan_to_income\"].isna() | ((df[\"calc_loan_to_income\"] - df[\"loan_to_income_ratio\"]).abs() <= 0.01)"
+  },
+  {
+    "id": "R7_DTI_LOGIC",
+    "desc": "Tỷ lệ nợ trên thu nhập phải lớn hơn hoặc bằng tỷ lệ khoản vay trên thu nhập - Chấp nhận giá trị khuyết thiếu",
+    "severity": "warning",
+    "check": "df[\"debt_to_income_ratio\"].isna() | df[\"loan_percent_income\"].isna() | (df[\"debt_to_income_ratio\"] >= df[\"loan_percent_income\"])"
+  },
+  {
+    "id": "R8_DEFAULT_DELINQUENCY",
+    "desc": "Nếu có lịch sử vỡ nợ (Y), số lần nợ quá hạn phải lớn hơn 0 - Chấp nhận giá trị khuyết thiếu",
+    "severity": "warning",
+    "check": "df[\"cb_person_default_on_file\"].isna() | df[\"past_delinquencies\"].isna() | ~((df[\"cb_person_default_on_file\"] == \"Y\") & (df[\"past_delinquencies\"] == 0))"
+  },
+  {
+    "id": "R9_UTILIZATION_ACCOUNTS",
+    "desc": "Không thể có tỷ lệ sử dụng tín dụng lớn hơn 0 khi số tài khoản đang mở bằng 0 - Chấp nhận giá trị khuyết thiếu",
+    "severity": "warning",
+    "check": "df[\"credit_utilization_ratio\"].isna() | df[\"open_accounts\"].isna() | ~((df[\"credit_utilization_ratio\"] > 0) & (df[\"open_accounts\"] == 0))"
+  },
+  {
+    "id": "R10_TOTAL_DEBT_SYNC",
+    "desc": "Nếu khoản nợ khác bằng 0, tỷ lệ nợ trên thu nhập phải bằng tỷ lệ khoản vay trên thu nhập",
+    "severity": "warning",
+    "check": "(df[\"other_debt\"] != 0) | ((df[\"debt_to_income_ratio\"] - df[\"loan_percent_income\"]).abs() <= 0.01)"
+  },
+  {
+    "id": "R11_GEO_BOUNDS",
+    "desc": "Vĩ độ phải nằm trong khoảng [-90, 90] và Kinh độ phải nằm trong khoảng [-180, 180] - Chấp nhận giá trị khuyết thiếu",
+    "severity": "warning",
+    "check": "df[\"city_latitude\"].isna() | df[\"city_longitude\"].isna() | (df[\"city_latitude\"].between(-90, 90) & df[\"city_longitude\"].between(-180, 180))"
+  },
+  {
+    "_comment": "=== NHÓM: debt_to_income_ratio (3 quy tắc) ===",
+    "id": "R12_DTI_NULL",
+    "desc": "LỖI: debt_to_income_ratio bị thiếu và không thể tính lại từ other_debt/person_income - Dữ liệu không đủ để phân tích rủi ro",
+    "severity": "critical",
+    "fill_target": "debt_to_income_ratio",
+    "fill_expr": "np.where(df[\"person_income\"] > 0, (df[\"other_debt\"] + df[\"loan_amnt\"]) / df[\"person_income\"], np.nan)",
+    "check": "~df[\"debt_to_income_ratio\"].isna()"
+  },
+  {
+    "id": "R13_DTI_RANGE",
+    "desc": "LỖI: debt_to_income_ratio phải >= 0 - Tỷ lệ nợ trên thu nhập không thể âm",
+    "severity": "critical",
+    "check": "df[\"debt_to_income_ratio\"].isna() | (df[\"debt_to_income_ratio\"] >= 0)"
+  },
+  {
+    "id": "R14_DTI_MAX",
+    "desc": "LỖI: debt_to_income_ratio vượt ngưỡng cho phép (> 20) - Khả năng dữ liệu bị nhập sai đơn vị hoặc bất thường",
+    "severity": "warning",
+    "check": "df[\"debt_to_income_ratio\"].isna() | (df[\"debt_to_income_ratio\"] <= 20)"
+  },
+
+  {
+    "_comment": "=== NHÓM: cb_person_default_on_file (2 quy tắc) ===",
+    "id": "R15_DEFAULT_NULL",
+    "desc": "LỖI: cb_person_default_on_file bị thiếu và không thể suy luận - Trường lịch sử vỡ nợ là bắt buộc",
+    "severity": "critical",
+    "fill_target": "cb_person_default_on_file",
+    "fill_expr": "np.where(df[\"past_delinquencies\"].notna() & (df[\"past_delinquencies\"] == 0), \"N\", np.nan)",
+    "check": "~df[\"cb_person_default_on_file\"].isna()"
+  },
+  {
+    "id": "R16_DEFAULT_VALUE",
+    "desc": "LỖI: cb_person_default_on_file chứa giá trị không hợp lệ - Chỉ chấp nhận 'Y' hoặc 'N'",
+    "severity": "critical",
+    "check": "df[\"cb_person_default_on_file\"].isna() | df[\"cb_person_default_on_file\"].isin([\"Y\", \"N\"])"
+  },
+
+  {
+    "_comment": "=== NHÓM: loan_grade (3 quy tắc) ===",
+    "id": "R17_GRADE_NULL",
+    "desc": "LỖI: loan_grade bị thiếu và không thể suy luận - Xếp hạng khoản vay là trường bắt buộc để phân loại rủi ro",
+    "severity": "critical",
+    "fill_target": "loan_grade",
+    "fill_expr": "np.full(len(df), np.nan)",
+    "check": "~df[\"loan_grade\"].isna()"
+  },
+  {
+    "id": "R18_GRADE_VALUE",
+    "desc": "LỖI: loan_grade chứa giá trị không hợp lệ - Chỉ chấp nhận các mức A, B, C, D, E, F, G",
+    "severity": "critical",
+    "check": "df[\"loan_grade\"].isna() | df[\"loan_grade\"].isin([\"A\", \"B\", \"C\", \"D\", \"E\", \"F\", \"G\"])"
+  },
+  {
+    "id": "R19_GRADE_UTILIZATION",
+    "desc": "LỖI: loan_grade hạng A không nên có credit_utilization_ratio >= 0.8 - Nghi ngờ xếp hạng bị gán sai",
+    "severity": "warning",
+    "check": "df[\"loan_grade\"].isna() | df[\"credit_utilization_ratio\"].isna() | ~((df[\"loan_grade\"] == \"A\") & (df[\"credit_utilization_ratio\"] >= 0.8))"
+  },
+
+  {
+    "_comment": "=== NHÓM: past_delinquencies (2 quy tắc) ===",
+    "id": "R20_DELINQ_NULL",
+    "desc": "LỖI: past_delinquencies bị thiếu và không thể suy luận - Lịch sử nợ quá hạn là bắt buộc để đánh giá rủi ro",
+    "severity": "critical",
+    "fill_target": "past_delinquencies",
+    "fill_expr": "np.where(df[\"cb_person_default_on_file\"] == \"N\", 0, np.nan)",
+    "check": "~df[\"past_delinquencies\"].isna()"
+  },
+  {
+    "id": "R21_DELINQ_RANGE",
+    "desc": "LỖI: past_delinquencies phải >= 0 - Số lần nợ quá hạn không thể là số âm",
+    "severity": "critical",
+    "check": "df[\"past_delinquencies\"].isna() | (df[\"past_delinquencies\"] >= 0)"
+  }
+]
