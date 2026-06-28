@@ -54,17 +54,7 @@ To execute the complete pipeline (Extract -> Monitor -> Transform -> Load):
 ```bash
 # Set PYTHONPATH to root and run main
 $env:PYTHONPATH = "."
-python -m src.maingit checkout --ours "docs/Báo Cáo NghienData.docx"
-git add "docs/Báo Cáo NghienData.docx"
-git commit -m "Resolve merge conflict"
-```
-
-To run the pipeline in standalone mode (**Extract & Transform only**, without writing to the Database):
-
-```bash
-# Set PYTHONPATH to root and run main with --skip-db
-$env:PYTHONPATH = "."
-python -m src.main --skip-db
+python -m src.main
 ```
 
 To run the pipeline in standalone mode (**Extract & Transform only**, without writing to the Database):
