@@ -1,6 +1,10 @@
 ### I. Nghiệp vụ Rủi ro Tín dụng & Tư duy Kinh doanh (Domain Knowledge)
 1. Định nghĩa "Vỡ nợ" (Default) trong dự án của bạn được xác định dựa trên tiêu chí nào (DPD 30, 60 hay 90)? Tại sao?
 - DPD (Days Past Due) là số ngày khách hàng trễ hạn thanh toán so với ngày phải trả nợ.
+- Nhóm định nghĩa "Vỡ nợ" (Default) theo tiêu chí DPD ≥ 90 ngày. Đây là ngưỡng được sử dụng phổ biến trong ngành ngân hàng vì phản ánh khách hàng có khả năng mất khả năng thanh toán cao hơn. DPD 30 và DPD 60 được xem là các mức cảnh báo nợ quá hạn sớm, chưa được coi là vỡ nợ.
+- DPD 30: Quá hạn từ 30 ngày – cảnh báo sớm.
+- DPD 60: Quá hạn từ 60 ngày – rủi ro cao hơn, cần theo dõi sát.
+- DPD 90: Quá hạn từ 90 ngày trở lên – thường được xem là Default (vỡ nợ).
 2. Điểm tín dụng (Credit Score) bạn tạo ra có ý nghĩa gì đối với quyết định phê duyệt khoản vay của ngân hàng?
 - Điểm tín dụng (Credit Score) là chỉ số đánh giá mức độ rủi ro và khả năng trả nợ của khách hàng. Ngân hàng sử dụng điểm này để hỗ trợ quyết định phê duyệt khoản vay. Khách hàng có điểm tín dụng cao thường dễ được chấp thuận vay hơn, trong khi khách hàng có điểm thấp sẽ có nguy cơ bị từ chối hoặc áp dụng điều kiện vay chặt chẽ hơn.
 3. Sự khác biệt giữa Probability of Default (PD), Loss Given Default (LGD), và Exposure at Default (EAD) là gì? Mô hình của bạn đang giải quyết yếu tố nào?
@@ -13,15 +17,15 @@
 5. Nếu khách hàng có thu nhập cao nhưng điểm tín dụng (Credit History) ngắn, rủi ro tiềm ẩn ở đây là gì?
 - Thu nhập cao không đồng nghĩa với rủi ro thấp. Nếu lịch sử tín dụng ngắn, ngân hàng thiếu dữ liệu để đánh giá khả năng trả nợ trong quá khứ, nên vẫn tồn tại rủi ro tiềm ẩn.
 6. Nhóm khách hàng "Thin-file" (chưa từng vay mượn) sẽ bị mô hình của bạn đánh giá như thế nào? Có công bằng không?
-- Mô hình thường đánh giá thận trọng hơn do thiếu dữ liệu lịch sử.
+- Khách hàng "Thin-file" (ít hoặc chưa có lịch sử tín dụng) thường sẽ được mô hình đánh giá rủi ro cao hơn vì thiếu dữ liệu để chứng minh khả năng trả nợ. Tuy nhiên, điều này không hoàn toàn công bằng vì việc thiếu lịch sử tín dụng không đồng nghĩa với khả năng vỡ nợ cao.
 7. Sự khác nhau giữa nợ thế chấp (Secured Loan) và nợ tín chấp (Unsecured Loan) ảnh hưởng thế nào đến cách xây dựng Scorecard?
-- Secured Loan có tài sản đảm bảo nên rủi ro thấp hơn và scorecard thường cho điểm tốt hơn.
+- Nợ thế chấp (Secured Loan) có tài sản bảo đảm nên khi khách hàng không trả được nợ, ngân hàng có thể xử lý tài sản để thu hồi một phần vốn. Vì vậy, mức độ rủi ro thường thấp hơn. Trong khi đó, nợ tín chấp (Unsecured Loan) không có tài sản bảo đảm nên rủi ro cao hơn và Scorecard phải đánh giá chặt chẽ hơn về khả năng trả nợ của khách hàng.
 8. Khi tỷ lệ lạm phát kinh tế tăng cao, mô hình chấm điểm dựa trên dữ liệu quá khứ của bạn có còn chính xác không?
-- Độ chính xác có thể giảm do Concept Drift, cần tái huấn luyện định kỳ.
+- Không hoàn toàn chính xác. Khi lạm phát tăng cao, thu nhập thực tế giảm và khả năng trả nợ của khách hàng có thể thay đổi. Trong khi đó, mô hình được huấn luyện trên dữ liệu quá khứ nên có thể không phản ánh đúng điều kiện kinh tế mới, làm giảm độ chính xác của dự báo.
 9. Hệ thống của bạn xử lý thế nào với các khách hàng có nghề nghiệp tự do (Self-employed) với thu nhập không ổn định?
-- Dùng thêm chỉ số dòng tiền, thu nhập trung bình nhiều tháng thay vì thu nhập một thời điểm.
+- Đối với khách hàng có nghề nghiệp tự do (Self-employed), hệ thống không đánh giá chỉ dựa vào mức thu nhập mà còn kết hợp các yếu tố khác như tỷ lệ nợ trên thu nhập (DTI), lịch sử tín dụng, số tiền vay và các thông tin liên quan. Do thu nhập không ổn định nên nhóm khách hàng này thường được đánh giá thận trọng hơn.
 10. Bạn làm cách nào để giải thích cho Giám đốc rủi ro hiểu tại sao một khách hàng bị mô hình từ chối phê duyệt?
-- Dựa vào các yếu tố ảnh hưởng mạnh nhất như DTI cao, lịch sử nợ xấu, thu nhập thấp,...
+- Nhóm sẽ giải thích dựa trên các yếu tố ảnh hưởng lớn nhất đến điểm tín dụng của khách hàng, thay vì chỉ nói mô hình từ chối. Ví dụ, khách hàng bị từ chối vì tỷ lệ nợ trên thu nhập (DTI) cao, lịch sử tín dụng ngắn, điểm tín dụng thấp hoặc số ngày quá hạn (DPD) cao. Nhờ đó, Giám đốc rủi ro có thể hiểu rõ nguyên nhân và đưa ra quyết định phù hợp.
 11. "Information Value (IV)" và "Weight of Evidence (WOE)" có ý nghĩa gì trong nghiệp vụ tín dụng?
 - WOE: Chuyển đổi biến để phản ánh khả năng phân biệt Good/Bad.
 - IV: Đo sức mạnh dự báo của biến.
