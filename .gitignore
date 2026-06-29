@@ -4,7 +4,7 @@ data/processed
 data/output
 
 # docs
-docs/data_issuses.txt
+docs/engineering/data_issues.txt
 
 # Python bytecode
 __pycache__/
