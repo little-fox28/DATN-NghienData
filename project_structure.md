@@ -11,7 +11,9 @@ NghienData-DATN/
 ├── docs/                   # Tài liệu và nội dung tham khảo
 │   ├── 01_reports/         # Báo cáo chính thức (Word, PDF)
 │   ├── 02_qna/             # Câu hỏi phản biện, bộ hỏi đáp
-│   ├── 03_engineering/     # Tài liệu Data Engineering, rules, log
+│   ├── 03_notes/           # Tài liệu kỹ thuật, nghiệp vụ, rules, log
+│   │   ├── business/       # Tài liệu nghiệp vụ, từ điển dữ liệu
+│   │   └── engineering/    # Data Engineering rules, data issues log
 │   ├── 04_feedback/        # Các file ghi nhận ý kiến cá nhân
 │   └── 05_assets/          # Tài nguyên tĩnh (Hình ảnh, sơ đồ ERD)
 ├── notebook/               # Notebook thử nghiệm, EDA hoặc ghi chú nhanh
