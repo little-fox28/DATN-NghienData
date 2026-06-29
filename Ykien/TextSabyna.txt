@@ -16,3 +16,16 @@ o	Tạo luồng cảnh báo sớm (Early Warning System) khi một khách hàng 
 •	Lợi thế: Dữ liệu dạng bảng (Tabular data) rất tường minh, dễ làm sạch, dễ thiết kế Data Warehouse (nhánh AE/DE) và dễ lên Dashboard trực quan (nhánh DA).
 •	Thử thách thực sự: Dữ liệu cực kỳ lệch (thường số ca trả nợ đúng hạn sẽ nhiều hơn rất nhiều so với ca nợ xấu). Việc xử lý mất cân bằng dữ liệu (Imbalanced Data) để mô hình dự báo nợ xấu không bị sai lệch chính là "bài toán khó" để nâng tầm dự án này lên, không sợ bị đánh giá là quá dễ.
 	Em Trinh xin được làm BA cho chủ đề Credit Risk
+19/06/2026
+Khảo sát hiện trạng và đặc tả yêu cầu hệ thống
+Nghiệp vụ Ngân hàng
+Tối ưu hóa các trường dữ liệu cho báo cáo
+Cập nhập thêm 10 rules cho dataset
+22/06/2026
+file excel giải thích nghĩa của từng trường + công thức + tiếng việt 
+giờ mình sẽ làm slide dựa trên những gì đã làm, để biết được mình cần nói những insigh gì, từ đó sẽ lên dashboard
+23/06/2026
+Tạo bộ câu hỏi Business Analyst cho phần Dictionary giải thích dự đoán ai sẽ quỵt nợ? Ai có thể tạo thẻ tín dụng dựa trên tiêu chí nào?
+Tại sao lại dùng tiêu chí đó? => bảo vệ luận điểm của mình bẳng cách nào?
+=> Tập trung khai thác insigh để tạo ra nhiều câu hỏi => training câu hỏi cho các bạn khác trả lời
+Tính điểm cá nhân, nếu thành viên không trả lời được câu hỏi cũng sẽ rớt tốt nghiệp

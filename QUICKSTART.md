@@ -7,7 +7,7 @@ Welcome to the **Credit Risk Data Engineering Project**. This repository contain
 ## 🛠 Prerequisites
 
 Before you begin, ensure you have the following installed:
-- **Python 3.10+**
+- **Python 3.11+**
 - **Git**
 - **Kaggle Account** (for data extraction)
 
@@ -49,12 +49,22 @@ pip install -r requirements.txt
 
 ## 🚀 Running the Pipeline
 
-To execute the complete pipeline (Extract -> Monitor -> Transform):
+To execute the complete pipeline (Extract -> Monitor -> Transform -> Load):
 
 ```bash
 # Set PYTHONPATH to root and run main
 $env:PYTHONPATH = "."
-python -m src.main
+python -m src.maingit checkout --ours "docs/Báo Cáo NghienData.docx"
+git add "docs/Báo Cáo NghienData.docx"
+git commit -m "Resolve merge conflict"
+```
+
+To run the pipeline in standalone mode (**Extract & Transform only**, without writing to the Database):
+
+```bash
+# Set PYTHONPATH to root and run main with --skip-db
+$env:PYTHONPATH = "."
+python -m src.main --skip-db
 ```
 
 ---
@@ -166,12 +176,20 @@ pip install -r requirements.txt
 
 ## 🚀 Khởi chạy pipeline
 
-Để thực hiện các quy trình (Trích xuất -> Giám sát -> Chuyển đổi):
+Để thực hiện quy trình đầy đủ (Trích xuất -> Giám sát -> Chuyển đổi -> Tải vào Database):
 
 ```bash
 # Set PYTHONPATH to root and run main
 $env:PYTHONPATH = "."
 python -m src.main
+```
+
+Để chạy pipeline ở chế độ độc lập (**Extract & Transform only**, không ghi vào Database):
+
+```bash
+# Set PYTHONPATH to root và chạy main với tham số --skip-db
+$env:PYTHONPATH = "."
+python -m src.main --skip-db
 ```
 
 ---
@@ -203,7 +221,7 @@ Pipeline có khả năng tự động nhận diện nếu dữ liệu đã ở �
 ## 🤝 Đóng góp
 - Tuân thủ các **OOP (Object-Oriented Programming)** đã được xây dựng tại thư mục `src/`.
 - Đảm bảo cập nhật toàn bộ quy tắc nghiệp vụ trong `CreditDataValidator` nếu có yêu cầu thay đổi.
-- Luôn kiểm tra file  `docs/data_issuses.txt` sau mỗi làn chạy để có thể theo dõi tình trạng chất lượng dữ liệu.
+- Luôn kiểm tra file  `docs/data_issuses.txt` sau mỗi lần chạy để có thể theo dõi tình trạng chất lượng dữ liệu.
 
 ---
 **Zui zẻ nha!** 📈

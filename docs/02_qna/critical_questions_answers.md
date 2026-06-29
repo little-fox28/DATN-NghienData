@@ -1,17 +1,17 @@
 ### I. Nghiệp vụ Rủi ro Tín dụng & Tư duy Kinh doanh (Domain Knowledge)
 1. Định nghĩa "Vỡ nợ" (Default) trong dự án của bạn được xác định dựa trên tiêu chí nào (DPD 30, 60 hay 90)? Tại sao?
-- Thường dùng DPD ≥ 90 ngày theo chuẩn Basel và IFRS 9 vì phản ánh rõ khả năng mất vốn.
+- DPD (Days Past Due) là số ngày khách hàng trễ hạn thanh toán so với ngày phải trả nợ.
 2. Điểm tín dụng (Credit Score) bạn tạo ra có ý nghĩa gì đối với quyết định phê duyệt khoản vay của ngân hàng?
--Là thước đo rủi ro tín dụng, điểm càng cao khả năng vỡ nợ càng thấp.
+- Điểm tín dụng (Credit Score) là chỉ số đánh giá mức độ rủi ro và khả năng trả nợ của khách hàng. Ngân hàng sử dụng điểm này để hỗ trợ quyết định phê duyệt khoản vay. Khách hàng có điểm tín dụng cao thường dễ được chấp thuận vay hơn, trong khi khách hàng có điểm thấp sẽ có nguy cơ bị từ chối hoặc áp dụng điều kiện vay chặt chẽ hơn.
 3. Sự khác biệt giữa Probability of Default (PD), Loss Given Default (LGD), và Exposure at Default (EAD) là gì? Mô hình của bạn đang giải quyết yếu tố nào?
-- PD: Xác suất vỡ nợ.
-- LGD: Tỷ lệ tổn thất khi vỡ nợ.
-- EAD: Dư nợ tại thời điểm vỡ nợ.
-- Dự án này tập trung vào PD.
+- Probability of Default (PD) là xác suất khách hàng sẽ rơi vào trạng thái vỡ nợ trong  một khoảng thời gian nhất định.
+- Loss Given Default (LGD) là tỷ lệ tổn thất mà ngân hàng phải chịu khi khách hàng đã vỡ nợ.
+- Exposure at Default (EAD) là giá trị dư nợ của khách hàng tại thời điểm xảy ra vỡ nợ.
+- Trong dự án của em, mô hình tập trung vào PD (Probability of Default), tức là dự đoán khả năng khách hàng có vỡ nợ hay không dựa trên các đặc điểm về nhân khẩu học, tài chính và lịch sử tín dụng. LGD và EAD không nằm trong phạm vi phân tích của dự án.
 4. Tại sao tỷ lệ nợ trên thu nhập (DTI - Debt-to-Income) lại là một chỉ số sống còn trong việc đánh giá rủi ro?
-- DTI cao cho thấy phần lớn thu nhập đã dùng để trả nợ, rủi ro mất khả năng thanh toán cao.
+- DTI (Debt-to-Income) là tỷ lệ nợ trên thu nhập, phản ánh khả năng trả nợ của khách hàng. DTI càng cao thì gánh nặng nợ càng lớn và nguy cơ vỡ nợ càng cao. Vì vậy, đây là chỉ số quan trọng để ngân hàng đánh giá rủi ro tín dụng và quyết định cho vay.
 5. Nếu khách hàng có thu nhập cao nhưng điểm tín dụng (Credit History) ngắn, rủi ro tiềm ẩn ở đây là gì?
-- Thiếu dữ liệu đánh giá hành vi trả nợ nên vẫn tiềm ẩn rủi ro.
+- Thu nhập cao không đồng nghĩa với rủi ro thấp. Nếu lịch sử tín dụng ngắn, ngân hàng thiếu dữ liệu để đánh giá khả năng trả nợ trong quá khứ, nên vẫn tồn tại rủi ro tiềm ẩn.
 6. Nhóm khách hàng "Thin-file" (chưa từng vay mượn) sẽ bị mô hình của bạn đánh giá như thế nào? Có công bằng không?
 - Mô hình thường đánh giá thận trọng hơn do thiếu dữ liệu lịch sử.
 7. Sự khác nhau giữa nợ thế chấp (Secured Loan) và nợ tín chấp (Unsecured Loan) ảnh hưởng thế nào đến cách xây dựng Scorecard?
