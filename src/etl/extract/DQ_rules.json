@@ -1,5 +1,21 @@
 [
   {
+    "id": "R22_FILL_EMP_LENGTH",
+    "desc": "Tự động điền số năm làm việc khuyết thiếu bằng trung vị (median) của nhóm tuổi tương ứng",
+    "severity": "warning",
+    "fill_target": "person_emp_length",
+    "fill_expr": "df[\"person_emp_length\"].fillna(df.groupby(\"person_age\")[\"person_emp_length\"].transform(\"median\")).fillna(df[\"person_emp_length\"].median())",
+    "check": "~df[\"person_emp_length\"].isna()"
+  },
+  {
+    "id": "R23_FILL_INT_RATE",
+    "desc": "Tự động điền lãi suất khoản vay khuyết thiếu bằng trung vị của hạng tín dụng tương ứng",
+    "severity": "warning",
+    "fill_target": "loan_int_rate",
+    "fill_expr": "df[\"loan_int_rate\"].fillna(df.groupby(\"loan_grade\")[\"loan_int_rate\"].transform(\"median\")).fillna(df[\"loan_int_rate\"].median())",
+    "check": "~df[\"loan_int_rate\"].isna()"
+  },
+  {
     "id": "R1_AGE",
     "desc": "Kiểm tra độ tuổi (Phải từ 18 đến 85)",
     "severity": "critical",

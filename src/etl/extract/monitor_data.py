@@ -46,23 +46,23 @@ class CreditDataValidator:
 
     def _get_validation_results(
         self, df: pd.DataFrame
-    ) -> Tuple[pd.DataFrame, pd.Series]:
+    ) -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame]:
         """
         Internal method to apply rules vectorially and return the mask of passed records.
+        Also returns df_prepared which contains all auto-filled/corrected values.
         """
         df_prepared = self._prepare_validation_df(df)
         results_df = pd.DataFrame(
             {rule["id"]: self._apply_rule(df_prepared, rule) for rule in self.rules}
         )
         passed_all = results_df.all(axis=1)
-        return results_df, passed_all
+        return results_df, passed_all, df_prepared
 
     def _apply_rule(self, df: pd.DataFrame, rule: Dict[str, Any]) -> pd.Series:
         try:
-            # Step 1: Apply fallback computation (fill_expr) if field is null
-            # If computation also yields NaN, the check will fail → record marked critical
+            # Step 1: Apply fallback computation (fill_expr) if field is null.
+            # NOTE: df here is df_prepared (a copy of original), so mutations are safe and persistent.
             if "fill_target" in rule and "fill_expr" in rule:
-                df = df.copy()
                 fill_target = rule["fill_target"]
                 null_mask = df[fill_target].isna()
                 if null_mask.any():
@@ -123,16 +123,14 @@ class CreditDataValidator:
         Typically used during the Extract process.
         """
         report_file = Path(report_path)
-        if report_file.exists():
-            logger.info(f"Quality report already exists at {report_path}. Skipping scan to optimize performance.")
-            return True
-
+        
+        # Luôn luôn sinh lại report mới nhất thay vì skip
         logger.info(f"Scanning {len(df)} records for issues...")
 
         try:
-            results_df, passed_all = self._get_validation_results(df)
-            status_series = self.calculate_status(df, results_df)
-            df_quarantine = df[~passed_all].copy()
+            results_df, passed_all, df_prepared = self._get_validation_results(df)
+            status_series = self.calculate_status(df_prepared, results_df)
+            df_quarantine = df_prepared[~passed_all].copy()
 
             report_file.parent.mkdir(parents=True, exist_ok=True)
 
@@ -164,6 +162,19 @@ class CreditDataValidator:
                 f.write(f"  - PASS:     {pass_count:6} records ({(pass_count / total_records * 100):.2f}%)\n")
                 f.write(f"  - WARNING:  {warning_count:6} records ({(warning_count / total_records * 100):.2f}%)\n")
                 f.write(f"  - CRITICAL: {critical_count:6} records ({(critical_count / total_records * 100):.2f}%)\n\n")
+
+                # Missing values analysis: show latest state for columns that had or have missing values
+                numeric_cols = df.select_dtypes(include=["number"]).columns
+                missing_before = df[numeric_cols].isna().sum()
+                missing_after = df_prepared[numeric_cols].isna().sum()
+                cols_to_report = missing_before[(missing_before > 0) | (missing_after > 0)].index
+                if not len(cols_to_report) == 0:
+                    f.write("MISSING VALUES ANALYSIS:\n")
+                    for col in cols_to_report:
+                        after = int(missing_after.get(col, 0))
+                        pct_after = after / total_records * 100
+                        f.write(f"  - {col}: {after} missing ({pct_after:.1f}%)\n")
+                    f.write("\n")
 
                 f.write("RULE VIOLATION BREAKDOWN:\n")
                 for rule in self.rules:
@@ -218,12 +229,13 @@ class CreditDataValidator:
         )
 
         try:
-            results_df, _ = self._get_validation_results(df)
+            results_df, _, df_prepared = self._get_validation_results(df)
             
             # Calculate status column vectorially
-            status_series = self.calculate_status(df, results_df)
+            # Use df_prepared which has auto-filled values applied
+            status_series = self.calculate_status(df_prepared, results_df)
             
-            df_with_status = df.copy()
+            df_with_status = df_prepared.copy()
             df_with_status["status"] = status_series
             
             # Segregate based on status
