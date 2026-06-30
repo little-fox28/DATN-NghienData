@@ -116,7 +116,7 @@ class CreditDataValidator:
         return status
 
     def report_issues(
-        self, df: pd.DataFrame, report_path: str = "docs/data_issuses.txt"
+        self, df: pd.DataFrame, report_path: str = "docs/03_notes/engineering/data_issues.txt"
     ) -> bool:
         """
         Feature 1: Scans data and generates a structured Data Quality Scan Report.
