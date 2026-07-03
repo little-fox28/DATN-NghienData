@@ -1,228 +1,185 @@
-# 🚀 Credit Risk ELT Pipeline - Quickstart Guide (English ver)
+# 🚀 Credit Risk ELT Pipeline - Quickstart Guide / Hướng dẫn Khởi chạy nhanh
 
-Welcome to the **Credit Risk Data Engineering Project**. This repository contains a production-ready ELT (Extract, Load, Transform) pipeline designed to ingest, validate, and process credit risk datasets for downstream machine learning.
+> Select your language / Chọn ngôn ngữ hiển thị để xem chi tiết:
 
----
+<details open>
+<summary><b>🇬🇧 English Version (Click to collapse)</b></summary>
 
-## 🛠 Prerequisites
-
-Before you begin, ensure you have the following installed:
-- **Python 3.11+**
-- **Git**
-- **Kaggle Account** (for data extraction)
+## Welcome to the Credit Risk Data Engineering Project
+This repository contains a production-ready ELT (Extract, Load, Transform) pipeline designed to ingest, validate, and process credit risk datasets for downstream analytics and machine learning.
 
 ---
 
-## ⚙️ Setup Instructions
+### 🛠 Prerequisites
+Ensure you have the following installed on your machine:
+*   **Python 3.10+** (Python 3.11 recommended)
+*   **Git**
+*   **Kaggle Account & API Token** (for downloading the source dataset)
+*   **SQL Server** (required only for the DB Load phase)
 
-### 1. Clone the Repository
+---
+
+### ⚙️ Setup Instructions
+
+#### 1. Clone the Repository
 ```bash
 git clone <repository-url>
 cd DATN
 ```
 
-### 2. Create a Virtual Environment
-```bash
-# Windows
+#### 2. Create and Activate a Virtual Environment
+**Windows:**
+```powershell
 python -m venv .venv
 .venv\Scripts\activate
-
-# macOS/Linux
+```
+**macOS / Linux:**
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Install Dependencies
+#### 3. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configure Kaggle API
-1. Go to your [Kaggle Account Settings](https://www.kaggle.com/settings).
-2. Click **'Your API Token'** -> **Generate New Key**.
-3. Create a `.env` file in the root directory and add your credentials:
-   ```env
-   KAGGLE_API_TOKEN=KGAT_...
-   ```
-
----
-
-## 🚀 Running the Pipeline
-
-To execute the complete pipeline (Extract -> Monitor -> Transform -> Load):
-
-```bash
-# Set PYTHONPATH to root and run main
-$env:PYTHONPATH = "."
-python -m src.maingit checkout --ours "docs/Báo Cáo NghienData.docx"
-git add "docs/Báo Cáo NghienData.docx"
-git commit -m "Resolve merge conflict"
-```
-
-To run the pipeline in standalone mode (**Extract & Transform only**, without writing to the Database):
-
-```bash
-# Set PYTHONPATH to root and run main with --skip-db
-$env:PYTHONPATH = "."
-python -m src.main --skip-db
-```
-
----
-
-## 📂 Project Structure
-
-- `src/elt/extract/`: Data ingestion logic and the **Data Quality Scanner**.
-- `src/elt/transform/`: XLS to CSV conversion and data segregation.
-- `data/raw/`: Original files downloaded from Kaggle.
-- `data/processed/`: Cleaned and validated datasets (`df_clean.csv`).
-- `docs/`: Automated quality reports (`data_issuses.txt`).
-- `tests/`: Unit and integration tests.
-
----
-
-## ✨ Key Features
-
-### 🔍 1. Data Quality Scanner (Extract Phase)
-The pipeline automatically scans raw data for business rule violations (Age, Income, Ratios, etc.) and generates a professional report in `docs/data_issuses.txt`.
-
-### 🛡️ 2. Data Segregation (Transform Phase)
-Valid records are saved to `data/processed/df_clean.csv`, while invalid records are quarantined in `df_quarantine.csv` with detailed violation notes for debugging.
-
-### ⚡ 3. Smart Conversion
-The pipeline intelligently detects if data is already in CSV format to bypass redundant conversion steps, saving time and resources.
-
-### 🔌 4. Seamless Database Integration (Load Phase)
-
-**Step 1: Configure the `.env` file**
-Create or update the `.env` file in the root directory with your SQL Server credentials:
-
+#### 4. Configure Environment Variables
+Create a `.env` file in the root directory of the project and add your configurations:
 ```env
-# Your SQL Server instance name
-DB_SERVER=Your_Server_Name
-# Default database name for SQL Server connection
-```bash
+# Kaggle API Credentials
+KAGGLE_API_TOKEN=YOUR_KAGGLE_API_TOKEN_HERE
+
+# Database Credentials (SQL Server)
+DB_SERVER=YOUR_SERVER_NAME
 DB_NAME=CreditRiskDB
-```
-# Strict SQL Server Authentication credentials
-```bash
 DB_USER=sa
-DB_PASS=YourPassword123
+DB_PASS=YOUR_PASSWORD_HERE
 ```
-**Step 2: Execute the Pipeline**
-- Initialize the infrastructure
-```bash
-python -m src.utils.setup_db
-```
-- Run the ELT pipeline
-```bash
-python -m src.main
-```
-## 🤝 Contributing
-- Follow the **OOP (Object-Oriented Programming)** style established in the `src/` directory.
-- Ensure all business rules are updated in `CreditDataValidator` if requirements change.
-- Always check the `docs/data_issuses.txt` after a run to monitor dataset health.
+*Note: Go to [Kaggle Account Settings](https://www.kaggle.com/settings) and click **'Your API Token'** -> **Generate New Key** to obtain your Kaggle token.*
 
 ---
 
+### 🚀 Running the Pipeline
 
-# 🚀 Credit Risk ELT Pipeline - Hướng dẫn (Tiếng việt)
-
-Chào mừng đến với  **Dự án xử lý và xây dựng dữ liệu rủi ro tín dụng**. Đây là kho lưu trữ chứa quy trình ELT (Extract (Trích xuất), Load (Tải), Transform (Chuyển đổi)) hệ thống chuẩn bị cho môi trường tiếp nhận dữ liệu, thu thập, xác thực, và xử lý các tập dữ liệu rủi ro tín dụng cho các ứng dụng học máy (Machine learning).
-
----
-
-## 🛠 Điều kiện bắt buộc
-
-Trước khi bắt đầu, hãy đảm bảo đã cài đặt các chương trình sau:
-- **Python 3.11+**
-- **Git**
-- **Kaggle Account** (để trích xuất dữ liệu)
-
----
-
-## ⚙️ Hướng dẫn cài đặt
-
-### 1. Sao chép kho lưu trữ từ git 
+To run the complete ELT pipeline (Downloads from Kaggle, runs validation rules, auto-heals missing data, and naps to SQL Server):
 ```bash
-git clone <repository-url>
-cd DATN
-```
-
-### 2. Tạo môi trường ảo 
-```bash
-# Windows
-python -m venv .venv
-.venv\Scripts\activate
-
-# macOS/Linux
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-### 3. Cài đặt thư viện
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Cài đặt cấu hình API của Kaggle
-1. Vào phần cài đặt tài khoản của bạn [Kaggle Account Settings](https://www.kaggle.com/settings).
-2. Click **'Your API Token'** -> **Generate New Key**.
-3. tạo một  `.env` tệp trong thư mục và thêm thông tin API Token của mình vào :
-   ```env
-   KAGGLE_API_TOKEN=KGAT_...
-   ```
-
----
-
-## 🚀 Khởi chạy pipeline
-
-Để thực hiện quy trình đầy đủ (Trích xuất -> Giám sát -> Chuyển đổi -> Tải vào Database):
-
-```bash
-# Set PYTHONPATH to root and run main
+# Set PYTHONPATH and run main
 $env:PYTHONPATH = "."
 python -m src.main
 ```
 
-Để chạy pipeline ở chế độ độc lập (**Extract & Transform only**, không ghi vào Database):
-
+To run the pipeline in **standalone mode** (Extract & Transform only, without database connection):
 ```bash
-# Set PYTHONPATH to root và chạy main với tham số --skip-db
 $env:PYTHONPATH = "."
 python -m src.main --skip-db
 ```
 
 ---
 
-## 📂 Cấu trúc dự án
-
-- `src/elt/extract/`: Logic thu thập dữ liệu và **Trình quét chất lượng dữ liệu**.
-- `src/elt/transform/`: Chuyển đổi XLS sang CSV và phân tách dữ liệu.
-- `data/raw/`: Tệp gốc được tải xuống từ Kaggle.
-- `data/processed/`: dữ liệu đã được làm sạch và xác thực được lưu tại (`df_clean.csv`).
-- `docs/`: Các báo cáo chất lượng được tự động hoá lưu tại (`data_issuses.txt`).
-- `tests/`: Kiểm thử và tích hợp.
+### ✨ Key Features
+1.  **Data Quality Scanner:** Automatically runs 21 business validation rules (defined in `DQ_rules.json`) and outputs a structured log to `docs/03_notes/engineering/data_issues.txt`.
+2.  **Data Healing & Imputation:** Imputes missing numerical variables (median-by-age for employment length, and median-by-grade for interest rates) before validation checks.
+3.  **Data Segregation:** Splits output into `df_pass.csv` (perfect data), `df_warning.csv` (healed data), and `df_critical.csv` (quarantined records).
+4.  **Database Star Schema:** Automatically runs `sp_load_star_schema` stored procedure in SQL Server to model data into Fact and Dimension tables.
 
 ---
 
-## ✨ các tính năng chính 
+### 🤝 Contributing
+*   Follow the Object-Oriented Programming (OOP) design patterns inside `src/`.
+*   Keep business rules configuration-driven by updating `src/etl/extract/DQ_rules.json`.
+*   Ensure unit tests pass before submitting code.
 
-### 🔍 1. Trình quét chất lượng dữ liệu (Giai đoạn Extract )
-Pipeline tự động quét dữ liệu thô để phát hiện các trường hợp vi phạm quy tắc nghiệp vụ (Tuổi, Thu nhập, Tỷ lệ, v.v.) và tạo báo cáo chất lượng trong `docs/data_issuses.txt`.
+</details>
 
-### 🛡️ 2. Phân tách dữ liệu (Giai đoạn Transform)
-Các bản ghi hợp lệ sẽ được lưu vào `data/processed/df_clean.csv`, Trong khi các bản ghi không hợp lệ sẽ được lưu cách ly trong  `df_quarantine.csv` với ghi chú chi tiết về các lỗi vi phạm để hỗ trợ sửa lỗi.
+<details>
+<summary><b>🇻🇳 Bản Tiếng Việt (Click để mở rộng)</b></summary>
 
-### ⚡ 3. Chuyển đổi thông minh
-Pipeline có khả năng tự động nhận diện nếu dữ liệu đã ở định dạng CSV để bỏ qua các bước chuyển đổi không cần thiết, và giúp tiết kiệm thời gian và tài nguyên.
+## Chào mừng bạn đến với Dự án Xử lý Dữ liệu Rủi ro Tín dụng
+Mã nguồn này chứa quy trình ELT (Trích xuất, Nạp, Biến đổi) chuẩn sản xuất được thiết kế để thu thập, xác thực chất lượng và chuẩn hóa các tập dữ liệu tín dụng bán lẻ phục vụ phân tích nghiệp vụ và học máy.
+
+---
+
+### 🛠 Điều kiện tiên quyết
+Đảm bảo máy tính của bạn đã được cài đặt sẵn:
+*   **Python 3.10+** (Khuyên dùng Python 3.11)
+*   **Git**
+*   **Tài khoản Kaggle & API Token** (để trích xuất dữ liệu tự động)
+*   **SQL Server** (chỉ yêu cầu nếu bạn chạy pha nạp Database)
 
 ---
 
-## 🤝 Đóng góp
-- Tuân thủ các **OOP (Object-Oriented Programming)** đã được xây dựng tại thư mục `src/`.
-- Đảm bảo cập nhật toàn bộ quy tắc nghiệp vụ trong `CreditDataValidator` nếu có yêu cầu thay đổi.
-- Luôn kiểm tra file  `docs/data_issuses.txt` sau mỗi lần chạy để có thể theo dõi tình trạng chất lượng dữ liệu.
+### ⚙️ Hướng dẫn cài đặt
+
+#### 1. Sao chép kho lưu trữ
+```bash
+git clone <repository-url>
+cd DATN
+```
+
+#### 2. Tạo và kích hoạt môi trường ảo (Virtual Environment)
+**Windows:**
+```powershell
+python -m venv .venv
+.venv\Scripts\activate
+```
+**macOS / Linux:**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+#### 3. Cài đặt các thư viện cần thiết
+```bash
+pip install -r requirements.txt
+```
+
+#### 4. Cấu hình biến môi trường
+Tạo tệp `.env` tại thư mục gốc của dự án và điền thông tin cấu hình:
+```env
+# Thông tin API Kaggle
+KAGGLE_API_TOKEN=YOUR_KAGGLE_API_TOKEN_HERE
+
+# Kết nối SQL Server
+DB_SERVER=YOUR_SERVER_NAME
+DB_NAME=CreditRiskDB
+DB_USER=sa
+DB_PASS=YOUR_PASSWORD_HERE
+```
+*Lưu ý: Truy cập [Kaggle Account Settings](https://www.kaggle.com/settings) nhấn chọn **'Your API Token'** -> **Generate New Key** để lấy mã Token.*
 
 ---
-**Zui zẻ nha!** 📈
 
+### 🚀 Khởi chạy Pipeline
+
+Để thực hiện toàn bộ quy trình ELT khép kín (Tải dữ liệu, quét chất lượng, điền khuyết tự động và nạp vào SQL Server):
+```bash
+# Thiết lập PYTHONPATH và chạy module main
+$env:PYTHONPATH = "."
+python -m src.main
+```
+
+Để chạy pipeline ở **chế độ độc lập** (Chỉ chạy Extract & Transform, không ghi vào Database):
+```bash
+$env:PYTHONPATH = "."
+python -m src.main --skip-db
+```
+
+---
+
+### ✨ Các Tính năng Chính
+1.  **Trình quét chất lượng dữ liệu (DQ Scanner):** Tự động áp dụng 21 luật nghiệp vụ định nghĩa trong file `DQ_rules.json` và xuất báo cáo chi tiết ra file `docs/03_notes/engineering/data_issues.txt`.
+2.  **Sửa lỗi dữ liệu (Data Healing):** Tự động điền dữ liệu khuyết thiếu bằng thuật toán trung vị nhóm (trung vị số năm làm việc theo độ tuổi, trung vị lãi suất theo hạng tín dụng).
+3.  **Phân tách dữ liệu:** Tách dữ liệu đầu ra thành các tệp: `df_pass.csv` (dữ liệu sạch hoàn hảo), `df_warning.csv` (dữ liệu đã điền khuyết), và `df_critical.csv` (các hồ sơ lỗi nặng bị cách ly).
+4.  **Tự động hóa Kho dữ liệu (DWH):** Tự động kích hoạt Stored Procedure `sp_load_star_schema` trong SQL Server để phân bổ dữ liệu vào các bảng Fact và Dimension.
+
+---
+
+### 🤝 Quy tắc đóng góp phát triển
+*   Tuân thủ mô hình thiết kế hướng đối tượng (OOP) đã dựng trong thư mục `src/`.
+*   Cập nhật hoặc thêm mới luật kiểm tra dữ liệu thông qua tệp cấu hình `src/etl/extract/DQ_rules.json`.
+*   Đảm bảo chạy kiểm thử thành công trước khi đẩy mã nguồn mới.
+
+---
+**Chúc bạn làm việc vui vẻ!** 📈
+</details>
