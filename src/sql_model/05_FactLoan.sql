@@ -1,7 +1,10 @@
-IF OBJECT_ID('FactLoan', 'U') IS NOT NULL 
-    DROP TABLE FactLoan;
+IF OBJECT_ID(N'dbo.FactLoan', N'U') IS NOT NULL
+BEGIN
+    DROP TABLE dbo.FactLoan;
+END;
+GO
 
-CREATE TABLE FactLoan
+CREATE TABLE dbo.FactLoan
 (
     FactLoanKey INT IDENTITY(1,1) NOT NULL,
     CustomerKey INT NOT NULL,
@@ -28,20 +31,22 @@ CREATE TABLE FactLoan
     -- Foreign Keys
     CONSTRAINT FK_FactLoan_Customer
         FOREIGN KEY (CustomerKey)
-        REFERENCES DimCustomer(CustomerKey),
+        REFERENCES dbo.DimCustomer(CustomerKey),
 
     CONSTRAINT FK_FactLoan_Location
         FOREIGN KEY (LocationKey)
-        REFERENCES DimLocation(LocationKey),
+        REFERENCES dbo.DimLocation(LocationKey),
 
     CONSTRAINT FK_FactLoan_Purpose
         FOREIGN KEY (PurposeKey)
-        REFERENCES DimLoanPurpose(PurposeKey),
+        REFERENCES dbo.DimLoanPurpose(PurposeKey),
 
     CONSTRAINT FK_FactLoan_Grade
         FOREIGN KEY (GradeKey)
-        REFERENCES DimLoanGrade(GradeKey)
+        REFERENCES dbo.DimLoanGrade(GradeKey)
 );
+GO
 -- Create Clustered Columnstore Index for maximum OLAP aggregation speed
-CREATE CLUSTERED COLUMNSTORE INDEX CCI_FactLoan ON FactLoan;
+CREATE CLUSTERED COLUMNSTORE INDEX CCI_FactLoan
+ON dbo.FactLoan;
 GO
