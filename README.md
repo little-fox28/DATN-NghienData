@@ -60,11 +60,11 @@ flowchart TD
 
 ## 📂 Hướng Dẫn Cấu Trúc Thư Mục
 Để xem cấu trúc chi tiết của các tệp nguồn và tài liệu kỹ thuật, vui lòng tham khảo tệp cấu trúc dự án:
-👉 **[project_structure.md](file:///c:/Users/OMEN/Desktop/Learn/FPT/DATN/project_structure.md)**
+👉 **[project_structure.md]
 
 ---
 
 ## 📋 Khởi Chạy Nhanh Dự Án
 Các chỉ dẫn cài đặt thư viện, cấu hình môi trường ảo, kết nối cơ sở dữ liệu và lệnh khởi chạy pipeline đã được chuyển toàn bộ sang:
-👉 **[QUICKSTART.md](file:///c:/Users/OMEN/Desktop/Learn/FPT/DATN/QUICKSTART.md)**
+👉 **[QUICKSTART.md]
 *(Bao gồm phiên bản tiếng Anh và tiếng Việt được chia tab trực quan trên GitHub)*
