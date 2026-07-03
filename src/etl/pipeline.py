@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
+import pandas as pd
 from typing import Optional
-
 from .extract.fetch_data import download_kaggle_file
 from .extract.monitor_data import CreditDataValidator
 from .transform.convert_xls_to_csv import convert_xls_to_csv
@@ -97,65 +97,46 @@ class ETLPipeline:
 
             logger.info(f"Scanning raw data: {file_to_scan}")
             if file_to_scan.suffix.lower() == '.csv':
-                df = pd.read_csv(file_to_scan)
+                df_raw = pd.read_csv(file_to_scan)
             else:
-                df = pd.read_excel(file_to_scan, engine='xlrd' if file_to_scan.suffix.lower() == '.xls' else None)
+                df_raw = pd.read_excel(file_to_scan, engine='xlrd' if file_to_scan.suffix.lower() == '.xls' else None)
 
+            if df_raw.empty:
+                logger.error("Extracted raw data is empty.")
+                return None
+
+            # Generate Data Quality Scan Report on the in-memory dataframe
+            logger.info("Generating Data Quality Scan Report...")
             validator = CreditDataValidator()
-            validator.report_issues(df)
+            validator.report_issues(df_raw)
 
-            logger.info("Extract phase completed successfully.")
-            return True
+            logger.info("Extract phase completed successfully. Data passed to RAM.")
+            return df_raw
 
         except Exception as e:
             logger.error(f"Unexpected error during extract phase: {e}", exc_info=True)
             return False
 
-    def transform(self) -> bool:
+    def transform(self, df_raw: pd.DataFrame) -> bool:
         """
         Execute the Transform phase.
-        Converts XLS to CSV (if needed) and segregates data into clean/quarantine (Feature 2).
+        Receives raw data directly from RAM to avoid redundant disk I/O.
+        Validates, segregates into clean/quarantine, and saves the output.
         """
         logger.info("=" * 60)
         logger.info("Starting ETL Pipeline - Transform Phase")
         logger.info("=" * 60)
 
-        if not self.raw_data_path:
-            logger.error("Transform phase failed - no raw data path available.")
+        if df_raw is None or df_raw.empty:
+            logger.error("Transform phase failed - no raw data provided in memory.")
             return False
 
         try:
-            import pandas as pd
-            
-            # 1. Identify input file
-            input_file = self.raw_data_path
-            if input_file.is_dir():
-                files = list(input_file.glob("*.csv")) + list(input_file.glob("*.xls"))
-                if not files:
-                    logger.error("No data files found for transformation.")
-                    return False
-                input_file = files[0]
-
-            # 2. Check for bypass: If already CSV, don't call conversion
-            if input_file.suffix.lower() == '.csv':
-                logger.info(f"Bypassing conversion: {input_file.name} is already in CSV format.")
-                working_csv = input_file
-            else:
-                interim_csv = Path(self.raw_data_dir) / self.TRANSFORMED_FILE
-                success = convert_xls_to_csv(
-                    input_path=str(input_file),
-                    output_path=str(interim_csv)
-                )
-                if not success:
-                    logger.error("Transform phase failed during XLS to CSV conversion")
-                    return False
-                working_csv = interim_csv
-
-            # 3. Segregate and Save to data/processed (Feature 2)
-            logger.info(f"Loading data from {working_csv} for segregation...")
-            df = pd.read_csv(working_csv)
+            logger.info("Executing Data Quality Validation and Segregation...")
             validator = CreditDataValidator()
-            df_clean, _ = validator.segregate_and_save(df, output_dir=self.processed_data_dir)
+            
+            # Run Data Quality checks and split data ONCE
+            df_clean, _ = validator.segregate_and_save(df_raw, output_dir=self.processed_data_dir)
 
             self.transformed_data_path = Path("data/output") / "df_output.csv"
             logger.info(f"Transform phase successful. Clean data saved at: {self.transformed_data_path}")
@@ -194,25 +175,33 @@ class ETLPipeline:
 
     def run(self) -> bool:
         """
-        Execute the complete ETL pipeline.
+        Execute the complete ELT pipeline.
+        Skips Load phase if no database configuration is provided.
         """
-        logger.info("Initializing ETL Pipeline")
+        logger.info("INITIATING ELT PIPELINE")
 
-        if not self.extract():
+        # PHASE 1: EXTRACT (Load data directly to RAM)
+        df_raw = self.extract()
+        
+        # Stop pipeline if df_raw is empty or an error occurred (returns False/None)
+        if df_raw is None or isinstance(df_raw, bool):
+            logger.error("Pipeline aborted at Extract Phase.")
             return False
 
-        if not self.transform():
+        # PHASE 2: TRANSFORM (Pass df_raw here to avoid reading the file twice)
+        if not self.transform(df_raw):
+            logger.error("Pipeline aborted at Transform Phase.")
             return False
-
+            
         # PHASE 3: LOAD (Push clean data to SQL Server & build Star Schema)
         if not self.skip_db:
             if not self.load():
                 logger.error("Pipeline aborted at Load Phase.")
                 return False
         else:
-            logger.info("Skipping Load Phase as requested (skip_db=True).")
+            logger.info("Skipping Load Phase as requested (--skip-db).")
 
         logger.info("=" * 60)
-        logger.info("ETL Pipeline completed successfully!")
+        logger.info("ELT PIPELINE COMPLETED SUCCESSFULLY!")
         logger.info("=" * 60)
         return True
