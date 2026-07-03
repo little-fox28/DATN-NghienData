@@ -150,13 +150,13 @@ def split_sql_batches(
 def execute_database_config(
     master_engine: Engine,
     config_file: Path,
+    target_db: str,
 ) -> None:
     """
     Execute SQL Server and database configuration.
 
-    The script runs through the master database using
-    AUTOCOMMIT because ALTER DATABASE and RECONFIGURE
-    cannot run inside the schema transaction.
+    The database name is read from DB_NAME in .env
+    and injected into the SQL configuration template.
     """
 
     if not config_file.exists():
@@ -171,6 +171,9 @@ def execute_database_config(
             f"{config_file}"
         )
 
+  
+    validate_database_name(target_db)
+
     logger.info("=" * 60)
     logger.info(
         "PHASE 2: SQL SERVER AND DATABASE CONFIGURATION"
@@ -182,9 +185,20 @@ def execute_database_config(
         config_file,
     )
 
+   
     sql_script = config_file.read_text(
         encoding="utf-8-sig"
     )
+
+    sql_script = sql_script.replace(
+        "{{DB_NAME}}",
+        target_db,
+    )
+
+    if "{{DB_NAME}}" in sql_script:
+        raise ValueError(
+            "The database name placeholder was not replaced."
+        )
 
     sql_batches = split_sql_batches(
         sql_script
@@ -196,7 +210,7 @@ def execute_database_config(
             f"{config_file}"
         )
 
-    # master_engine was created with AUTOCOMMIT.
+
     with master_engine.connect() as conn:
         for batch_number, sql_batch in enumerate(
             sql_batches,
@@ -211,9 +225,11 @@ def execute_database_config(
                 sql_batch
             )
 
+    
     logger.info(
         "SQL Server and database configuration "
-        "completed successfully."
+        "completed successfully for database '%s'.",
+        target_db,
     )
 
 
@@ -256,9 +272,7 @@ def execute_schema_files(
         len(SCHEMA_FILES),
     )
 
-    # All schema scripts share one transaction.
-    # Success => commit.
-    # Failure => rollback.
+   
     with target_engine.begin() as conn:
         for file_name in SCHEMA_FILES:
             file_path = (
@@ -319,9 +333,7 @@ def setup_infrastructure() -> bool:
            the target database.
     """
 
-    # ---------------------------------------------------------
-    # 1. Read configuration from .env
-    # ---------------------------------------------------------
+   
     server = os.getenv("DB_SERVER")
     target_db = os.getenv("DB_NAME")
     db_user = os.getenv("DB_USER")
@@ -361,21 +373,19 @@ def setup_infrastructure() -> bool:
         )
         return False
 
-    # setup_db.py is located in src/utils.
-    # parents[1] points to src.
+   
     src_directory = (
         Path(__file__)
         .resolve()
         .parents[1]
     )
 
-    # src/sql_model
     schema_folder = (
         src_directory
         / "sql_model"
     )
 
-    # src/sql_model/sql_config/07_config_database.sql
+ 
     config_file = (
         schema_folder
         / "sql_config"
@@ -393,9 +403,7 @@ def setup_infrastructure() -> bool:
     target_engine = None
 
     try:
-        # -----------------------------------------------------
-        # 2. Connect to master with AUTOCOMMIT
-        # -----------------------------------------------------
+       
         master_engine = create_sql_engine(
             server=server,
             database="master",
@@ -404,9 +412,7 @@ def setup_infrastructure() -> bool:
             autocommit=True,
         )
 
-        # -----------------------------------------------------
-        # 3. Create target database if it does not exist
-        # -----------------------------------------------------
+        
         with master_engine.connect() as conn:
             database_exists = conn.execute(
                 text(
@@ -449,17 +455,14 @@ def setup_infrastructure() -> bool:
                     target_db,
                 )
 
-        # -----------------------------------------------------
-        # 4. Run database and server configuration
-        # -----------------------------------------------------
+        
         execute_database_config(
             master_engine=master_engine,
             config_file=config_file,
+            target_db=target_db
         )
 
-        # -----------------------------------------------------
-        # 5. Validate the sql_model directory
-        # -----------------------------------------------------
+      
         if not schema_folder.exists():
             logger.error(
                 "SQL schema directory was not found: %s",
@@ -474,9 +477,7 @@ def setup_infrastructure() -> bool:
             )
             return False
 
-        # -----------------------------------------------------
-        # 6. Connect to the target database
-        # -----------------------------------------------------
+       
         target_engine = create_sql_engine(
             server=server,
             database=target_db,
@@ -485,9 +486,7 @@ def setup_infrastructure() -> bool:
             autocommit=False,
         )
 
-        # -----------------------------------------------------
-        # 7. Execute files 00 through 06
-        # -----------------------------------------------------
+       
         execute_schema_files(
             target_engine=target_engine,
             schema_folder=schema_folder,

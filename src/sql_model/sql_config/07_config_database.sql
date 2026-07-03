@@ -4,29 +4,25 @@ GO
 SET NOCOUNT ON;
 GO
 
-------------------------------------------------------------
--- 1. Check whether the database exists
-------------------------------------------------------------
-IF DB_ID(N'CreditRiskDB') IS NULL
+
+IF DB_ID(N'{{DB_NAME}}') IS NULL
 BEGIN
     THROW 50001,
-        N'Database CreditRiskDB was not found.',
+        N'Database {{DB_NAME}} was not found.',
         1;
 END;
 GO
 
-------------------------------------------------------------
--- 2. Set the Recovery Model to SIMPLE if necessary
-------------------------------------------------------------
+
 IF EXISTS
 (
     SELECT 1
     FROM sys.databases
-    WHERE name = N'CreditRiskDB'
+    WHERE name = N'{{DB_NAME}}'
       AND recovery_model_desc <> N'SIMPLE'
 )
 BEGIN
-    ALTER DATABASE [CreditRiskDB]
+    ALTER DATABASE [{{DB_NAME}}]
     SET RECOVERY SIMPLE;
 
     PRINT N'Recovery Model has been changed to SIMPLE.';
@@ -37,18 +33,16 @@ BEGIN
 END;
 GO
 
-------------------------------------------------------------
--- 3. Enable Read Committed Snapshot Isolation if necessary
-------------------------------------------------------------
+
 IF EXISTS
 (
     SELECT 1
     FROM sys.databases
-    WHERE name = N'CreditRiskDB'
+    WHERE name = N'{{DB_NAME}}'
       AND is_read_committed_snapshot_on = 0
 )
 BEGIN
-    ALTER DATABASE [CreditRiskDB]
+    ALTER DATABASE [{{DB_NAME}}]
     SET READ_COMMITTED_SNAPSHOT ON
     WITH ROLLBACK IMMEDIATE;
 
@@ -60,9 +54,7 @@ BEGIN
 END;
 GO
 
-------------------------------------------------------------
--- 4. Check server-level configuration permissions
-------------------------------------------------------------
+
 IF ISNULL(IS_SRVROLEMEMBER(N'sysadmin'), 0) <> 1
 BEGIN
     THROW 50002,
@@ -71,9 +63,7 @@ BEGIN
 END;
 GO
 
-------------------------------------------------------------
--- 5. Enable advanced configuration options
-------------------------------------------------------------
+
 EXEC sys.sp_configure
     'show advanced options',
     1;
@@ -81,9 +71,7 @@ EXEC sys.sp_configure
 RECONFIGURE;
 GO
 
-------------------------------------------------------------
--- 6. Set Cost Threshold for Parallelism to 50
-------------------------------------------------------------
+
 DECLARE @CurrentCostThreshold INT;
 
 SELECT
@@ -107,9 +95,7 @@ BEGIN
 END;
 GO
 
-------------------------------------------------------------
--- 7. Set Maximum Degree of Parallelism to 4
-------------------------------------------------------------
+
 DECLARE @CurrentMaxDop INT;
 
 SELECT
@@ -133,9 +119,7 @@ BEGIN
 END;
 GO
 
-------------------------------------------------------------
--- 8. Disable advanced configuration options
-------------------------------------------------------------
+
 EXEC sys.sp_configure
     'show advanced options',
     0;
@@ -143,15 +127,15 @@ EXEC sys.sp_configure
 RECONFIGURE;
 GO
 
-------------------------------------------------------------
--- 9. Verify the database and server configurations
-------------------------------------------------------------
+
 SELECT
     name AS DatabaseName,
     recovery_model_desc AS RecoveryModel,
     is_read_committed_snapshot_on AS RCSIEnabled
 FROM sys.databases
-WHERE name = N'CreditRiskDB';
+WHERE name = N'{{DB_NAME}}';
+GO
+
 
 SELECT
     name AS ConfigurationName,
