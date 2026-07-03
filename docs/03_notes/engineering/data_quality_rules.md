@@ -128,8 +128,8 @@ Tài liệu này áp dụng các chiều chất lượng dữ liệu tiêu chu�
 * **Rule ID:** `R14_DTI_MAX`
 * **Dimension:** Validity
 * **Severity:** WARNING
-* **Business Rationale:** Tỷ lệ nợ trên thu nhập vượt quá 20 là bất thường, có thể do lỗi nhập liệu đơn vị hoặc bất thường cực đoan cần xem xét.
-* **Technical Logic:** `IF debt_to_income_ratio IS NOT NULL THEN debt_to_income_ratio <= 20`
+* **Business Rationale:** Tỷ lệ nợ trên thu nhập vượt quá 1.2 (120% thu nhập năm) là bất thường, có thể do lỗi nhập liệu đơn vị hoặc rủi ro tài chính cực đoan cần xem xét.
+* **Technical Logic:** `IF debt_to_income_ratio IS NOT NULL THEN debt_to_income_ratio <= 1.2`
 * **Action on Fail:** Flag record.
 
 ### DQ-R15: Kiểm tra khuyết thiếu thông tin vỡ nợ (Default File Null Check)

@@ -98,11 +98,10 @@
   },
   {
     "id": "R14_DTI_MAX",
-    "desc": "LỖI: debt_to_income_ratio vượt ngưỡng cho phép (> 20) - Khả năng dữ liệu bị nhập sai đơn vị hoặc bất thường",
+    "desc": "LỖI: debt_to_income_ratio vượt ngưỡng hợp lý (> 1.2) - Khách hàng có tỷ lệ nợ quá cao so với thu nhập hoặc dữ liệu bất thường",
     "severity": "warning",
-    "check": "df[\"debt_to_income_ratio\"].isna() | (df[\"debt_to_income_ratio\"] <= 20)"
+    "check": "df[\"debt_to_income_ratio\"].isna() | (df[\"debt_to_income_ratio\"] <= 1.2)"
   },
-
   {
     "_comment": "=== NHÓM: cb_person_default_on_file (2 quy tắc) ===",
     "id": "R15_DEFAULT_NULL",
@@ -118,7 +117,6 @@
     "severity": "critical",
     "check": "df[\"cb_person_default_on_file\"].isna() | df[\"cb_person_default_on_file\"].isin([\"Y\", \"N\"])"
   },
-
   {
     "_comment": "=== NHÓM: loan_grade (3 quy tắc) ===",
     "id": "R17_GRADE_NULL",
