@@ -6,19 +6,24 @@ NghienData-DATN/
 ├── requirements.txt        # Danh sách thư viện Python cần cài đặt
 ├── project_structure.md    # Mô tả cấu trúc dự án hiện tại
 ├── data/                   # Khu vực lưu dữ liệu của dự án
-│   └── raw/                # Dữ liệu gốc đầu vào, ví dụ file .xls
+│   ├── raw/                # Dữ liệu gốc đầu vào
+│   └── output/             # Dữ liệu đầu ra sau xử lý
 ├── docs/                   # Tài liệu và nội dung tham khảo
-│   └── Ykien/              # Các file ghi nhận ý kiến
+│   ├── 01_reports/         # Báo cáo chính thức (Word, PDF)
+│   ├── 02_qna/             # Câu hỏi phản biện, bộ hỏi đáp
+│   ├── 03_notes/           # Tài liệu kỹ thuật, nghiệp vụ, rules, log
+│   │   ├── business/       # Tài liệu nghiệp vụ, từ điển dữ liệu
+│   │   └── engineering/    # Data Engineering rules, data issues log
+│   ├── 04_feedback/        # Các file ghi nhận ý kiến cá nhân
+│   └── 05_assets/          # Tài nguyên tĩnh (Hình ảnh, sơ đồ ERD)
 ├── notebook/               # Notebook thử nghiệm, EDA hoặc ghi chú nhanh
-│   └── .gitkeep
 ├── src/                    # Mã nguồn chính của hệ thống
-│   ├── __init__.py
-│   └── etl/                # Luồng trích xuất - biến đổi - nạp dữ liệu
-│       ├── __init__.py
-│       ├── extract.py      # Trích xuất dữ liệu từ nguồn
-│       ├── transform.py     # Biến đổi và làm sạch dữ liệu
-│       ├── load.py         # Nạp dữ liệu đã xử lý
-│       └── pipeline.py     # Điều phối toàn bộ quy trình ELT
+│   ├── etl/                # Luồng trích xuất - biến đổi - nạp dữ liệu
+│   │   ├── extract/        # Trích xuất dữ liệu và kiểm tra (monitor_data.py, DQ_rules.json)
+│   │   ├── transform/      # Biến đổi và làm sạch dữ liệu
+│   │   ├── load.py         # Nạp dữ liệu vào DB
+│   │   └── pipeline.py     # Điều phối quy trình
+│   ├── sql_model/          # Chứa các file schema SQL Server (Dim/Fact)
+│   └── utils/              # Các hàm tiện ích (logger, setup_db)
 └── tests/                  # Tệp kiểm thử và script xác nhận chức năng
-    └── .gitkeep
 ```

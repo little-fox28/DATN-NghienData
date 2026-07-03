@@ -1,6 +1,10 @@
 ### I. Nghiệp vụ Rủi ro Tín dụng & Tư duy Kinh doanh (Domain Knowledge)
 1. Định nghĩa "Vỡ nợ" (Default) trong dự án của bạn được xác định dựa trên tiêu chí nào (DPD 30, 60 hay 90)? Tại sao?
 - DPD (Days Past Due) là số ngày khách hàng trễ hạn thanh toán so với ngày phải trả nợ.
+- Nhóm định nghĩa "Vỡ nợ" (Default) theo tiêu chí DPD ≥ 90 ngày. Đây là ngưỡng được sử dụng phổ biến trong ngành ngân hàng vì phản ánh khách hàng có khả năng mất khả năng thanh toán cao hơn. DPD 30 và DPD 60 được xem là các mức cảnh báo nợ quá hạn sớm, chưa được coi là vỡ nợ.
+- DPD 30: Quá hạn từ 30 ngày – cảnh báo sớm.
+- DPD 60: Quá hạn từ 60 ngày – rủi ro cao hơn, cần theo dõi sát.
+- DPD 90: Quá hạn từ 90 ngày trở lên – thường được xem là Default (vỡ nợ).
 2. Điểm tín dụng (Credit Score) bạn tạo ra có ý nghĩa gì đối với quyết định phê duyệt khoản vay của ngân hàng?
 - Điểm tín dụng (Credit Score) là chỉ số đánh giá mức độ rủi ro và khả năng trả nợ của khách hàng. Ngân hàng sử dụng điểm này để hỗ trợ quyết định phê duyệt khoản vay. Khách hàng có điểm tín dụng cao thường dễ được chấp thuận vay hơn, trong khi khách hàng có điểm thấp sẽ có nguy cơ bị từ chối hoặc áp dụng điều kiện vay chặt chẽ hơn.
 3. Sự khác biệt giữa Probability of Default (PD), Loss Given Default (LGD), và Exposure at Default (EAD) là gì? Mô hình của bạn đang giải quyết yếu tố nào?
@@ -13,33 +17,29 @@
 5. Nếu khách hàng có thu nhập cao nhưng điểm tín dụng (Credit History) ngắn, rủi ro tiềm ẩn ở đây là gì?
 - Thu nhập cao không đồng nghĩa với rủi ro thấp. Nếu lịch sử tín dụng ngắn, ngân hàng thiếu dữ liệu để đánh giá khả năng trả nợ trong quá khứ, nên vẫn tồn tại rủi ro tiềm ẩn.
 6. Nhóm khách hàng "Thin-file" (chưa từng vay mượn) sẽ bị mô hình của bạn đánh giá như thế nào? Có công bằng không?
-- Mô hình thường đánh giá thận trọng hơn do thiếu dữ liệu lịch sử.
+- Khách hàng "Thin-file" (ít hoặc chưa có lịch sử tín dụng) thường sẽ được mô hình đánh giá rủi ro cao hơn vì thiếu dữ liệu để chứng minh khả năng trả nợ. Tuy nhiên, điều này không hoàn toàn công bằng vì việc thiếu lịch sử tín dụng không đồng nghĩa với khả năng vỡ nợ cao.
 7. Sự khác nhau giữa nợ thế chấp (Secured Loan) và nợ tín chấp (Unsecured Loan) ảnh hưởng thế nào đến cách xây dựng Scorecard?
-- Secured Loan có tài sản đảm bảo nên rủi ro thấp hơn và scorecard thường cho điểm tốt hơn.
+- Nợ thế chấp (Secured Loan) có tài sản bảo đảm nên khi khách hàng không trả được nợ, ngân hàng có thể xử lý tài sản để thu hồi một phần vốn. Vì vậy, mức độ rủi ro thường thấp hơn. Trong khi đó, nợ tín chấp (Unsecured Loan) không có tài sản bảo đảm nên rủi ro cao hơn và Scorecard phải đánh giá chặt chẽ hơn về khả năng trả nợ của khách hàng.
 8. Khi tỷ lệ lạm phát kinh tế tăng cao, mô hình chấm điểm dựa trên dữ liệu quá khứ của bạn có còn chính xác không?
-- Độ chính xác có thể giảm do Concept Drift, cần tái huấn luyện định kỳ.
+- Không hoàn toàn chính xác. Khi lạm phát tăng cao, thu nhập thực tế giảm và khả năng trả nợ của khách hàng có thể thay đổi. Trong khi đó, mô hình được huấn luyện trên dữ liệu quá khứ nên có thể không phản ánh đúng điều kiện kinh tế mới, làm giảm độ chính xác của dự báo.
 9. Hệ thống của bạn xử lý thế nào với các khách hàng có nghề nghiệp tự do (Self-employed) với thu nhập không ổn định?
-- Dùng thêm chỉ số dòng tiền, thu nhập trung bình nhiều tháng thay vì thu nhập một thời điểm.
+- Đối với khách hàng có nghề nghiệp tự do (Self-employed), hệ thống không đánh giá chỉ dựa vào mức thu nhập mà còn kết hợp các yếu tố khác như tỷ lệ nợ trên thu nhập (DTI), lịch sử tín dụng, số tiền vay và các thông tin liên quan. Do thu nhập không ổn định nên nhóm khách hàng này thường được đánh giá thận trọng hơn.
 10. Bạn làm cách nào để giải thích cho Giám đốc rủi ro hiểu tại sao một khách hàng bị mô hình từ chối phê duyệt?
-- Dựa vào các yếu tố ảnh hưởng mạnh nhất như DTI cao, lịch sử nợ xấu, thu nhập thấp,...
+- Nhóm sẽ giải thích dựa trên các yếu tố ảnh hưởng lớn nhất đến điểm tín dụng của khách hàng, thay vì chỉ nói mô hình từ chối. Ví dụ, khách hàng bị từ chối vì tỷ lệ nợ trên thu nhập (DTI) cao, lịch sử tín dụng ngắn, điểm tín dụng thấp hoặc số ngày quá hạn (DPD) cao. Nhờ đó, Giám đốc rủi ro có thể hiểu rõ nguyên nhân và đưa ra quyết định phù hợp.
 11. "Information Value (IV)" và "Weight of Evidence (WOE)" có ý nghĩa gì trong nghiệp vụ tín dụng?
-- WOE: Chuyển đổi biến để phản ánh khả năng phân biệt Good/Bad.
-- IV: Đo sức mạnh dự báo của biến.
-12. Tại sao Basel II/IFRS 9 lại khuyên dùng Logistic Regression cho Credit Scorecard thay vì các mô hình Black-box như Deep Learning?
-- Dễ giải thích minh bạch đáp ứng yêu càu kiểm toán và quy định basel
+- WOE (Weight of Evidence) dùng để đo khả năng phân biệt khách hàng tốt và khách hàng xấu ở từng nhóm dữ liệu của một biến. IV (Information Value) đo mức độ quan trọng của toàn bộ biến trong việc dự đoán rủi ro tín dụng. Trong thực tế, WOE được dùng để mã hóa dữ liệu, còn IV được dùng để chọn những biến có khả năng dự báo tốt cho mô hình chấm điểm tín dụng.
+### 12. Tại sao Basel II/IFRS 9 lại khuyên dùng Logistic Regression cho Credit Scorecard thay vì các mô hình Black-box như Deep Learning?
 13. Làm sao để phân biệt giữa khách hàng "không có khả năng trả nợ" và khách hàng "cố tình lừa đảo" (Fraud) thông qua dữ liệu?
-- Default là mất khả năng trả nợ
-- Fraud là cố tình gian lận thông tin.
+- Em sẽ phân biệt dựa trên dữ liệu lịch sử tín dụng và hành vi khách hàng. Nếu khách hàng có hồ sơ nhất quán nhưng thu nhập giảm, DTI cao và trả chậm dần thì đó là rủi ro tín dụng. Ngược lại, nếu hồ sơ có dấu hiệu giả mạo, thông tin không nhất quán hoặc xuất hiện nhiều giao dịch bất thường ngay từ đầu thì có khả năng là gian lận (Fraud). Vì vậy, Credit Risk và Fraud là hai bài toán khác nhau và thường được xử lý bằng các mô hình riêng.
 14. Mục đích vay (Loan Intent) như "Y tế" hay "Giáo dục" khác gì so với "Tiêu dùng cá nhân" về mặt rủi ro?
-- Khoản vay y tế hoặc giáo dục thường ổn định hơn vay tiêu dùng cá nhân.
+- Loan Intent phản ánh mức độ rủi ro khác nhau giữa các khoản vay. Thông thường, vay Giáo dục hoặc Y tế có mục đích rõ ràng và thiết yếu nên rủi ro thường thấp hơn vay Tiêu dùng cá nhân. Tuy nhiên, trong thực tế ngân hàng không đánh giá dựa trên Loan Intent riêng lẻ mà kết hợp với các yếu tố như thu nhập, lịch sử tín dụng và DTI để đưa ra quyết định chính xác hơn.
 15. Tỷ lệ cấp tín dụng trên giá trị tài sản đảm bảo (LTV - Loan-to-Value) có được phản ánh trong bộ dữ liệu của bạn không?
-- Không. Bộ dữ liệu hiện tại không có thông tin tài sản đảm bảo nên không tính được LTV.
-16. Bạn sẽ tư vấn gì cho Business User nếu tỷ lệ duyệt (Approval Rate) của hệ thống tự động quá thấp, dẫn đến mất doanh số? 
-- Đề xuất xem lại Cut-off Score và đánh đổi giữa tăng doanh số và kiểm soát rủi ro.
+- Không. Bộ dữ liệu của em không có thông tin về giá trị tài sản đảm bảo nên không thể tính chỉ số LTV. Nếu có thêm dữ liệu này, em sẽ đưa LTV vào mô hình vì đây là chỉ số quan trọng phản ánh mức độ rủi ro của khoản vay; LTV càng cao thì rủi ro tín dụng thường càng lớn.
+### 16. Bạn sẽ tư vấn gì cho Business User nếu tỷ lệ duyệt (Approval Rate) của hệ thống tự động quá thấp, dẫn đến mất doanh số? 
 17. Cut-off score (Điểm cắt) để phân loại Duyệt/Từ chối được bạn xác định dựa trên cơ sở tối ưu hóa lợi nhuận hay cực tiểu hóa rủi ro?
-- Tối ưu giữa lợi nhuận kỳ vọng và mức rủi ro chấp nhận được.
+- Trong đồ án của em, em xác định Cut-off Score theo hướng kiểm soát rủi ro vì mục tiêu chính là xây dựng mô hình dự đoán khả năng vỡ nợ. Tuy nhiên, trong thực tế các ngân hàng thường kết hợp cả hai yếu tố: vừa kiểm soát tỷ lệ nợ xấu, vừa tối ưu lợi nhuận. Khi đó, Cut-off Score sẽ được lựa chọn dựa trên sự cân bằng giữa Risk và Return theo khẩu vị rủi ro (Risk Appetite) của ngân hàng.
 18. Làm sao để mô hình không vi phạm các nguyên tắc đạo đức/phân biệt đối xử (độ tuổi, giới tính, vùng miền)?
-- Hạn chế sử dụng các biến nhạy cảm như giới tính, vùng miền hoặc kiểm tra Fairness.
+- Để tránh phân biệt đối xử, sẽ không để mô hình ra quyết định dựa trên các đặc điểm nhạy cảm như giới tính, dân tộc hay vùng miền. Đồng thời, sẽ kiểm tra định kỳ xem mô hình có tạo ra sự khác biệt bất hợp lý giữa các nhóm khách hàng hay không và hiệu chỉnh nếu phát hiện dấu hiệu thiên vị.
 19. "Vùng xám" (Grey area - khách hàng nằm ngay sát ranh giới cut-off) sẽ được xử lý thủ công hay tự động?
 - Chuyển sang thẩm định thủ công thay vì quyết định tự động.
 20. Giả sử hệ thống chấm điểm sai và gây thiệt hại tài chính, ai (hoặc bộ phận nào) sẽ chịu trách nhiệm?
