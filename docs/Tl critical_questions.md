@@ -27,23 +27,19 @@
 10. Bạn làm cách nào để giải thích cho Giám đốc rủi ro hiểu tại sao một khách hàng bị mô hình từ chối phê duyệt?
 - Nhóm sẽ giải thích dựa trên các yếu tố ảnh hưởng lớn nhất đến điểm tín dụng của khách hàng, thay vì chỉ nói mô hình từ chối. Ví dụ, khách hàng bị từ chối vì tỷ lệ nợ trên thu nhập (DTI) cao, lịch sử tín dụng ngắn, điểm tín dụng thấp hoặc số ngày quá hạn (DPD) cao. Nhờ đó, Giám đốc rủi ro có thể hiểu rõ nguyên nhân và đưa ra quyết định phù hợp.
 11. "Information Value (IV)" và "Weight of Evidence (WOE)" có ý nghĩa gì trong nghiệp vụ tín dụng?
-- WOE: Chuyển đổi biến để phản ánh khả năng phân biệt Good/Bad.
-- IV: Đo sức mạnh dự báo của biến.
-12. Tại sao Basel II/IFRS 9 lại khuyên dùng Logistic Regression cho Credit Scorecard thay vì các mô hình Black-box như Deep Learning?
-- Dễ giải thích minh bạch đáp ứng yêu càu kiểm toán và quy định basel
+- WOE (Weight of Evidence) dùng để đo khả năng phân biệt khách hàng tốt và khách hàng xấu ở từng nhóm dữ liệu của một biến. IV (Information Value) đo mức độ quan trọng của toàn bộ biến trong việc dự đoán rủi ro tín dụng. Trong thực tế, WOE được dùng để mã hóa dữ liệu, còn IV được dùng để chọn những biến có khả năng dự báo tốt cho mô hình chấm điểm tín dụng.
+### 12. Tại sao Basel II/IFRS 9 lại khuyên dùng Logistic Regression cho Credit Scorecard thay vì các mô hình Black-box như Deep Learning?
 13. Làm sao để phân biệt giữa khách hàng "không có khả năng trả nợ" và khách hàng "cố tình lừa đảo" (Fraud) thông qua dữ liệu?
-- Default là mất khả năng trả nợ
-- Fraud là cố tình gian lận thông tin.
+- Em sẽ phân biệt dựa trên dữ liệu lịch sử tín dụng và hành vi khách hàng. Nếu khách hàng có hồ sơ nhất quán nhưng thu nhập giảm, DTI cao và trả chậm dần thì đó là rủi ro tín dụng. Ngược lại, nếu hồ sơ có dấu hiệu giả mạo, thông tin không nhất quán hoặc xuất hiện nhiều giao dịch bất thường ngay từ đầu thì có khả năng là gian lận (Fraud). Vì vậy, Credit Risk và Fraud là hai bài toán khác nhau và thường được xử lý bằng các mô hình riêng.
 14. Mục đích vay (Loan Intent) như "Y tế" hay "Giáo dục" khác gì so với "Tiêu dùng cá nhân" về mặt rủi ro?
-- Khoản vay y tế hoặc giáo dục thường ổn định hơn vay tiêu dùng cá nhân.
+- Loan Intent phản ánh mức độ rủi ro khác nhau giữa các khoản vay. Thông thường, vay Giáo dục hoặc Y tế có mục đích rõ ràng và thiết yếu nên rủi ro thường thấp hơn vay Tiêu dùng cá nhân. Tuy nhiên, trong thực tế ngân hàng không đánh giá dựa trên Loan Intent riêng lẻ mà kết hợp với các yếu tố như thu nhập, lịch sử tín dụng và DTI để đưa ra quyết định chính xác hơn.
 15. Tỷ lệ cấp tín dụng trên giá trị tài sản đảm bảo (LTV - Loan-to-Value) có được phản ánh trong bộ dữ liệu của bạn không?
-- Không. Bộ dữ liệu hiện tại không có thông tin tài sản đảm bảo nên không tính được LTV.
-16. Bạn sẽ tư vấn gì cho Business User nếu tỷ lệ duyệt (Approval Rate) của hệ thống tự động quá thấp, dẫn đến mất doanh số? 
-- Đề xuất xem lại Cut-off Score và đánh đổi giữa tăng doanh số và kiểm soát rủi ro.
+- Không. Bộ dữ liệu của em không có thông tin về giá trị tài sản đảm bảo nên không thể tính chỉ số LTV. Nếu có thêm dữ liệu này, em sẽ đưa LTV vào mô hình vì đây là chỉ số quan trọng phản ánh mức độ rủi ro của khoản vay; LTV càng cao thì rủi ro tín dụng thường càng lớn.
+### 16. Bạn sẽ tư vấn gì cho Business User nếu tỷ lệ duyệt (Approval Rate) của hệ thống tự động quá thấp, dẫn đến mất doanh số? 
 17. Cut-off score (Điểm cắt) để phân loại Duyệt/Từ chối được bạn xác định dựa trên cơ sở tối ưu hóa lợi nhuận hay cực tiểu hóa rủi ro?
-- Tối ưu giữa lợi nhuận kỳ vọng và mức rủi ro chấp nhận được.
+- Trong đồ án của em, em xác định Cut-off Score theo hướng kiểm soát rủi ro vì mục tiêu chính là xây dựng mô hình dự đoán khả năng vỡ nợ. Tuy nhiên, trong thực tế các ngân hàng thường kết hợp cả hai yếu tố: vừa kiểm soát tỷ lệ nợ xấu, vừa tối ưu lợi nhuận. Khi đó, Cut-off Score sẽ được lựa chọn dựa trên sự cân bằng giữa Risk và Return theo khẩu vị rủi ro (Risk Appetite) của ngân hàng.
 18. Làm sao để mô hình không vi phạm các nguyên tắc đạo đức/phân biệt đối xử (độ tuổi, giới tính, vùng miền)?
-- Hạn chế sử dụng các biến nhạy cảm như giới tính, vùng miền hoặc kiểm tra Fairness.
+- Để tránh phân biệt đối xử, sẽ không để mô hình ra quyết định dựa trên các đặc điểm nhạy cảm như giới tính, dân tộc hay vùng miền. Đồng thời, sẽ kiểm tra định kỳ xem mô hình có tạo ra sự khác biệt bất hợp lý giữa các nhóm khách hàng hay không và hiệu chỉnh nếu phát hiện dấu hiệu thiên vị.
 19. "Vùng xám" (Grey area - khách hàng nằm ngay sát ranh giới cut-off) sẽ được xử lý thủ công hay tự động?
 - Chuyển sang thẩm định thủ công thay vì quyết định tự động.
 20. Giả sử hệ thống chấm điểm sai và gây thiệt hại tài chính, ai (hoặc bộ phận nào) sẽ chịu trách nhiệm?
