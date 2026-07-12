@@ -9,6 +9,14 @@ NghienData-DATN/
 │   ├── raw/                # Dữ liệu gốc đầu vào
 │   └── output/             # Dữ liệu đầu ra sau xử lý
 ├── docs/                   # Tài liệu và nội dung tham khảo
+<<<<<<< HEAD
+│   ├── 01_reports/         # Báo cáo và tài liệu chính (file Word)
+│   ├── 02_design_assets/   # Sơ đồ thiết kế hệ thống và ERD
+│   ├── 03_team_feedback/   # Ý kiến đóng góp từ các thành viên trong nhóm
+│   ├── 04_qna/             # Câu hỏi và tài liệu chuẩn bị phản biện
+│   ├── 05_data_quality/    # Nhật ký lỗi và chất lượng dữ liệu đầu vào
+│   └── 06_notes/           # Ghi chú kỹ thuật, DE rules
+=======
 │   ├── 01_reports/         # Báo cáo chính thức (Word, PDF)
 │   ├── 02_qna/             # Câu hỏi phản biện, bộ hỏi đáp
 │   ├── 03_notes/           # Tài liệu kỹ thuật, nghiệp vụ, rules, log
@@ -16,6 +24,7 @@ NghienData-DATN/
 │   │   └── engineering/    # Data Engineering rules, data issues log
 │   ├── 04_feedback/        # Các file ghi nhận ý kiến cá nhân
 │   └── 05_assets/          # Tài nguyên tĩnh (Hình ảnh, sơ đồ ERD)
+>>>>>>> develop
 ├── notebook/               # Notebook thử nghiệm, EDA hoặc ghi chú nhanh
 ├── src/                    # Mã nguồn chính của hệ thống
 │   ├── etl/                # Luồng trích xuất - biến đổi - nạp dữ liệu
