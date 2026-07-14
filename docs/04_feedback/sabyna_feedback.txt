@@ -15,4 +15,4 @@ o	Tạo luồng cảnh báo sớm (Early Warning System) khi một khách hàng 
 4. Khả năng làm của bản thân (Vừa sức nhưng vẫn có độ khó)
 •	Lợi thế: Dữ liệu dạng bảng (Tabular data) rất tường minh, dễ làm sạch, dễ thiết kế Data Warehouse (nhánh AE/DE) và dễ lên Dashboard trực quan (nhánh DA).
 •	Thử thách thực sự: Dữ liệu cực kỳ lệch (thường số ca trả nợ đúng hạn sẽ nhiều hơn rất nhiều so với ca nợ xấu). Việc xử lý mất cân bằng dữ liệu (Imbalanced Data) để mô hình dự báo nợ xấu không bị sai lệch chính là "bài toán khó" để nâng tầm dự án này lên, không sợ bị đánh giá là quá dễ.
-	Em Trinh xin được làm BA cho chủ đề Credit Risk
+	Em Trinh xin được làm BA cho chủ đề Credit Risk.
