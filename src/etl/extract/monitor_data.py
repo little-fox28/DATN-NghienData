@@ -236,6 +236,8 @@ class CreditDataValidator:
             status_series = self.calculate_status(df_prepared, results_df)
             
             df_with_status = df_prepared.copy()
+            if "calc_loan_to_income" in df_with_status.columns:
+                df_with_status.drop(columns=["calc_loan_to_income"], inplace=True)
             df_with_status["status"] = status_series
             
             # Segregate based on status
