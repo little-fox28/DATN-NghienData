@@ -1,6 +1,26 @@
+# Environment & Configuration
 python-dotenv
+pyyaml
+
+# Database
+sqlalchemy
+pyodbc
+
+# Data Science
 kaggle
 pandas
 numpy
-sqlalchemy
-pyodbc
+
+# Machine Learning
+scikit-learn
+xgboost
+joblib
+optbinning
+
+# Visualization
+matplotlib
+
+# Backend API & Loan App Service
+fastapi
+uvicorn
+pydantic

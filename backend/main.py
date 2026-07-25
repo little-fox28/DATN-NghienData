@@ -1,0 +1,95 @@
+"""
+backend/main.py — FastAPI Loan Collection API & ML Scoring Endpoint
+Chạy ứng dụng: python -m backend.main
+"""
+import sys
+from pathlib import Path
+
+# Thêm root directory vào sys.path để import dễ dàng
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+import uvicorn
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+from typing import Optional, List
+
+from backend.config import HOST, PORT
+from src.machine_learning.predict import score_single
+
+app = FastAPI(
+    title="Loan Application & Credit Risk API",
+    description="API thu thập thông tin khoản vay và tính toán điểm tín dụng (ML Core)",
+    version="1.0.0",
+)
+
+
+# Schema nhận dữ liệu đơn xin vay
+class LoanApplication(BaseModel):
+    person_age: int = Field(..., example=28, description="Tuổi khách hàng")
+    person_income: float = Field(..., example=65000, description="Thu nhập hàng năm ($)")
+    person_home_ownership: str = Field(..., example="RENT", description="Sở hữu nhà (RENT, OWN, MORTGAGE, OTHER)")
+    person_emp_length: float = Field(..., example=4.0, description="Số năm làm việc")
+    loan_intent: str = Field(..., example="PERSONAL", description="Mục đích vay")
+    loan_grade: str = Field(..., example="B", description="Hạng tín dụng (A-G)")
+    loan_amnt: float = Field(..., example=10000, description="Số tiền vay ($)")
+    loan_int_rate: float = Field(..., example=11.14, description="Lãi suất (%)")
+    loan_percent_income: float = Field(..., example=0.15, description="Tỷ lệ nợ/thu nhập")
+    cb_person_default_on_file: str = Field(..., example="N", description="Lịch sử vỡ nợ (Y/N)")
+    cb_person_cred_hist_length: int = Field(..., example=3, description="Độ dài lịch sử tín dụng (năm)")
+
+    # Các trường bổ sung
+    gender: Optional[str] = Field("MALE", example="MALE")
+    marital_status: Optional[str] = Field("SINGLE", example="SINGLE")
+    education_level: Optional[str] = Field("BACHELOR", example="BACHELOR")
+    employment_type: Optional[str] = Field("FULL_TIME", example="FULL_TIME")
+    loan_to_income_ratio: Optional[float] = Field(0.15, example=0.15)
+    debt_to_income_ratio: Optional[float] = Field(0.25, example=0.25)
+    credit_utilization_ratio: Optional[float] = Field(0.35, example=0.35)
+    past_delinquencies: Optional[int] = Field(0, example=0)
+
+
+@app.get("/")
+def root():
+    return {
+        "service": "Loan Collection & Credit Risk API",
+        "status": "online",
+        "documentation": f"http://{HOST}:{PORT}/docs"
+    }
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
+
+
+@app.post("/api/v1/predict", summary="Chấm điểm tín dụng cho một hồ sơ vay")
+def predict_credit_risk(application: LoanApplication):
+    """
+    Nhận thông tin khoản vay từ App, gọi lõi ML `src.machine_learning` để tính toán:
+    - PD Score (Xác suất vỡ nợ)
+    - Credit Score (Điểm tín dụng 300 - 850)
+    - Risk Tier (Nhóm rủi ro: LOW, MEDIUM, HIGH, CRITICAL)
+    - Decision (Quyết định: APPROVED, MANUAL_REVIEW, REJECTED)
+    """
+    try:
+        record = application.model_dump()
+        result = score_single(record)
+        return {
+            "success": True,
+            "application_summary": {
+                "income": application.person_income,
+                "loan_amount": application.loan_amnt,
+                "intent": application.loan_intent
+            },
+            "credit_risk_assessment": result
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi tính toán ML: {str(e)}")
+
+
+if __name__ == "__main__":
+    print(f"🚀 Starting Loan Collection API on http://{HOST}:{PORT}")
+    print(f"📖 Swagger Docs available at http://{HOST}:{PORT}/docs")
+    uvicorn.run("backend.main:app", host=HOST, port=PORT, reload=True)
