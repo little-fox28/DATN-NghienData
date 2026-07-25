@@ -1,102 +1,251 @@
-# DATN - Phân tích rủi ro tài chính
+# Đồ Án Tốt Nghiệp: Hệ Thống Phân Tích Rủi Ro Tín Dụng
 
-## Cài đặt môi trường
-
-> Yêu cầu: **Python 3.10+** đã được cài sẵn trên máy
+Chào mừng bạn đến với kho lưu trữ mã nguồn của dự án **Hệ thống chấm điểm rủi ro tín dụng**. Đây là đồ án tốt nghiệp thiết kế và xây dựng một quy trình ELT (Extract - Load - Transform) khép kín phục vụ tích hợp, chuẩn hóa dữ liệu lớn về rủi ro tín dụng và cấu trúc kho dữ liệu phục vụ báo cáo quản trị thông minh (BI).
 
 ---
 
-### Bước 1: tạo môi trường ảo 
+## 📌 Tổng Quan Dự Án
+Dự án giải quyết bài toán xử lý dữ liệu thô từ nguồn Kaggle, thực hiện kiểm soát chất lượng dữ liệu (Data Quality) nghiêm ngặt thông qua các bộ quy tắc nghiệp vụ định nghĩa bằng cấu hình, tự động sửa lỗi và điền khuyết dữ liệu (Data Healing), phân tách dữ liệu lỗi, nạp vào SQL Server và tự động phân bổ vào mô hình Star Schema (gồm bảng Fact và các bảng Dimension) được tối ưu hóa cho Data Warehouse.
 
+---
+
+## 🚀 Các Giai Đoạn & Tính Năng Cốt Lõi
+
+Hệ thống được tổ chức theo quy trình **ELT** (Extract - Transform - Load):
+
+```mermaid
+flowchart TD
+    A["Nguồn Dữ Liệu (Kaggle API)"] -->|Extract| B["Dữ Liệu Thô (Raw File)"]
+    B -->|Scan & Monitor| C["Báo Cáo Chất Lượng (data_issues.txt)"]
+    B -->|Healing & Segregation| D{"Transform (Phân Tách Dữ Liệu)"}
+    
+    D -->|Lỗi Nặng| E["Cách Ly (df_critical.csv)"]
+    D -->|Hợp Lệ & Cảnh Báo| F["Dữ Liệu Sạch (df_output.csv)"]
+    
+    F -->|Load & Transact| G["Staging Table (stg_loan)"]
+    G -->|Stored Procedure| H["Mô Hình Star Schema (Fact & Dim)"]
+    H -->|Query Optimization| I["Báo Cáo BI (PowerBI Dashboard)"]
+```
+
+### 1. Extract (Trích Xuất & Giám Sát)
+*   Tích hợp Kaggle API để tự động tải tệp dữ liệu rủi ro tín dụng thô từ đám mây về thư mục `data/raw/`.
+*   Tích hợp công cụ **Data Quality Validator** quét qua dữ liệu và phát hiện các trường hợp vi phạm quy tắc nghiệp vụ.
+*   Tự động xuất báo cáo chất lượng dữ liệu chi tiết tại `docs/03_notes/engineering/data_issues.txt`.
+
+### 2. Transform (Biến Đổi & Sửa Lỗi Tự Động)
+*   **Data Healing (Điền khuyết tự động):**
+    *   Tự động điền số năm làm việc (`person_emp_length`) bị thiếu bằng giá trị trung vị (median) theo nhóm tuổi của khách hàng.
+    *   Tự động điền lãi suất khoản vay (`loan_int_rate`) bị thiếu bằng giá trị trung vị theo hạng tín dụng (`loan_grade`).
+*   **Phân tách dữ liệu (Data Segregation):**
+    *   **PASS & WARNING:** Các bản ghi hợp lệ hoặc lỗi nhẹ được lưu trữ tại `data/output/df_output.csv`.
+    *   **CRITICAL:** Các bản ghi vi phạm logic nghiêm trọng (như tuổi < 18, số tiền vay âm) sẽ bị cách ly ra file riêng để phục vụ kiểm toán và gán cờ rủi ro.
+
+### 3. Load (Tải Nạp & Chuẩn Hóa Kho Dữ Liệu)
+*   Nạp dữ liệu sạch vào bảng tạm **Staging (`stg_loan`)** của SQL Server với tốc độ tối ưu nhờ cấu hình `fast_executemany` và cơ chế `TRUNCATE` giảm thiểu ghi log.
+*   Tự động kích hoạt Stored Procedure `sp_load_star_schema` để chia nhỏ và ánh xạ dữ liệu sang mô hình Star Schema:
+    *   Bảng sự kiện chính: `FactLoan`
+    *   Các bảng chiều: `DimCustomer`, `DimLocation`, `DimLoanPurpose`, `DimLoanGrade`.
+*   Cơ sở dữ liệu được cấu hình tối ưu hóa cho Data Warehouse (SIMPLE Recovery, RCSI, Clustered Columnstore Index trên Fact table) nhằm đảm bảo hiệu năng tối đa cho PowerBI.
+
+---
+
+## 🛠️ Công Nghệ Sử Dụng
+*   **Ngôn ngữ lập trình:** Python 3.10+
+*   **Thư viện phân tích & xử lý:** Pandas, Numpy
+*   **Quản lý cơ sở dữ liệu:** SQL Server (SSMS), SQLAlchemy, PyODBC
+*   **Nguồn dữ liệu & Cloud:** Kaggle API
+*   **Công cụ biểu diễn:** PowerBI / SSAS (Star Schema)
+
+---
+
+## 📂 Hướng Dẫn Cấu Trúc Thư Mục
+Để xem cấu trúc chi tiết của các tệp nguồn và tài liệu kỹ thuật, vui lòng tham khảo tệp cấu trúc dự án:
+👉 **[project_structure.md](project_structure.md)**
+
+---
+
+## 📋 Hướng Dẫn Khởi Chạy Nhanh / Quickstart Guide
+
+> Chọn ngôn ngữ hiển thị / Select your language:
+
+<details open>
+<summary><b>🇬🇧 English Version (Click to collapse)</b></summary>
+
+### Welcome to the Credit Risk Data Engineering Project
+This repository contains a production-ready ELT (Extract, Load, Transform) pipeline designed to ingest, validate, and process credit risk datasets for downstream analytics and machine learning.
+
+---
+
+#### 🛠 Prerequisites
+Ensure you have the following installed on your machine:
+*   **Python 3.10+** (Python 3.11 recommended)
+*   **Git**
+*   **Kaggle Account & API Token** (for downloading the source dataset)
+*   **SQL Server** (required only for the DB Load phase)
+
+---
+
+#### ⚙️ Setup Instructions
+
+##### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd DATN
+```
+
+##### 2. Create and Activate a Virtual Environment
 **Windows:**
-```cmd
-py -3.11 -m venv .venv
-```
-
-**Linux / macOS:**
-```bash
-python3.11 -m venv .venv
-```
-
----
-
-### Bước 2: kích hoạt môi trường ảo
-
-**Windows (Command Prompt):**
-```cmd
-.venv\Scripts\activate.bat
-```
-
-**Windows (PowerShell):**
 ```powershell
-.venv\Scripts\Activate.ps1
+python -m venv .venv
+.venv\Scripts\activate
 ```
-
-> Nếu PowerShell báo lỗi, chạy lệnh này trước rồi kích hoạt lại:
-> ```powershell
-> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-> ```
-
-**Linux / macOS:**
+**macOS / Linux:**
 ```bash
+python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-Kích hoạt thành công sẽ thấy `(.venv)` ở đầu folder dự án.
-
----
-
-### Bước 3: cài đặt thư viện
-**Cài đặt toàn bộ thư viện của dự án**
+##### 3. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
-**Hoặc có thể cài đặt thủ công các gói làm việc:**
+
+##### 4. Configure Environment Variables
+Create a `.env` file in the root directory of the project and add your configurations:
+```env
+# Kaggle API Credentials
+KAGGLE_API_TOKEN=YOUR_KAGGLE_API_TOKEN_HERE
+
+# Database Credentials (SQL Server)
+DB_SERVER=YOUR_SERVER_NAME
+DB_NAME=CreditRiskDB
+DB_USER=sa
+DB_PASS=YOUR_PASSWORD_HERE
+```
+*Note: Go to [Kaggle Account Settings](https://www.kaggle.com/settings) and click **'Your API Token'** -> **Generate New Key** to obtain your Kaggle token.*
+
+---
+
+#### 🚀 Running the Pipeline
+
+To run the complete ELT pipeline (Downloads from Kaggle, runs validation rules, auto-heals missing data, and loads to SQL Server):
 ```bash
-pip install python-dotenv kaggle pandas
+# Set PYTHONPATH and run main
+$env:PYTHONPATH = "."
+python -m src.main
 ```
 
----
-
-### Bước 4: tắt môi trường ảo (sau khi hoàn tất công việc)
-
+To run the pipeline in **standalone mode** (Extract & Transform only, without database connection):
 ```bash
-deactivate
+$env:PYTHONPATH = "."
+python -m src.main --skip-db
 ```
 
 ---
 
-### Cấu trúc dự án
+#### ✨ Key Features
+1.  **Data Quality Scanner:** Automatically runs 21 business validation rules (defined in `DQ_rules.json`) and outputs a structured log to `docs/03_notes/engineering/data_issues.txt`.
+2.  **Data Healing & Imputation:** Imputes missing numerical variables (median-by-age for employment length, and median-by-grade for interest rates) before validation checks.
+3.  **Data Segregation:** Splits output into `df_pass.csv` (perfect data), `df_warning.csv` (healed data), and `df_critical.csv` (quarantined records).
+4.  **Database Star Schema:** Automatically runs `sp_load_star_schema` stored procedure in SQL Server to model data into Fact and Dimension tables.
 
-```Text
-ghienData-DATN/
-├── .gitignore              # Danh sách tệp/thư mục không đưa vào Git
-├── GIT_WORKFLOW_GUIDE.md   # Hướng dẫn quy trình làm việc với Git
-├── README.md               # Giới thiệu tổng quan về dự án
-├── requirements.txt        # Danh sách thư viện Python cần cài đặt
-├── project_structure.md    # Mô tả cấu trúc dự án hiện tại
-├── data/                   # Khu vực lưu dữ liệu của dự án
-│   └── raw/                # Dữ liệu gốc đầu vào, ví dụ file .xls
-├── docs/                   # Tài liệu và nội dung tham khảo
-│   └── Ykien/              # Các file ghi nhận ý kiến
-├── notebook/               # Notebook thử nghiệm, EDA hoặc ghi chú nhanh
-│   └── .gitkeep
-├── src/                    # Mã nguồn chính của hệ thống
-│   ├── __init__.py
-│   └── elt/                # Luồng trích xuất - biến đổi - nạp dữ liệu
-│       ├── __init__.py
-│       ├── extract.py      # Trích xuất dữ liệu từ nguồn
-│       ├── transform.py     # Biến đổi và làm sạch dữ liệu
-│       ├── load.py         # Nạp dữ liệu đã xử lý
-│       └── pipeline.py     # Điều phối toàn bộ quy trình ELT
-└── tests/                  # Tệp kiểm thử và script xác nhận chức năng
-    └── .gitkeep
-```
 ---
 
-### Lưu ý 
+#### 🤝 Contributing
+*   Follow the Object-Oriented Programming (OOP) design patterns inside `src/`.
+*   Keep business rules configuration-driven by updating `src/etl/extract/DQ_rules.json`.
+*   Ensure unit tests pass before submitting code.
 
-- Thư mục `.venv` không được push lên git (đã có trong `.gitignore`).
-- Mỗi thành viên tự tạo `.venv` trên máy tính của mình theo hướng dẫn trên .
+</details>
 
-### Hướng dẫn sử dụng pipeline được chỉ dẫn ở mục QUICKSTART.md
+<details>
+<summary><b>🇻🇳 Bản Tiếng Việt (Click để mở rộng)</b></summary>
+
+### Chào mừng bạn đến với Dự án Xử lý Dữ liệu Rủi ro Tín dụng
+Mã nguồn này chứa quy trình ELT (Trích xuất, Nạp, Biến đổi) chuẩn sản xuất được thiết kế để thu thập, xác thực chất lượng và chuẩn hóa các tập dữ liệu tín dụng bán lẻ phục vụ phân tích nghiệp vụ và học máy.
+
+---
+
+#### 🛠 Điều kiện tiên quyết
+Đảm bảo máy tính của bạn đã được cài đặt sẵn:
+*   **Python 3.10+** (Khuyên dùng Python 3.11)
+*   **Git**
+*   **Tài khoản Kaggle & API Token** (để trích xuất dữ liệu tự động)
+*   **SQL Server** (chỉ yêu cầu nếu bạn chạy pha nạp Database)
+
+---
+
+#### ⚙️ Hướng dẫn cài đặt
+
+##### 1. Sao chép kho lưu trữ
+```bash
+git clone <repository-url>
+cd DATN
+```
+
+##### 2. Tạo và kích hoạt môi trường ảo (Virtual Environment)
+**Windows:**
+```powershell
+python -m venv .venv
+.venv\Scripts\activate
+```
+**macOS / Linux:**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+##### 3. Cài đặt các thư viện cần thiết
+```bash
+pip install -r requirements.txt
+```
+
+##### 4. Cấu hình biến môi trường
+Tạo tệp `.env` tại thư mục gốc của dự án và điền thông tin cấu hình:
+```env
+# Thông tin API Kaggle
+KAGGLE_API_TOKEN=YOUR_KAGGLE_API_TOKEN_HERE
+
+# Kết nối SQL Server
+DB_SERVER=YOUR_SERVER_NAME
+DB_NAME=CreditRiskDB
+DB_USER=sa
+DB_PASS=YOUR_PASSWORD_HERE
+```
+*Lưu ý: Truy cập [Kaggle Account Settings](https://www.kaggle.com/settings) nhấn chọn **'Your API Token'** -> **Generate New Key** để lấy mã Token.*
+
+---
+
+#### 🚀 Khởi chạy Pipeline
+
+Để thực hiện toàn bộ quy trình ELT khép kín (Tải dữ liệu, quét chất lượng, điền khuyết tự động và nạp vào SQL Server):
+```bash
+# Thiết lập PYTHONPATH và chạy module main
+$env:PYTHONPATH = "."
+python -m src.main
+```
+
+Để chạy pipeline ở **chế độ độc lập** (Chỉ chạy Extract & Transform, không ghi vào Database):
+```bash
+$env:PYTHONPATH = "."
+python -m src.main --skip-db
+```
+
+---
+
+#### ✨ Các Tính năng Chính
+1.  **Trình quét chất lượng dữ liệu (DQ Scanner):** Tự động áp dụng 21 luật nghiệp vụ định nghĩa trong file `DQ_rules.json` và xuất báo cáo chi tiết ra file `docs/03_notes/engineering/data_issues.txt`.
+2.  **Sửa lỗi dữ liệu (Data Healing):** Tự động điền dữ liệu khuyết thiếu bằng thuật toán trung vị nhóm (trung vị số năm làm việc theo độ tuổi, trung vị lãi suất theo hạng tín dụng).
+3.  **Phân tách dữ liệu:** Tách dữ liệu đầu ra thành các tệp: `df_pass.csv` (dữ liệu sạch hoàn hảo), `df_warning.csv` (dữ liệu đã điền khuyết), và `df_critical.csv` (các hồ sơ lỗi nặng bị cách ly).
+4.  **Tự động hóa Kho dữ liệu (DWH):** Tự động kích hoạt Stored Procedure `sp_load_star_schema` trong SQL Server để phân bổ dữ liệu vào các bảng Fact và Dimension.
+
+---
+
+#### 🤝 Quy tắc đóng góp phát triển
+*   Tuân thủ mô hình thiết kế hướng đối tượng (OOP) đã dựng trong thư mục `src/`.
+*   Cập nhật hoặc thêm mới luật kiểm tra dữ liệu thông qua tệp cấu hình `src/etl/extract/DQ_rules.json`.
+*   Đảm bảo chạy kiểm thử thành công trước khi đẩy mã nguồn mới.
+
+---
+**Chúc bạn làm việc vui vẻ!** 📈
+</details>

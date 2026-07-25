@@ -1,7 +1,7 @@
-IF OBJECT_ID('DimLocation', 'U') IS  NOT NULL
-    DROP TABLE DimLocation;
+IF OBJECT_ID('dbo.DimLocation', 'U') IS  NOT NULL
+    DROP TABLE dbo.DimLocation;
 
-CREATE TABLE DimLocation (
+CREATE TABLE dbo.DimLocation (
     LocationKey INT IDENTITY(1,1) PRIMARY KEY,
     Country VARCHAR(50),
     State VARCHAR(50),

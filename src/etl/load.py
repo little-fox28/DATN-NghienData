@@ -70,11 +70,11 @@ class DataLoader:
         conn.execute(text(f"EXEC {sp_name}"))
         logger.info("Data distribution to Fact and Dimension tables completed successfully!")
 
-    def load_to_staging_and_transform(self, csv_file_path: Path, staging_table: str = 'stg_loan', sp_name: str = 'sp_load_star_schema') -> bool:
-        """
-        Executes Phase 2.2 (Load to Staging) and Phase 2.3 (In-Database Transform) sequentially.
-        """
-        return bool(re.match(r'^[a-zA-Z0-9_]+$', identifier))
+    # def load_to_staging_and_transform(self, csv_file_path: Path, staging_table: str = 'stg_loan', sp_name: str = 'sp_load_star_schema') -> bool:
+    #     """
+    #     Executes Phase 2.2 (Load to Staging) and Phase 2.3 (In-Database Transform) sequentially.
+    #     """
+    #     return bool(re.match(r'^[a-zA-Z0-9_]+$', identifier)
 
     def load_to_staging_and_transform(self, csv_file_path: Path, staging_table: str = 'stg_loan', sp_name: str = 'sp_load_star_schema') -> bool:
         """
