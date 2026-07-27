@@ -19,6 +19,8 @@ from backend.config import HOST, PORT
 from src.machine_learning.config import get_task_config
 from src.machine_learning.predict import ModelPredictor
 
+from fastapi.middleware.cors import CORSMiddleware
+
 # Khởi tạo sẵn ModelPredictor cho bài toán mặc định (Credit Risk) khi khởi động API
 try:
     default_config = get_task_config("credit_risk")
@@ -33,30 +35,39 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Cấu hình CORS để Frontend (React/Vite) gọi API không bị lỗi Preflight OPTIONS 405
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Schema nhận dữ liệu đơn xin vay
 class LoanApplication(BaseModel):
-    person_age: int = Field(..., example=28, description="Tuổi khách hàng")
-    person_income: float = Field(..., example=65000, description="Thu nhập hàng năm ($)")
-    person_home_ownership: str = Field(..., example="RENT", description="Sở hữu nhà (RENT, OWN, MORTGAGE, OTHER)")
-    person_emp_length: float = Field(..., example=4.0, description="Số năm làm việc")
-    loan_intent: str = Field(..., example="PERSONAL", description="Mục đích vay")
-    loan_grade: str = Field(..., example="B", description="Hạng tín dụng (A-G)")
-    loan_amnt: float = Field(..., example=10000, description="Số tiền vay ($)")
-    loan_int_rate: float = Field(..., example=11.14, description="Lãi suất (%)")
-    loan_percent_income: float = Field(..., example=0.15, description="Tỷ lệ nợ/thu nhập")
-    cb_person_default_on_file: str = Field(..., example="N", description="Lịch sử vỡ nợ (Y/N)")
-    cb_person_cred_hist_length: int = Field(..., example=3, description="Độ dài lịch sử tín dụng (năm)")
+    person_age: int = Field(..., json_schema_extra={"example": 28}, description="Tuổi khách hàng")
+    person_income: float = Field(..., json_schema_extra={"example": 65000}, description="Thu nhập hàng năm ($)")
+    person_home_ownership: str = Field(..., json_schema_extra={"example": "RENT"}, description="Sở hữu nhà (RENT, OWN, MORTGAGE, OTHER)")
+    person_emp_length: float = Field(..., json_schema_extra={"example": 4.0}, description="Số năm làm việc")
+    loan_intent: str = Field(..., json_schema_extra={"example": "PERSONAL"}, description="Mục đích vay")
+    loan_grade: str = Field(..., json_schema_extra={"example": "B"}, description="Hạng tín dụng (A-G)")
+    loan_amnt: float = Field(..., json_schema_extra={"example": 10000}, description="Số tiền vay ($)")
+    loan_int_rate: float = Field(..., json_schema_extra={"example": 11.14}, description="Lãi suất (%)")
+    loan_percent_income: float = Field(..., json_schema_extra={"example": 0.15}, description="Tỷ lệ nợ/thu nhập")
+    cb_person_default_on_file: str = Field(..., json_schema_extra={"example": "N"}, description="Lịch sử vỡ nợ (Y/N)")
+    cb_person_cred_hist_length: int = Field(..., json_schema_extra={"example": 3}, description="Độ dài lịch sử tín dụng (năm)")
 
     # Các trường bổ sung
-    gender: Optional[str] = Field("MALE", example="MALE")
-    marital_status: Optional[str] = Field("SINGLE", example="SINGLE")
-    education_level: Optional[str] = Field("BACHELOR", example="BACHELOR")
-    employment_type: Optional[str] = Field("FULL_TIME", example="FULL_TIME")
-    loan_to_income_ratio: Optional[float] = Field(0.15, example=0.15)
-    debt_to_income_ratio: Optional[float] = Field(0.25, example=0.25)
-    credit_utilization_ratio: Optional[float] = Field(0.35, example=0.35)
-    past_delinquencies: Optional[int] = Field(0, example=0)
+    gender: Optional[str] = Field("MALE", json_schema_extra={"example": "MALE"})
+    marital_status: Optional[str] = Field("SINGLE", json_schema_extra={"example": "SINGLE"})
+    education_level: Optional[str] = Field("BACHELOR", json_schema_extra={"example": "BACHELOR"})
+    employment_type: Optional[str] = Field("FULL_TIME", json_schema_extra={"example": "FULL_TIME"})
+    loan_to_income_ratio: Optional[float] = Field(0.15, json_schema_extra={"example": 0.15})
+    debt_to_income_ratio: Optional[float] = Field(0.25, json_schema_extra={"example": 0.25})
+    credit_utilization_ratio: Optional[float] = Field(0.35, json_schema_extra={"example": 0.35})
+    past_delinquencies: Optional[int] = Field(0, json_schema_extra={"example": 0})
 
 
 @app.get("/")

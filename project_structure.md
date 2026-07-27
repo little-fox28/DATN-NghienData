@@ -10,6 +10,14 @@ DATN/
 ├── backend/                        # Dịch vụ Backend API (FastAPI)
 │   ├── config.py                   # Cấu hình server và kết nối CSDL
 │   └── main.py                     # Entry point API thu thập và dự báo khoản vay
+├── frontend/                       # Cổng giao diện ứng dụng vay (React + TypeScript + Vite)
+│   ├── src/
+│   │   ├── api/                    # Client kết nối REST API tới Backend FastAPI
+│   │   ├── components/             # UI Components (Navbar, Wizard, CreditScoreGauge)
+│   │   ├── types/                  # TypeScript Data Structures
+│   │   ├── App.tsx                 # Main Multi-step Form App
+│   │   └── index.css               # Design System (Enterprise Theme & Glassmorphism)
+│   └── package.json
 ├── data/                           # Khu vực lưu trữ dữ liệu dự án
 │   ├── raw/                        # Dữ liệu thô đầu vào
 │   ├── processed/                  # Dữ liệu đã làm sạch cho ML
