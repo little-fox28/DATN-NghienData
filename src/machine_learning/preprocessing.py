@@ -1,97 +1,97 @@
 """
-preprocessing.py — Tầng 1: Tiền xử lý dữ liệu (Data Preprocessing).
-Đọc dữ liệu thô, xử lý missing values, loại bỏ outlier và chia tập train/test.
+Tầng 1: Tiền xử lý dữ liệu (Data Preprocessing).
 """
 import logging
 import pandas as pd
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 
-from src.machine_learning.config import (
-    RAW_DATA_PATH, PROCESSED_DATA_PATH,
-    TARGET_COL, FILLNA_COLS, DROP_COLS,
-    TEST_SIZE, RANDOM_STATE
-)
+from src.machine_learning.config import get_abs_path
 
 logger = logging.getLogger(__name__)
 
+class DataPreprocessor:
+    """Class xử lý dữ liệu thô, điền khuyết, loại bỏ outlier và chia tập train/test."""
+    
+    def __init__(self, config: dict):
+        """
+        Khởi tạo với cấu hình của bài toán (task config).
+        """
+        self.config = config
+        self.raw_data_path = self.config.get("raw_data_path")
+        self.target_col = self.config.get("target_column")
+        self.fillna_cols = self.config.get("fillna_median_cols", [])
+        self.drop_cols = self.config.get("drop_cols", [])
+        self.test_size = self.config.get("test_size", 0.2)
+        self.random_state = self.config.get("random_state", 42)
+        
+        # Đường dẫn lưu data đã xử lý (dung chung cho pipeline)
+        self.processed_data_path = get_abs_path("data/processed/df_clean.csv")
 
-def load_raw_data() -> pd.DataFrame:
-    """Đọc tệp CSV dữ liệu thô."""
-    path = RAW_DATA_PATH
-    if not path.exists():
-        # Fallback if filename has URL encoding or spaces
-        fallback = path.parent / "Credit Risk Data.csv"
-        if fallback.exists():
-            path = fallback
-    logger.info(f"Loading raw data from: {path}")
-    df = pd.read_csv(path)
-    logger.info(f"Loaded {len(df):,} records with {df.shape[1]} columns.")
-    return df
+    def load_raw_data(self) -> pd.DataFrame:
+        """Đọc tệp CSV dữ liệu thô."""
+        path = Path(self.raw_data_path)
+        if not path.exists():
+            # Fallback nếu tên file có khoảng trắng bị mã hoá thành %20
+            fallback = path.parent / "Credit Risk Data.csv"
+            if fallback.exists():
+                path = fallback
+        logger.info(f"Loading raw data from: {path}")
+        df = pd.read_csv(path)
+        logger.info(f"Loaded {len(df):,} records with {df.shape[1]} columns.")
+        return df
 
+    def handle_missing_values(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Điền giá trị khuyết bằng Median cho các cột được cấu hình."""
+        logger.info("Handling missing values...")
+        for col in self.fillna_cols:
+            if col in df.columns:
+                median_val = df[col].median()
+                n_missing = df[col].isnull().sum()
+                df[col] = df[col].fillna(median_val)
+                logger.info(f"  Filled {n_missing} missing values in '{col}' with median={median_val:.4f}")
+        return df
 
-def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
-    """Điền giá trị khuyết bằng Median cho các cột được cấu hình trong config.yaml."""
-    logger.info("Handling missing values...")
-    for col in FILLNA_COLS:
-        if col in df.columns:
-            median_val = df[col].median()
-            n_missing = df[col].isnull().sum()
-            df[col] = df[col].fillna(median_val)
-            logger.info(f"  Filled {n_missing} missing values in '{col}' with median={median_val:.4f}")
-    return df
+    def remove_outliers(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Loại bỏ các outlier cực đoan theo quy tắc kinh doanh."""
+        logger.info("Removing extreme outliers...")
+        n_before = len(df)
 
+        if "person_age" in df.columns:
+            df = df[(df["person_age"] >= 18) & (df["person_age"] <= 85)]
+        if "person_emp_length" in df.columns and "person_age" in df.columns:
+            df = df[df["person_emp_length"] <= df["person_age"] - 18]
 
-def remove_outliers(df: pd.DataFrame) -> pd.DataFrame:
-    """Loại bỏ các outlier cực đoan theo quy tắc kinh doanh."""
-    logger.info("Removing extreme outliers...")
-    n_before = len(df)
+        n_removed = n_before - len(df)
+        logger.info(f"Removed {n_removed} outlier records. Remaining: {len(df):,}")
+        return df
 
-    if "person_age" in df.columns:
-        df = df[(df["person_age"] >= 18) & (df["person_age"] <= 85)]
-    if "person_emp_length" in df.columns and "person_age" in df.columns:
-        df = df[df["person_emp_length"] <= df["person_age"] - 18]
+    def clean(self, save: bool = True) -> pd.DataFrame:
+        """Chạy quy trình Preprocessing: Load -> Handle Missing -> Remove Outliers -> Save."""
+        df = self.load_raw_data()
+        df = self.handle_missing_values(df)
+        df = self.remove_outliers(df)
 
-    n_removed = n_before - len(df)
-    logger.info(f"Removed {n_removed} outlier records. Remaining: {len(df):,}")
-    return df
+        if save:
+            self.processed_data_path.parent.mkdir(parents=True, exist_ok=True)
+            df.to_csv(self.processed_data_path, index=False)
+            logger.info(f"Cleaned data saved to: {self.processed_data_path}")
 
+        return df
 
-def clean(save: bool = True) -> pd.DataFrame:
-    """
-    Chạy quy trình Preprocessing: Load -> Handle Missing -> Remove Outliers -> Save.
-    """
-    df = load_raw_data()
-    df = handle_missing_values(df)
-    df = remove_outliers(df)
+    def split_data(self, df: pd.DataFrame):
+        """Chia DataFrame thành tập Train và Test."""
+        logger.info(f"Splitting data: test_size={self.test_size}, random_state={self.random_state}")
 
-    if save:
-        Path(PROCESSED_DATA_PATH).parent.mkdir(parents=True, exist_ok=True)
-        df.to_csv(PROCESSED_DATA_PATH, index=False)
-        logger.info(f"Cleaned data saved to: {PROCESSED_DATA_PATH}")
+        cols_to_drop = [c for c in self.drop_cols if c in df.columns]
+        X = df.drop(columns=cols_to_drop + [self.target_col], errors="ignore")
+        y = df[self.target_col]
 
-    return df
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=self.test_size, random_state=self.random_state, stratify=y
+        )
 
+        logger.info(f"Train size: {len(X_train):,} | Test size: {len(X_test):,}")
+        logger.info(f"Target rate - Train: {y_train.mean():.2%} | Test: {y_test.mean():.2%}")
 
-def split_data(df: pd.DataFrame):
-    """Chia DataFrame thành tập Train và Test."""
-    logger.info(f"Splitting data: test_size={TEST_SIZE}, random_state={RANDOM_STATE}")
-
-    cols_to_drop = [c for c in DROP_COLS if c in df.columns]
-    X = df.drop(columns=cols_to_drop + [TARGET_COL], errors="ignore")
-    y = df[TARGET_COL]
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y
-    )
-
-    logger.info(f"Train size: {len(X_train):,} | Test size: {len(X_test):,}")
-    logger.info(f"Default rate - Train: {y_train.mean():.2%} | Test: {y_test.mean():.2%}")
-
-    return X_train, X_test, y_train, y_test
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    df_clean = clean(save=True)
-    print(f"\nPreprocessing complete. Shape: {df_clean.shape}")
+        return X_train, X_test, y_train, y_test

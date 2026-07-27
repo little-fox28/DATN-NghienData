@@ -1,80 +1,105 @@
 """
-pipeline.py — Kịch bản chạy End-to-End ML Pipeline.
-Gọi tuần tự: Preprocessing -> Encoding -> Train -> Evaluate.
+Kịch bản chạy End-to-End ML Pipeline.
 
 Sử dụng:
-    python -m src.machine_learning.pipeline
-    python -m src.machine_learning.pipeline --skip-preprocessing
+    python -m src.machine_learning.pipeline --task credit_risk
+    python -m src.machine_learning.pipeline --task credit_risk --skip-preprocessing
 """
 import logging
 import argparse
+from typing import Optional
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+from src.machine_learning.config import get_task_config
+
 logger = logging.getLogger(__name__)
 
+class MLPipeline:
+    """
+    Quản lý quy trình Machine Learning Pipeline End-to-End.
+    Kết nối các tầng Preprocessing -> Feature Engineering -> Training -> Evaluation.
+    """
 
-def run(skip_preprocessing: bool = False) -> dict:
-    """Chạy toàn bộ ML Pipeline."""
-    logger.info("=" * 60)
-    logger.info("STARTING CREDIT RISK ML PIPELINE")
-    logger.info("=" * 60)
+    def __init__(self, task_name: str = "credit_risk", skip_preprocessing: bool = False):
+        self.task_name = task_name
+        self.skip_preprocessing = skip_preprocessing
+        
+        # Load cấu hình cụ thể cho bài toán
+        self.config = get_task_config(self.task_name)
+        # Bổ sung task_name vào config để các lớp bên dưới sử dụng (vd: đặt tên biểu đồ)
+        self.config["task_name"] = self.task_name
+        
+        # Import các Class OOP vừa xây dựng
+        from src.machine_learning.preprocessing import DataPreprocessor
+        from src.machine_learning.features import FeatureEngineer
+        from src.machine_learning.train import ModelTrainer
+        from src.machine_learning.evaluate import ModelEvaluator
+        
+        # Khởi tạo các module con với cùng một config duy nhất
+        self.preprocessor = DataPreprocessor(self.config)
+        self.feature_eng = FeatureEngineer(self.config)
+        self.trainer = ModelTrainer(self.config)
+        self.evaluator = ModelEvaluator(self.config)
 
-    # --- Bước 1: Preprocessing ---
-    from src.machine_learning.preprocessing import clean, split_data
+    def run(self) -> Optional[dict]:
+        """Thực thi toàn bộ pipeline tuần tự."""
+        logger.info("=" * 60)
+        logger.info(f"STARTING ML PIPELINE FOR TASK: {self.task_name.upper()}")
+        logger.info("=" * 60)
 
-    if skip_preprocessing:
-        import pandas as pd
-        from src.machine_learning.config import PROCESSED_DATA_PATH
-        logger.info(f"[SKIP] Loading existing cleaned data from: {PROCESSED_DATA_PATH}")
-        df = pd.read_csv(PROCESSED_DATA_PATH)
-    else:
-        logger.info("[STEP 1/4] Preprocessing data...")
-        df = clean(save=True)
+        try:
+            # --- Bước 1: Preprocessing ---
+            logger.info("[STEP 1/4] Preprocessing data...")
+            if self.skip_preprocessing:
+                import pandas as pd
+                logger.info(f"[SKIP] Loading existing cleaned data from: {self.preprocessor.processed_data_path}")
+                df = pd.read_csv(self.preprocessor.processed_data_path)
+            else:
+                df = self.preprocessor.clean(save=True)
+            
+            X_train, X_test, y_train, y_test = self.preprocessor.split_data(df)
 
-    X_train, X_test, y_train, y_test = split_data(df)
+            # --- Bước 2: Feature Engineering ---
+            logger.info("[STEP 2/4] Encoding categorical features...")
+            self.feature_eng.build_encoder(X_train)
+            self.feature_eng.save_encoder()
+            
+            X_train_enc = self.feature_eng.transform(X_train)
+            X_test_enc = self.feature_eng.transform(X_test)
 
-    # --- Bước 2: Feature Encoding ---
-    from src.machine_learning.features import build_encoder, save_encoder, transform
+            # --- Bước 3: Training ---
+            logger.info(f"[STEP 3/4] Training model for task: {self.task_name}...")
+            self.trainer.train(X_train_enc, y_train, X_test_enc, y_test)
+            self.trainer.save_model()
 
-    logger.info("[STEP 2/4] Encoding categorical features (OrdinalEncoder)...")
-    encoder = build_encoder(X_train)
-    save_encoder(encoder)
-
-    X_train_enc = transform(encoder, X_train)
-    X_test_enc  = transform(encoder, X_test)
-
-    # --- Bước 3: Train ---
-    from src.machine_learning.train import train, save_model
-
-    logger.info("[STEP 3/4] Training XGBoost model...")
-    model = train(X_train_enc, y_train, X_test_enc, y_test)
-    save_model(model)
-
-    # --- Bước 4: Evaluate ---
-    from src.machine_learning.evaluate import evaluate
-
-    logger.info("[STEP 4/4] Evaluating model on test set...")
-    metrics = evaluate(model, X_test_enc, y_test, save=True)
-
-    logger.info("=" * 60)
-    logger.info("PIPELINE COMPLETED SUCCESSFULLY!")
-    logger.info(f"  AUC-ROC : {metrics['auc']:.4f}")
-    logger.info(f"  Gini    : {metrics['gini']:.4f}")
-    logger.info(f"  KS Stat : {metrics['ks']:.4f}")
-    logger.info("=" * 60)
-
-    return metrics
+            # --- Bước 4: Evaluation ---
+            logger.info("[STEP 4/4] Evaluating model...")
+            metrics = self.evaluator.evaluate(
+                model=self.trainer.model, 
+                X_test=X_test_enc, 
+                y_test=y_test, 
+                save=True
+            )
+            
+            logger.info("=" * 60)
+            logger.info("PIPELINE COMPLETED SUCCESSFULLY!")
+            logger.info("=" * 60)
+            
+            return metrics
+            
+        except Exception as e:
+            logger.error(f"Pipeline failed: {str(e)}", exc_info=True)
+            return None
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Credit Risk ML Training Pipeline")
-    parser.add_argument(
-        "--skip-preprocessing",
-        action="store_true",
-        help="Bỏ qua bước làm sạch dữ liệu, dùng lại data đã xử lý trước đó."
-    )
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    
+    parser = argparse.ArgumentParser(description="Multi-task ML Training Pipeline")
+    parser.add_argument("--task", type=str, default="credit_risk", help="Tên bài toán cần chạy (vd: credit_risk, loan_intent)")
+    parser.add_argument("--skip-preprocessing", action="store_true", help="Bỏ qua làm sạch dữ liệu, dùng data đã xử lý")
+    
     args = parser.parse_args()
-    run(skip_preprocessing=args.skip_preprocessing)
+    
+    pipeline = MLPipeline(task_name=args.task, skip_preprocessing=args.skip_preprocessing)
+    pipeline.run()
+

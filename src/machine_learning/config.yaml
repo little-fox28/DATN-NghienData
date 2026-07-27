@@ -1,78 +1,80 @@
 # =====================================================================
-# ML Project Configuration
-# Tất cả siêu tham số, đường dẫn dữ liệu, và cấu hình mô hình
-# đều được quản lý tại đây - KHÔNG hardcode trong code Python.
+# MULTI-TASK MACHINE LEARNING CONFIGURATION
 # =====================================================================
 
-# --- Đường dẫn dữ liệu (Data Paths) ---
-data:
-  raw_path: "data/raw/Credit%20Risk%20Data.csv"
-  processed_path: "data/processed/df_clean.csv"
-  final_path: "data/final/df_features.csv"
+global:
+  raw_data_path: "data/raw/Credit%20Risk%20Data.csv"
+  processed_dir: "data/processed"
+  models_dir: "models"
+  reports_dir: "reports"
 
-# --- Cấu hình Tiền xử lý Dữ liệu (Preprocessing) ---
-preprocessing:
-  target_column: "loan_status"
-  id_column: "client_ID"
-  fillna_median_cols:
-    - "person_emp_length"
-    - "loan_int_rate"
-  drop_cols:
-    - "client_ID"
-    - "city"
-    - "state"
-    - "country"
-    - "city_latitude"
-    - "city_longitude"
-  test_size: 0.2
-  random_state: 42
-
-# --- Cấu hình Đặc trưng (Feature Engineering) ---
-features:
-  woe_categorical_cols:
-    - "person_home_ownership"
-    - "loan_intent"
-    - "loan_grade"
-    - "cb_person_default_on_file"
-    - "gender"
-    - "marital_status"
-    - "education_level"
-    - "employment_type"
-  woe_numerical_cols:
-    - "person_age"
-    - "person_income"
-    - "person_emp_length"
-    - "loan_amnt"
-    - "loan_int_rate"
-    - "loan_percent_income"
-    - "cb_person_cred_hist_length"
-    - "loan_to_income_ratio"
-    - "debt_to_income_ratio"
-    - "credit_utilization_ratio"
-    - "past_delinquencies"
-  woe_artifact_path: "models/woe_binner.pkl"
-
-# --- Cấu hình Mô hình XGBoost ---
-model:
-  type: "xgboost"
-  artifact_path: "models/credit_risk_model.joblib"
-  params:
-    n_estimators: 300
-    max_depth: 5
-    learning_rate: 0.05
-    subsample: 0.8
-    colsample_bytree: 0.8
-    scale_pos_weight: 3.58
-    eval_metric: "auc"
+tasks:
+  # ===================================================================
+  # BÀI TOÁN 1: Dự báo Xác suất Nợ xấu (Credit Risk / Default Prediction)
+  # ===================================================================
+  credit_risk:
+    task_name: "Credit Risk Default Prediction"
+    task_type: "binary_classification"
+    target_column: "loan_status"
+    id_column: "client_ID"
+    
+    # Tiền xử lý
+    fillna_median_cols:
+      - "person_emp_length"
+      - "loan_int_rate"
+    drop_cols:
+      - "client_ID"
+      - "city"
+      - "state"
+      - "country"
+      - "city_latitude"
+      - "city_longitude"
+    test_size: 0.2
     random_state: 42
 
-# --- Cấu hình Đánh giá Mô hình (Evaluation) ---
-evaluation:
-  metrics_output_path: "reports/training_metrics.json"
-  figures_output_dir: "reports/figures"
+    # Danh sách đặc trưng (Feature Groups)
+    categorical_cols:
+      - "person_home_ownership"
+      - "loan_intent"
+      - "loan_grade"
+      - "cb_person_default_on_file"
+      - "gender"
+      - "marital_status"
+      - "education_level"
+      - "employment_type"
+    numerical_cols:
+      - "person_age"
+      - "person_income"
+      - "person_emp_length"
+      - "loan_amnt"
+      - "loan_int_rate"
+      - "loan_percent_income"
+      - "cb_person_cred_hist_length"
+      - "loan_to_income_ratio"
+      - "debt_to_income_ratio"
+      - "credit_utilization_ratio"
+      - "past_delinquencies"
 
-# --- Cấu hình Credit Scorecard Scaling ---
-scorecard:
-  target_score: 600
-  target_odds: 50
-  pdo: 20
+    # Mô hình & Lưu trữ Artifacts
+    model_type: "xgboost"
+    model_artifact: "models/credit_risk_model.joblib"
+    encoder_artifact: "models/woe_binner.pkl"
+    metrics_output: "reports/training_metrics.json"
+    figures_dir: "reports/figures"
+
+    # Siêu tham số mô hình (Hyperparameters)
+    params:
+      n_estimators: 300
+      max_depth: 5
+      learning_rate: 0.05
+      subsample: 0.8
+      colsample_bytree: 0.8
+      scale_pos_weight: 3.58
+      eval_metric: "auc"
+      random_state: 42
+
+    # Quy đổi điểm tín dụng (Scorecard)
+    scorecard:
+      target_score: 600
+      target_odds: 50
+      pdo: 20
