@@ -1,13 +1,18 @@
 """
 __init__.py — Public API cho module src.machine_learning.
 """
-from src.machine_learning.predict import score_single, score_batch
-from src.machine_learning.train import load_model
-from src.machine_learning.features import load_encoder
+from src.machine_learning.preprocessing import DataPreprocessor
+from src.machine_learning.features import FeatureEngineer
+from src.machine_learning.train import ModelTrainer
+from src.machine_learning.evaluate import ModelEvaluator
+from src.machine_learning.predict import ModelPredictor
+from src.machine_learning.pipeline import MLPipeline
 
 __all__ = [
-    "score_single",
-    "score_batch",
-    "load_model",
-    "load_encoder",
+    "DataPreprocessor",
+    "FeatureEngineer",
+    "ModelTrainer",
+    "ModelEvaluator",
+    "ModelPredictor",
+    "MLPipeline",
 ]
