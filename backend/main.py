@@ -16,7 +16,16 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 
 from backend.config import HOST, PORT
-from src.machine_learning.predict import score_single
+from src.machine_learning.config import get_task_config
+from src.machine_learning.predict import ModelPredictor
+
+# Khởi tạo sẵn ModelPredictor cho bài toán mặc định (Credit Risk) khi khởi động API
+try:
+    default_config = get_task_config("credit_risk")
+    default_config["task_name"] = "credit_risk"
+    default_predictor = ModelPredictor(default_config)
+except Exception as err:
+    default_predictor = None
 
 app = FastAPI(
     title="Loan Application & Credit Risk API",
@@ -65,9 +74,9 @@ def health_check():
 
 
 @app.post("/api/v1/predict", summary="Chấm điểm tín dụng cho một hồ sơ vay")
-def predict_credit_risk(application: LoanApplication):
+def predict_credit_risk(application: LoanApplication, task: str = "credit_risk"):
     """
-    Nhận thông tin khoản vay từ App, gọi lõi ML `src.machine_learning` để tính toán:
+    Nhận thông tin khoản vay từ Client/App, gọi lõi ML `src.machine_learning` để tính toán:
     - PD Score (Xác suất vỡ nợ)
     - Credit Score (Điểm tín dụng 300 - 850)
     - Risk Tier (Nhóm rủi ro: LOW, MEDIUM, HIGH, CRITICAL)
@@ -75,9 +84,19 @@ def predict_credit_risk(application: LoanApplication):
     """
     try:
         record = application.model_dump()
-        result = score_single(record)
+        
+        # Chọn predictor theo task
+        if task == "credit_risk" and default_predictor is not None:
+            result = default_predictor.score_single(record)
+        else:
+            task_cfg = get_task_config(task)
+            task_cfg["task_name"] = task
+            custom_predictor = ModelPredictor(task_cfg)
+            result = custom_predictor.score_single(record)
+
         return {
             "success": True,
+            "task": task,
             "application_summary": {
                 "income": application.person_income,
                 "loan_amount": application.loan_amnt,
