@@ -1,7 +1,7 @@
 import pandas as pd
 import shutil
 from pathlib import Path
-from src.utils.logger import get_logger
+from shared.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

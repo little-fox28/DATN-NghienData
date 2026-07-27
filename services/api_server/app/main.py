@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 # Thêm root directory vào sys.path để import dễ dàng
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = Path(__file__).resolve().parents[3]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
@@ -15,9 +15,9 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional, List
 
-from backend.config import HOST, PORT
-from src.machine_learning.config import get_task_config
-from src.machine_learning.predict import ModelPredictor
+from services.api_server.app.config import HOST, PORT
+from services.ml_engine.src.machine_learning.config import get_task_config
+from services.ml_engine.src.machine_learning.predict import ModelPredictor
 
 from fastapi.middleware.cors import CORSMiddleware
 

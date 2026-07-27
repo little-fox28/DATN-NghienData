@@ -2,7 +2,7 @@ import re
 import pandas as pd
 from pathlib import Path
 from sqlalchemy import text
-from src.utils.logger import get_logger
+from shared.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

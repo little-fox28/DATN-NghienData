@@ -4,7 +4,7 @@ import numpy as np
 from pathlib import Path
 from typing import Tuple, Dict, Any
 
-from src.utils.logger import get_logger
+from shared.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

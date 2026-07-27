@@ -9,7 +9,7 @@ import logging
 import argparse
 from typing import Optional
 
-from src.machine_learning.config import get_task_config
+from .config import get_task_config
 
 logger = logging.getLogger(__name__)
 
@@ -29,10 +29,10 @@ class MLPipeline:
         self.config["task_name"] = self.task_name
         
         # Import các Class OOP vừa xây dựng
-        from src.machine_learning.preprocessing import DataPreprocessor
-        from src.machine_learning.features import FeatureEngineer
-        from src.machine_learning.train import ModelTrainer
-        from src.machine_learning.evaluate import ModelEvaluator
+        from .preprocessing import DataPreprocessor
+        from .features import FeatureEngineer
+        from .train import ModelTrainer
+        from .evaluate import ModelEvaluator
         
         # Khởi tạo các module con với cùng một config duy nhất
         self.preprocessor = DataPreprocessor(self.config)

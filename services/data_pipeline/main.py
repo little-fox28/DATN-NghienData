@@ -2,9 +2,9 @@ from dotenv import load_dotenv
 import os
 import argparse
 
-from src.etl.pipeline import ETLPipeline
-from src.utils.logger import get_logger
-from src.utils.setup_db import setup_infrastructure
+from services.data_pipeline.src.etl.pipeline import ETLPipeline
+from shared.utils.logger import get_logger
+from shared.utils.setup_db import setup_infrastructure
 
 # Load environment variables from .env file
 load_dotenv()
