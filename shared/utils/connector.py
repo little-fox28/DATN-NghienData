@@ -1,6 +1,6 @@
 import urllib.parse
 from sqlalchemy import create_engine
-from src.utils.logger import get_logger
+from shared.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

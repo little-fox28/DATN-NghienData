@@ -1,12 +1,12 @@
 """
 backend/main.py — FastAPI Loan Collection API & ML Scoring Endpoint
-Chạy ứng dụng: python -m backend.main
+Chạy ứng dụng: python -m services.api_server.app.main
 """
 import sys
 from pathlib import Path
 
 # Thêm root directory vào sys.path để import dễ dàng
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
@@ -15,9 +15,9 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional, List
 
-from backend.config import HOST, PORT
-from src.machine_learning.config import get_task_config
-from src.machine_learning.predict import ModelPredictor
+from services.api_server.app.config import HOST, PORT
+from services.ml_engine.src.machine_learning.config import get_task_config
+from services.ml_engine.src.machine_learning.predict import ModelPredictor
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -122,4 +122,4 @@ def predict_credit_risk(application: LoanApplication, task: str = "credit_risk")
 if __name__ == "__main__":
     print(f"🚀 Starting Loan Collection API on http://{HOST}:{PORT}")
     print(f"📖 Swagger Docs available at http://{HOST}:{PORT}/docs")
-    uvicorn.run("backend.main:app", host=HOST, port=PORT, reload=True)
+    uvicorn.run("services.api_server.app.main:app", host=HOST, port=PORT, reload=True)

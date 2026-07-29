@@ -5,7 +5,7 @@ from typing import Optional
 
 from dotenv import load_dotenv
 from kaggle.api.kaggle_api_extended import KaggleApi
-from src.utils.logger import get_logger
+from shared.utils.logger import get_logger
 
 # Load environment variables from .env file
 load_dotenv()

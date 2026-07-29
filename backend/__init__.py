@@ -1,3 +1,0 @@
-"""
-backend package initialization
-"""

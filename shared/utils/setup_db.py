@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 
-from src.utils.logger import get_logger
+from shared.utils.logger import get_logger
 
 
 # Load environment variables from .env
