@@ -105,6 +105,9 @@
       "next": "Tiếp theo",
       "submit": "Chấm điểm AI ngay",
       "reset": "Nhập hồ sơ vay mới"
+    },
+    "messages": {
+      "success": "Chấm điểm tín dụng thành công!"
     }
   },
   "gauge": {

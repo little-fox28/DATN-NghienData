@@ -85,7 +85,7 @@ export const LoanApplicationPage: React.FC = () => {
       const apiResult = await predictCreditRisk(updatedData, 'credit_risk');
       setResult(apiResult);
       setCurrentStep(3);
-      message.success('Chấm điểm tín dụng thành công!');
+      message.success(t('loanApplication.messages.success'));
     } catch (err: any) {
       console.error(err);
       if (!err.errorFields) {
