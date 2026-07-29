@@ -1,0 +1,110 @@
+{
+  "navbar": {
+    "title": "CREDIT RISK",
+    "subtitle": "Hệ thống Thu thập Khoản vay & Chấm điểm Tín dụng"
+  },
+  "menu": {
+    "dashboard": "Dashboard Thống kê",
+    "apply": "Tạo Hồ sơ Vay mới"
+  },
+  "footer": {
+    "copyright": "© 2026 DATN — Credit Risk & Loan Origination System | Developed by NghienData Team"
+  },
+  "settings": {
+    "theme": "Giao diện",
+    "language": "Ngôn ngữ",
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Hệ thống",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "dashboard": {
+    "title": "Tổng quan Hệ thống (Dashboard)",
+    "welcome": "Chào mừng bạn đến với hệ thống Đánh giá Rủi ro Tín dụng sử dụng AI Core.",
+    "stats": {
+      "processed": "Tổng Hồ sơ Đã Xử lý",
+      "highRisk": "Cảnh báo Rủi ro Cao",
+      "reappraisal": "Đang Thẩm định Lại"
+    },
+    "futureNote": "Báo cáo chi tiết biểu đồ sẽ được bổ sung trong các phiên bản sau."
+  },
+  "loanApplication": {
+    "steps": {
+      "demographics": "Nhân khẩu học",
+      "financial": "Tài chính & Việc làm",
+      "intent": "Nhu cầu Khoản vay",
+      "result": "Kết quả"
+    },
+    "errors": {
+      "systemError": "Lỗi hệ thống",
+      "serverError": "Không thể kết nối với Server. Vui lòng kiểm tra Server.",
+      "requireAge": "Vui lòng nhập độ tuổi!",
+      "requireGender": "Vui lòng chọn giới tính!",
+      "required": "Vui lòng nhập trường này!",
+      "invalidInput": "Vui lòng kiểm tra lại thông tin đầu vào"
+    },
+    "step1": {
+      "title": "Bước 1: Thông tin Nhân khẩu học",
+      "description": "Thu thập các thuộc tính định danh cá nhân của người nộp đơn vay.",
+      "age": "Độ tuổi khách hàng",
+      "gender": "Giới tính",
+      "male": "Nam (MALE)",
+      "female": "Nữ (FEMALE)",
+      "education": "Trình độ Học vấn",
+      "highSchool": "Trung học (HIGH_SCHOOL)",
+      "bachelor": "Cử nhân (BACHELOR)",
+      "master": "Thạc sĩ (MASTER)",
+      "doctorate": "Tiến sĩ (DOCTORATE)",
+      "maritalStatus": "Tình trạng Hôn nhân",
+      "single": "Độc thân (SINGLE)",
+      "married": "Đã kết hôn (MARRIED)",
+      "divorced": "Đã ly hôn (DIVORCED)"
+    },
+    "step2": {
+      "title": "Bước 2: Năng lực Tài chính & Lịch sử Tín dụng",
+      "description": "Khai báo thu nhập, thâm niên việc làm và lịch sử ghi nhận nợ xấu trên CIC.",
+      "income": "Thu nhập Hàng năm ($)",
+      "homeOwnership": "Sở hữu Nhà ở",
+      "rent": "Thuê nhà (RENT)",
+      "own": "Sở hữu riêng (OWN)",
+      "mortgage": "Thế chấp (MORTGAGE)",
+      "other": "Khác (OTHER)",
+      "empLength": "Thâm niên Làm việc (Năm)",
+      "defaultHist": "Từng có Lịch sử Nợ xấu trên CIC?",
+      "no": "Không (N - No)",
+      "yes": "Có nợ xấu (Y - Yes)",
+      "credHistLength": "Độ dài Lịch sử Tín dụng (Năm)"
+    },
+    "step3": {
+      "title": "Bước 3: Chi tiết Đơn xin Vay",
+      "description": "Nhập số tiền vay, hạng rủi ro dự kiến và mục đích sử dụng vốn.",
+      "amount": "Số tiền xin vay ($)",
+      "intent": "Mục đích Vay",
+      "personal": "Vay Tiêu dùng (PERSONAL)",
+      "education": "Vay Học tập (EDUCATION)",
+      "medical": "Vay Y tế (MEDICAL)",
+      "venture": "Vay Kinh doanh (VENTURE)",
+      "homeImprovement": "Sửa chữa Nhà (HOMEIMPROVEMENT)",
+      "debtConsolidation": "Gộp nợ (DEBTCONSOLIDATION)",
+      "grade": "Hạng Khoản vay (A-G)",
+      "gradeA": "Grade A (An toàn nhất)",
+      "gradeB": "Grade B",
+      "gradeC": "Grade C",
+      "gradeD": "Grade D",
+      "gradeE": "Grade E",
+      "gradeF": "Grade F",
+      "gradeG": "Grade G (Rủi ro cao)",
+      "intRate": "Lãi suất Đề xuất (%)"
+    },
+    "result": {
+      "title": "Kết quả Phê duyệt & Chấm điểm Tín dụng"
+    },
+    "buttons": {
+      "prev": "Quay lại",
+      "next": "Tiếp theo",
+      "submit": "Chấm điểm AI ngay",
+      "reset": "Nhập hồ sơ vay mới"
+    }
+  }
+}
