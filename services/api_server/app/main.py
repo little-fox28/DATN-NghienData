@@ -1,5 +1,5 @@
 """
-backend/main.py — FastAPI Loan Collection API & ML Scoring Endpoint
+FastAPI Loan Collection API & ML Scoring Endpoint
 Chạy ứng dụng: python -m services.api_server.app.main
 """
 import sys
