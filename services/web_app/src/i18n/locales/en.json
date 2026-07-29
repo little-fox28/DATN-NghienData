@@ -109,5 +109,16 @@
     "messages": {
       "success": "Credit scoring successful!"
     }
+  },
+  "gauge": {
+    "decision": {
+      "approved": "APPLICATION AUTOMATICALLY APPROVED",
+      "manual": "MANUAL REVIEW REQUIRED",
+      "rejected": "APPLICATION AUTOMATICALLY REJECTED"
+    },
+    "scale": "Scale (300 - 850)",
+    "pdScore": "Probability of Default (PD)",
+    "riskTier": "Risk Tier",
+    "tierName": "Tier {{tier}}"
   }
 }

@@ -1,4 +1,4 @@
-import { Alert, Card, Col, Row, Typography } from 'antd';
+import { Alert, Card, Col, Row, Typography, theme } from 'antd';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,6 +18,7 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
   decision,
 }) => {
   const { t } = useTranslation();
+  const { token } = theme.useToken();
 
   // Normalize score to percentage (300 to 850 scale)
   const percentage = Math.min(Math.max(((score - 300) / 550) * 100, 0), 100);
@@ -58,7 +59,7 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
           <path
             d="M 20 100 A 80 80 0 0 1 180 100"
             fill="none"
-            stroke="#e5e7eb"
+            stroke={token.colorFillAlter}
             strokeWidth="16"
             strokeLinecap="round"
           />
@@ -90,13 +91,13 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
           }}>
             {score}
           </div>
-          <span style={{ fontSize: '13px', color: '#8c8c8c' }}>{t('gauge.scale')}</span>
+          <span style={{ fontSize: '13px', color: token.colorTextSecondary }}>{t('gauge.scale')}</span>
         </div>
       </div>
 
       <Row gutter={16} style={{ width: '100%' }}>
         <Col span={12}>
-          <Card bordered={false} className="gauge-stat-card" bodyStyle={{ padding: '16px', textAlign: 'center' }}>
+          <Card bordered={false} style={{ backgroundColor: token.colorFillAlter }} bodyStyle={{ padding: '16px', textAlign: 'center' }}>
             <Text type="secondary" style={{ fontSize: '12px' }}>{t('gauge.pdScore')}</Text>
             <Title level={3} style={{ margin: 0, color: getPdColor(pdScore) }}>
               {(pdScore * 100).toFixed(2)}%
@@ -104,7 +105,7 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
           </Card>
         </Col>
         <Col span={12}>
-          <Card bordered={false} className="gauge-stat-card" bodyStyle={{ padding: '16px', textAlign: 'center' }}>
+          <Card bordered={false} style={{ backgroundColor: token.colorFillAlter }} bodyStyle={{ padding: '16px', textAlign: 'center' }}>
             <Text type="secondary" style={{ fontSize: '12px' }}>{t('gauge.riskTier')}</Text>
             <Title level={3} style={{ margin: 0, color: getTierColor(riskTier) }}>
               {t('gauge.tierName', { tier: riskTier })}
