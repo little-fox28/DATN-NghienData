@@ -5,8 +5,8 @@
 global:
   raw_data_path: "data/raw/Credit%20Risk%20Data.csv"
   processed_dir: "data/processed"
-  models_dir: "models"
-  reports_dir: "reports"
+  models_dir: "services/ml_engine/models"
+  reports_dir: "services/ml_engine/reports"
 
 tasks:
   # ===================================================================
@@ -57,10 +57,10 @@ tasks:
 
     # Mô hình & Lưu trữ Artifacts
     model_type: "xgboost"
-    model_artifact: "models/credit_risk_model.joblib"
-    encoder_artifact: "models/woe_binner.pkl"
-    metrics_output: "reports/training_metrics.json"
-    figures_dir: "reports/figures"
+    model_artifact: "services/ml_engine/models/credit_risk_model.joblib"
+    encoder_artifact: "services/ml_engine/models/woe_binner.pkl"
+    metrics_output: "services/ml_engine/reports/training_metrics.json"
+    figures_dir: "services/ml_engine/reports/figures"
 
     # Siêu tham số mô hình (Hyperparameters)
     params:
