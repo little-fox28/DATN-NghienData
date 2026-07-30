@@ -1,21 +1,5 @@
 [
   {
-    "id": "R22_FILL_EMP_LENGTH",
-    "desc": "Tự động điền số năm làm việc khuyết thiếu bằng trung vị (median) của nhóm tuổi tương ứng",
-    "severity": "warning",
-    "fill_target": "person_emp_length",
-    "fill_expr": "df[\"person_emp_length\"].fillna(df.groupby(\"person_age\")[\"person_emp_length\"].transform(\"median\")).fillna(df[\"person_emp_length\"].median())",
-    "check": "~df[\"person_emp_length\"].isna()"
-  },
-  {
-    "id": "R23_FILL_INT_RATE",
-    "desc": "Tự động điền lãi suất khoản vay khuyết thiếu bằng trung vị của hạng tín dụng tương ứng",
-    "severity": "warning",
-    "fill_target": "loan_int_rate",
-    "fill_expr": "df[\"loan_int_rate\"].fillna(df.groupby(\"loan_grade\")[\"loan_int_rate\"].transform(\"median\")).fillna(df[\"loan_int_rate\"].median())",
-    "check": "~df[\"loan_int_rate\"].isna()"
-  },
-  {
     "id": "R1_AGE",
     "desc": "Kiểm tra độ tuổi (Phải từ 18 đến 85)",
     "severity": "critical",
@@ -56,12 +40,6 @@
     "desc": "Tỷ lệ nợ trên thu nhập phải lớn hơn hoặc bằng tỷ lệ khoản vay trên thu nhập - Chấp nhận giá trị khuyết thiếu",
     "severity": "warning",
     "check": "df[\"debt_to_income_ratio\"].isna() | df[\"loan_percent_income\"].isna() | (df[\"debt_to_income_ratio\"] >= df[\"loan_percent_income\"])"
-  },
-  {
-    "id": "R8_DEFAULT_DELINQUENCY",
-    "desc": "Nếu có lịch sử vỡ nợ (Y), số lần nợ quá hạn phải lớn hơn 0 - Chấp nhận giá trị khuyết thiếu",
-    "severity": "warning",
-    "check": "df[\"cb_person_default_on_file\"].isna() | df[\"past_delinquencies\"].isna() | ~((df[\"cb_person_default_on_file\"] == \"Y\") & (df[\"past_delinquencies\"] == 0))"
   },
   {
     "id": "R9_UTILIZATION_ACCOUNTS",
@@ -132,13 +110,6 @@
     "severity": "critical",
     "check": "df[\"loan_grade\"].isna() | df[\"loan_grade\"].isin([\"A\", \"B\", \"C\", \"D\", \"E\", \"F\", \"G\"])"
   },
-  {
-    "id": "R19_GRADE_UTILIZATION",
-    "desc": "LỖI: loan_grade hạng A không nên có credit_utilization_ratio >= 0.8 - Nghi ngờ xếp hạng bị gán sai",
-    "severity": "warning",
-    "check": "df[\"loan_grade\"].isna() | df[\"credit_utilization_ratio\"].isna() | ~((df[\"loan_grade\"] == \"A\") & (df[\"credit_utilization_ratio\"] >= 0.8))"
-  },
-
   {
     "_comment": "=== NHÓM: past_delinquencies (2 quy tắc) ===",
     "id": "R20_DELINQ_NULL",

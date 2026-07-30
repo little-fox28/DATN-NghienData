@@ -20,7 +20,10 @@ class DataPreprocessor:
         self.config = config
         self.raw_data_path = self.config.get("raw_data_path")
         self.target_col = self.config.get("target_column")
-        self.fillna_cols = self.config.get("fillna_median_cols", [])
+        # BA: Các cột này nếu NULL sẽ GIỮ NGUYÊN NaN để WoE Binner xử lý thành nhóm "Missing" riêng
+        self.fillna_missing_cols = self.config.get("fillna_missing_cols", [])
+        # Fallback tương thích ngược: nếu config cũ dùng fillna_median_cols thì vẫn chạy được
+        self.fillna_median_cols = self.config.get("fillna_median_cols", [])
         self.drop_cols = self.config.get("drop_cols", [])
         self.test_size = self.config.get("test_size", 0.2)
         self.random_state = self.config.get("random_state", 42)
@@ -42,23 +45,43 @@ class DataPreprocessor:
         return df
 
     def handle_missing_values(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Điền giá trị khuyết bằng Median cho các cột được cấu hình."""
+        """Xử lý giá trị khuyết theo chiến lược BA:
+        - fillna_missing_cols: Giữ nguyên NaN → WoE Binner sẽ gom thành nhóm 'Missing' riêng (điểm baseline = 0)
+        - fillna_median_cols (fallback): Điền bằng median (tương thích ngược với config cũ)
+        """
         logger.info("Handling missing values...")
-        for col in self.fillna_cols:
+
+        # Strategy mới theo BA: chỉ log, KHÔNG điền — để NaN cho WoE Binner xử lý
+        for col in self.fillna_missing_cols:
+            if col in df.columns:
+                n_missing = df[col].isnull().sum()
+                if n_missing > 0:
+                    logger.info(f"  '{col}': {n_missing} NaN values will be handled by WoE Binner as 'Missing' group")
+
+        # Strategy cũ (fallback): điền median
+        for col in self.fillna_median_cols:
             if col in df.columns:
                 median_val = df[col].median()
                 n_missing = df[col].isnull().sum()
                 df[col] = df[col].fillna(median_val)
-                logger.info(f"  Filled {n_missing} missing values in '{col}' with median={median_val:.4f}")
+                logger.info(f"  [Median Fallback] Filled {n_missing} missing in '{col}' with median={median_val:.4f}")
+
         return df
 
     def remove_outliers(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Loại bỏ các outlier cực đoan theo quy tắc kinh doanh."""
+        """Loại bỏ các outlier cực đoan theo quy tắc kinh doanh.
+        
+        Lưu ý: person_age đã bị loại khỏi feature set theo BA (không có khả năng phân biệt rủi ro
+        và bị cấm theo một số quy định phòng chống phân biệt đối xử). Tuy nhiên, nếu cột này
+        vẫn tồn tại trong dữ liệu gốc, vẫn dùng nó để lọc outlier TRƯỚC KHI drop.
+        """
         logger.info("Removing extreme outliers...")
         n_before = len(df)
 
+        # Lọc outlier về tuổi nếu cột vẫn còn trong dữ liệu gốc (trước bước drop)
         if "person_age" in df.columns:
             df = df[(df["person_age"] >= 18) & (df["person_age"] <= 85)]
+        # Lọc thâm niên phi lý (không thể làm việc nhiều hơn tuổi - 18)
         if "person_emp_length" in df.columns and "person_age" in df.columns:
             df = df[df["person_emp_length"] <= df["person_age"] - 18]
 
