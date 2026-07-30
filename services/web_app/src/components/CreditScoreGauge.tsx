@@ -62,11 +62,7 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
           <path
             d="M 20 100 A 80 80 0 0 1 180 100"
             fill="none"
-<<<<<<< HEAD
-            stroke="rgba(255, 255, 255, 0.1)"
-=======
             stroke={token.colorFillAlter}
->>>>>>> feature/frontend
             strokeWidth="16"
             strokeLinecap="round"
           />
@@ -88,29 +84,6 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
             </linearGradient>
           </defs>
         </svg>
-<<<<<<< HEAD
-        <div style={{ position: 'absolute', bottom: '10px', left: '0', right: '0' }}>
-          <div className="score-badge">{score}</div>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Thang điểm (300 - 850)</span>
-        </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', width: '100%', marginTop: '1rem' }}>
-        <div style={{ background: 'rgba(15, 23, 42, 0.5)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Xác suất Vỡ nợ (PD)</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#60A5FA', marginTop: '0.25rem' }}>
-            {(pdScore * 100).toFixed(2)}%
-          </div>
-        </div>
-
-        <div style={{ background: 'rgba(15, 23, 42, 0.5)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Phân hạng Rủi ro</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#34D399', marginTop: '0.25rem' }}>
-            TIER {riskTier}
-          </div>
-        </div>
-      </div>
-=======
         <div style={{ position: 'absolute', bottom: '10px', left: '0', right: '0', textAlign: 'center' }}>
           <div style={{
             fontSize: '3rem',
@@ -143,7 +116,6 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
           </Card>
         </Col>
       </Row>
->>>>>>> feature/frontend
     </div>
   );
 };

@@ -29,17 +29,10 @@ class MLPipeline:
         self.config["task_name"] = self.task_name
         
         # Import các Class OOP vừa xây dựng
-<<<<<<< HEAD
-        from .preprocessing import DataPreprocessor
-        from .features import FeatureEngineer
-        from .train import ModelTrainer
-        from .evaluate import ModelEvaluator
-=======
         from services.ml_engine.src.machine_learning.preprocessing import DataPreprocessor
         from services.ml_engine.src.machine_learning.features import FeatureEngineer
         from services.ml_engine.src.machine_learning.train import ModelTrainer
         from services.ml_engine.src.machine_learning.evaluate import ModelEvaluator
->>>>>>> feature/frontend
         
         # Khởi tạo các module con với cùng một config duy nhất
         self.preprocessor = DataPreprocessor(self.config)
