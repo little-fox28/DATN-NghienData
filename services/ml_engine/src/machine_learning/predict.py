@@ -48,19 +48,17 @@ class ModelPredictor:
     # ── SCORECARD CALIBRATION ───────────────────────────────────────────────
 
     def _pd_to_credit_score(self, pd_value: float) -> int:
-        """Chuyển đổi Xác suất Nợ xấu (PD) sang Điểm Tín dụng.
+        """Chuyển đổi Xác suất Nợ xấu (PD) sang Điểm Tín dụng chuẩn FICO (300 – 850).
 
         Công thức FICO-style (chuẩn BIS 2004):
             Score = Target_Score - Factor × ln(Odds / Target_Odds)
             Factor = PDO / ln(2)
-
-        Nguồn: BA Document - Novabank Credit Scorecard v1.0
         """
-        target_score = self.scorecard_cfg.get("target_score", 500)
-        target_odds  = self.scorecard_cfg.get("target_odds", 3.58)
-        pdo          = self.scorecard_cfg.get("pdo", 50)
-        score_min    = self.scorecard_cfg.get("score_min", 381)
-        score_max    = self.scorecard_cfg.get("score_max", 553)
+        target_score = self.scorecard_cfg.get("target_score", 600)
+        target_odds  = self.scorecard_cfg.get("target_odds", 20)
+        pdo          = self.scorecard_cfg.get("pdo", 20)
+        score_min    = self.scorecard_cfg.get("score_min", 300)
+        score_max    = self.scorecard_cfg.get("score_max", 850)
 
         pd_value = max(min(pd_value, 0.9999), 0.0001)
         odds     = pd_value / (1 - pd_value)
@@ -69,19 +67,19 @@ class ModelPredictor:
         return max(min(score, score_max), score_min)
 
     def _assign_risk_tier(self, credit_score: int) -> tuple[str, str]:
-        """Phân loại khách hàng vào nhóm rủi ro và đưa ra quyết định.
+        """Phân loại khách hàng vào nhóm rủi ro và đưa ra quyết định theo chuẩn FICO.
 
-        Ngưỡng dựa trên phân phối điểm thực tế của tập huấn luyện Novabank:
-            >= 510 : Rủi ro thấp   → Tự động phê duyệt
-            467-509: Rủi ro trung bình thấp → Phê duyệt có điều kiện (lãi suất cao hơn)
-            424-466: Rủi ro trung bình cao  → Thẩm định thủ công
-            < 424  : Rủi ro cao    → Từ chối tự động
+        Ngưỡng FICO chuẩn:
+            >= 740 : Very Good / Exceptional → Tự động phê duyệt
+            670-739: Good                   → Phê duyệt có điều kiện
+            580-669: Fair                   → Thẩm định thủ công
+            < 580  : Poor                   → Từ chối tự động
         """
-        if credit_score >= 510:
+        if credit_score >= 740:
             return "LOW", "APPROVED"
-        elif credit_score >= 467:
+        elif credit_score >= 670:
             return "MEDIUM_LOW", "APPROVED_CONDITIONAL"
-        elif credit_score >= 424:
+        elif credit_score >= 580:
             return "MEDIUM_HIGH", "MANUAL_REVIEW"
         else:
             return "HIGH", "REJECTED"
@@ -89,23 +87,11 @@ class ModelPredictor:
     # ── WoE CONTRIBUTION (EXPLAINABILITY) ───────────────────────────────────
 
     def _calculate_contributions(self, X_woe_row: pd.Series) -> dict:
-        """Tính đóng góp điểm của từng biến theo công thức BA.
+        """Tính đóng góp điểm của từng biến theo công thức WoE Contribution.
 
         Công thức: Points_i = Round(WoE_i × score_factor / 10)
-        Nguồn: BA Document — Mục 4, Tính toán điểm
-
-        Args:
-            X_woe_row: Một hàng dữ liệu đã qua WoE transform.
-
-        Returns:
-            dict chứa điểm đóng góp của từng biến, ví dụ:
-            {
-                "loan_to_income_ratio": -12.5,   # đóng góp âm → tăng rủi ro
-                "person_income":         8.2,    # đóng góp dương → giảm rủi ro
-                ...
-            }
         """
-        score_factor = self.scorecard_cfg.get("score_factor", 72.13)
+        score_factor = self.scorecard_cfg.get("score_factor", 28.85)
         all_feature_cols = self.config.get("numerical_cols", []) + self.config.get("categorical_cols", [])
 
         contributions = {}

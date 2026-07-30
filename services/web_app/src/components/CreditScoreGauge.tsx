@@ -5,7 +5,9 @@ import { useTranslation } from 'react-i18next';
 const { Title, Text } = Typography;
 
 interface CreditScoreGaugeProps {
-  score: number;       // 300 to 850
+  score: number;       // 381 to 553 (or custom)
+  minScore?: number;   // Default 381
+  maxScore?: number;   // Default 553
   pdScore: number;     // 0 to 1
   riskTier: string;
   decision: string;
@@ -13,6 +15,8 @@ interface CreditScoreGaugeProps {
 
 export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
   score,
+  minScore = 300,
+  maxScore = 850,
   pdScore,
   riskTier,
   decision,
@@ -20,8 +24,8 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
   const { t } = useTranslation();
   const { token } = theme.useToken();
 
-  // Normalize score to percentage (300 to 850 scale)
-  const percentage = Math.min(Math.max(((score - 300) / 550) * 100, 0), 100);
+  // Normalize score to percentage based on FICO scale (300 to 850)
+  const percentage = Math.min(Math.max(((score - minScore) / (maxScore - minScore)) * 100, 0), 100);
 
   const getDecisionAlert = () => {
     switch (decision) {
@@ -62,11 +66,7 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
           <path
             d="M 20 100 A 80 80 0 0 1 180 100"
             fill="none"
-<<<<<<< HEAD
-            stroke="rgba(255, 255, 255, 0.1)"
-=======
             stroke={token.colorFillAlter}
->>>>>>> feature/frontend
             strokeWidth="16"
             strokeLinecap="round"
           />
@@ -88,29 +88,6 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
             </linearGradient>
           </defs>
         </svg>
-<<<<<<< HEAD
-        <div style={{ position: 'absolute', bottom: '10px', left: '0', right: '0' }}>
-          <div className="score-badge">{score}</div>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Thang điểm (300 - 850)</span>
-        </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', width: '100%', marginTop: '1rem' }}>
-        <div style={{ background: 'rgba(15, 23, 42, 0.5)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Xác suất Vỡ nợ (PD)</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#60A5FA', marginTop: '0.25rem' }}>
-            {(pdScore * 100).toFixed(2)}%
-          </div>
-        </div>
-
-        <div style={{ background: 'rgba(15, 23, 42, 0.5)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Phân hạng Rủi ro</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#34D399', marginTop: '0.25rem' }}>
-            TIER {riskTier}
-          </div>
-        </div>
-      </div>
-=======
         <div style={{ position: 'absolute', bottom: '10px', left: '0', right: '0', textAlign: 'center' }}>
           <div style={{
             fontSize: '3rem',
@@ -121,7 +98,9 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
           }}>
             {score}
           </div>
-          <span style={{ fontSize: '13px', color: token.colorTextSecondary }}>{t('gauge.scale')}</span>
+          <span style={{ fontSize: '13px', color: token.colorTextSecondary }}>
+            {t('gauge.scale', { min: minScore, max: maxScore })}
+          </span>
         </div>
       </div>
 
@@ -143,7 +122,6 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
           </Card>
         </Col>
       </Row>
->>>>>>> feature/frontend
     </div>
   );
 };

@@ -101,15 +101,14 @@ tasks:
       random_state: 42
 
     # -------------------------------------------------------------------
-    # Quy đổi điểm tín dụng (Scorecard Calibration)
-    # Nguồn: BA Document — FICO-style Point Allocation
+    # Quy đổi điểm tín dụng (Scorecard Calibration - Standard FICO)
     # Công thức: Score = Target_Score - Factor × ln(Odds / Target_Odds)
-    # Factor = PDO / ln(2) = 50 / ln(2) ≈ 72.13
+    # Factor = PDO / ln(2) = 20 / ln(2) ≈ 28.85
     # -------------------------------------------------------------------
     scorecard:
-      target_score: 500       # Điểm chuẩn (tương ứng Target Odds 3.58)
-      target_odds: 3.58       # Tỷ lệ cược tại Target Score (Non-default/Default)
-      pdo: 50                 # Points to Double the Odds
-      score_factor: 72.13     # = PDO / ln(2) — hệ số chuyển đổi WoE → điểm
-      score_min: 381          # Điểm tối thiểu có thể đạt được
-      score_max: 553          # Điểm tối đa có thể đạt được
+      target_score: 600       # Điểm chuẩn FICO
+      target_odds: 20         # Tỷ lệ cược chuẩn
+      pdo: 20                 # Points to Double the Odds (FICO standard)
+      score_factor: 28.85     # = PDO / ln(2)
+      score_min: 300          # Điểm tối thiểu FICO
+      score_max: 850          # Điểm tối đa FICO

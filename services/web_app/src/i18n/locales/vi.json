@@ -117,7 +117,7 @@
       "manual": "CHUYỂN CÁN BỘ THẨM ĐỊNH THỦ CÔNG",
       "rejected": "HỒ SƠ BỊ TỪ CHỐI TỰ ĐỘNG"
     },
-    "scale": "Thang điểm (300 - 850)",
+    "scale": "Thang điểm ({{min}} - {{max}})",
     "pdScore": "Xác suất Vỡ nợ (PD)",
     "riskTier": "Phân hạng Rủi ro",
     "tierName": "Hạng {{tier}}"

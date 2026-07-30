@@ -117,7 +117,7 @@
       "manual": "MANUAL REVIEW REQUIRED",
       "rejected": "APPLICATION AUTOMATICALLY REJECTED"
     },
-    "scale": "Scale (300 - 850)",
+    "scale": "Score Scale ({{min}} - {{max}})",
     "pdScore": "Probability of Default (PD)",
     "riskTier": "Risk Tier",
     "tierName": "Tier {{tier}}"
