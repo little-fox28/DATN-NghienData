@@ -113,6 +113,7 @@
   "gauge": {
     "decision": {
       "approved": "APPLICATION AUTOMATICALLY APPROVED",
+      "approved_conditional": "APPROVED CONDITIONALLY (HIGHER RATE)",
       "manual": "MANUAL REVIEW REQUIRED",
       "rejected": "APPLICATION AUTOMATICALLY REJECTED"
     },

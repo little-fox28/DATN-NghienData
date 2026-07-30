@@ -27,6 +27,8 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
     switch (decision) {
       case 'APPROVED':
         return <Alert message={t('gauge.decision.approved')} type="success" showIcon />;
+      case 'APPROVED_CONDITIONAL':
+        return <Alert message={t('gauge.decision.approved_conditional')} type="info" showIcon />;
       case 'MANUAL_REVIEW':
         return <Alert message={t('gauge.decision.manual')} type="warning" showIcon />;
       case 'REJECTED':
@@ -37,15 +39,16 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
 
   const getPdColor = (pd: number) => {
     if (pd < 0.1) return '#52c41a'; // Xanh lá
-    if (pd < 0.2) return '#faad14'; // Vàng cam
+    if (pd < 0.25) return '#faad14'; // Vàng cam
     return '#f5222d'; // Đỏ
   };
 
   const getTierColor = (tier: string) => {
     const tTier = tier.toUpperCase();
-    if (tTier === 'A' || tTier === 'B' || tTier === 'LOW') return '#52c41a'; // Xanh lá
-    if (tTier === 'C' || tTier === 'D' || tTier === 'MEDIUM') return '#faad14'; // Vàng
-    return '#f5222d'; // Đỏ (HIGH, CRITICAL, E, F, G)
+    if (tTier === 'A' || tTier === 'LOW') return '#52c41a'; // Xanh lá
+    if (tTier === 'B' || tTier === 'MEDIUM_LOW') return '#1677ff'; // Xanh dương (Blue)
+    if (tTier === 'C' || tTier === 'D' || tTier === 'MEDIUM_HIGH') return '#faad14'; // Vàng cam
+    return '#f5222d'; // Đỏ (HIGH, CRITICAL)
   };
 
   return (

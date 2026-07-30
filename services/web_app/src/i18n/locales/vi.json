@@ -113,6 +113,7 @@
   "gauge": {
     "decision": {
       "approved": "HỒ SƠ ĐƯỢC PHÊ DUYỆT TỰ ĐỘNG",
+      "approved_conditional": "PHÊ DUYỆT CÓ ĐIỀU KIỆN (TĂNG LÃI SUẤT)",
       "manual": "CHUYỂN CÁN BỘ THẨM ĐỊNH THỦ CÔNG",
       "rejected": "HỒ SƠ BỊ TỪ CHỐI TỰ ĐỘNG"
     },
