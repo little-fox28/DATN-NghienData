@@ -1,4 +1,8 @@
+import { Alert, Card, Col, Row, Typography, theme } from 'antd';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+
+const { Title, Text } = Typography;
 
 interface CreditScoreGaugeProps {
   score: number;       // 300 to 850
@@ -13,45 +17,56 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
   riskTier,
   decision,
 }) => {
+  const { t } = useTranslation();
+  const { token } = theme.useToken();
+
   // Normalize score to percentage (300 to 850 scale)
   const percentage = Math.min(Math.max(((score - 300) / 550) * 100, 0), 100);
-  
-  const getDecisionClass = () => {
+
+  const getDecisionAlert = () => {
     switch (decision) {
       case 'APPROVED':
-        return 'decision-approved';
+        return <Alert message={t('gauge.decision.approved')} type="success" showIcon />;
+      case 'APPROVED_CONDITIONAL':
+        return <Alert message={t('gauge.decision.approved_conditional')} type="info" showIcon />;
       case 'MANUAL_REVIEW':
-        return 'decision-review';
+        return <Alert message={t('gauge.decision.manual')} type="warning" showIcon />;
       case 'REJECTED':
       default:
-        return 'decision-rejected';
+        return <Alert message={t('gauge.decision.rejected')} type="error" showIcon />;
     }
   };
 
-  const getDecisionText = () => {
-    switch (decision) {
-      case 'APPROVED':
-        return '✅ HỒ SƠ ĐƯỢC PHÊ DUYỆT TỰ ĐỘNG';
-      case 'MANUAL_REVIEW':
-        return '⚠️ CHUYỂN CÁN BỘ THẨM ĐỊNH THỦ CÔNG';
-      case 'REJECTED':
-      default:
-        return '❌ HỒ SƠ BỊ TỪ CHỐI TỰ ĐỘNG';
-    }
+  const getPdColor = (pd: number) => {
+    if (pd < 0.1) return '#52c41a'; // Xanh lá
+    if (pd < 0.25) return '#faad14'; // Vàng cam
+    return '#f5222d'; // Đỏ
+  };
+
+  const getTierColor = (tier: string) => {
+    const tTier = tier.toUpperCase();
+    if (tTier === 'A' || tTier === 'LOW') return '#52c41a'; // Xanh lá
+    if (tTier === 'B' || tTier === 'MEDIUM_LOW') return '#1677ff'; // Xanh dương (Blue)
+    if (tTier === 'C' || tTier === 'D' || tTier === 'MEDIUM_HIGH') return '#faad14'; // Vàng cam
+    return '#f5222d'; // Đỏ (HIGH, CRITICAL)
   };
 
   return (
-    <div className="result-container">
-      <div className={`decision-banner ${getDecisionClass()}`}>
-        {getDecisionText()}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
+      <div style={{ width: '100%' }}>
+        {getDecisionAlert()}
       </div>
 
-      <div style={{ position: 'relative', width: '220px', height: '140px', marginTop: '1rem' }}>
+      <div style={{ position: 'relative', width: '220px', height: '140px', marginTop: '16px' }}>
         <svg width="220" height="140" viewBox="0 0 200 120">
           <path
             d="M 20 100 A 80 80 0 0 1 180 100"
             fill="none"
+<<<<<<< HEAD
             stroke="rgba(255, 255, 255, 0.1)"
+=======
+            stroke={token.colorFillAlter}
+>>>>>>> feature/frontend
             strokeWidth="16"
             strokeLinecap="round"
           />
@@ -73,6 +88,7 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
             </linearGradient>
           </defs>
         </svg>
+<<<<<<< HEAD
         <div style={{ position: 'absolute', bottom: '10px', left: '0', right: '0' }}>
           <div className="score-badge">{score}</div>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Thang điểm (300 - 850)</span>
@@ -94,6 +110,40 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
           </div>
         </div>
       </div>
+=======
+        <div style={{ position: 'absolute', bottom: '10px', left: '0', right: '0', textAlign: 'center' }}>
+          <div style={{
+            fontSize: '3rem',
+            fontWeight: 800,
+            background: 'linear-gradient(135deg, #1677ff, #52c41a)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
+            {score}
+          </div>
+          <span style={{ fontSize: '13px', color: token.colorTextSecondary }}>{t('gauge.scale')}</span>
+        </div>
+      </div>
+
+      <Row gutter={16} style={{ width: '100%' }}>
+        <Col span={12}>
+          <Card bordered={false} style={{ backgroundColor: token.colorFillAlter }} bodyStyle={{ padding: '16px', textAlign: 'center' }}>
+            <Text type="secondary" style={{ fontSize: '12px' }}>{t('gauge.pdScore')}</Text>
+            <Title level={3} style={{ margin: 0, color: getPdColor(pdScore) }}>
+              {(pdScore * 100).toFixed(2)}%
+            </Title>
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card bordered={false} style={{ backgroundColor: token.colorFillAlter }} bodyStyle={{ padding: '16px', textAlign: 'center' }}>
+            <Text type="secondary" style={{ fontSize: '12px' }}>{t('gauge.riskTier')}</Text>
+            <Title level={3} style={{ margin: 0, color: getTierColor(riskTier) }}>
+              {t('gauge.tierName', { tier: riskTier })}
+            </Title>
+          </Card>
+        </Col>
+      </Row>
+>>>>>>> feature/frontend
     </div>
   );
 };

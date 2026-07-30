@@ -1,0 +1,125 @@
+{
+  "navbar": {
+    "title": "CREDIT RISK",
+    "subtitle": "Loan Origination & Credit Scoring System"
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "apply": "New Loan Application"
+  },
+  "footer": {
+    "copyright": "© 2026 DATN — Credit Risk & Loan Origination System | Developed by NghienData Team"
+  },
+  "settings": {
+    "theme": "Theme",
+    "language": "Language",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "dashboard": {
+    "title": "System Overview (Dashboard)",
+    "welcome": "Welcome to the Credit Risk Assessment system powered by AI Core.",
+    "stats": {
+      "processed": "Total Processed Applications",
+      "highRisk": "High Risk Alerts",
+      "reappraisal": "Pending Reappraisal"
+    },
+    "futureNote": "Detailed chart reports will be added in future versions."
+  },
+  "loanApplication": {
+    "steps": {
+      "demographics": "Demographics",
+      "financial": "Financial & Employment",
+      "intent": "Loan Intent",
+      "result": "Result"
+    },
+    "errors": {
+      "systemError": "System Error",
+      "serverError": "Cannot connect to Server. Please check the Server.",
+      "requireAge": "Please enter age!",
+      "requireGender": "Please select gender!",
+      "required": "This field is required!",
+      "invalidInput": "Please check your input information again"
+    },
+    "step1": {
+      "title": "Step 1: Demographics Information",
+      "description": "Collect personal identification attributes of the applicant.",
+      "age": "Applicant Age",
+      "gender": "Gender",
+      "male": "Male (MALE)",
+      "female": "Female (FEMALE)",
+      "education": "Education Level",
+      "highSchool": "High School (HIGH_SCHOOL)",
+      "bachelor": "Bachelor (BACHELOR)",
+      "master": "Master (MASTER)",
+      "doctorate": "Doctorate (DOCTORATE)",
+      "maritalStatus": "Marital Status",
+      "single": "Single (SINGLE)",
+      "married": "Married (MARRIED)",
+      "divorced": "Divorced (DIVORCED)"
+    },
+    "step2": {
+      "title": "Step 2: Financial Capacity & Credit History",
+      "description": "Declare income, employment length, and bad debt history on CIC.",
+      "income": "Annual Income ($)",
+      "homeOwnership": "Home Ownership",
+      "rent": "Rent (RENT)",
+      "own": "Own (OWN)",
+      "mortgage": "Mortgage (MORTGAGE)",
+      "other": "Other (OTHER)",
+      "empLength": "Employment Length (Years)",
+      "defaultHist": "Any bad debt history on CIC?",
+      "no": "No (N)",
+      "yes": "Yes (Y)",
+      "credHistLength": "Credit History Length (Years)"
+    },
+    "step3": {
+      "title": "Step 3: Loan Application Details",
+      "description": "Enter loan amount, expected risk grade, and capital usage intent.",
+      "amount": "Loan Amount ($)",
+      "intent": "Loan Intent",
+      "personal": "Personal (PERSONAL)",
+      "education": "Education (EDUCATION)",
+      "medical": "Medical (MEDICAL)",
+      "venture": "Venture (VENTURE)",
+      "homeImprovement": "Home Improvement (HOMEIMPROVEMENT)",
+      "debtConsolidation": "Debt Consolidation (DEBTCONSOLIDATION)",
+      "grade": "Loan Grade (A-G)",
+      "gradeA": "Grade A (Safest)",
+      "gradeB": "Grade B",
+      "gradeC": "Grade C",
+      "gradeD": "Grade D",
+      "gradeE": "Grade E",
+      "gradeF": "Grade F",
+      "gradeG": "Grade G (High Risk)",
+      "intRate": "Proposed Interest Rate (%)"
+    },
+    "result": {
+      "title": "Approval Result & Credit Scoring"
+    },
+    "buttons": {
+      "prev": "Back",
+      "next": "Next",
+      "submit": "Score with AI Now",
+      "reset": "New Loan Application"
+    },
+    "messages": {
+      "success": "Credit scoring successful!"
+    }
+  },
+  "gauge": {
+    "decision": {
+      "approved": "APPLICATION AUTOMATICALLY APPROVED",
+      "approved_conditional": "APPROVED CONDITIONALLY (HIGHER RATE)",
+      "manual": "MANUAL REVIEW REQUIRED",
+      "rejected": "APPLICATION AUTOMATICALLY REJECTED"
+    },
+    "scale": "Scale (300 - 850)",
+    "pdScore": "Probability of Default (PD)",
+    "riskTier": "Risk Tier",
+    "tierName": "Tier {{tier}}"
+  }
+}

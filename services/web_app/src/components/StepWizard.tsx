@@ -1,5 +1,6 @@
+import { Award, FileText, User, Wallet } from 'lucide-react';
 import React from 'react';
-import { User, Wallet, FileText, Award } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface StepWizardProps {
   currentStep: number;
@@ -7,11 +8,13 @@ interface StepWizardProps {
 }
 
 export const StepWizard: React.FC<StepWizardProps> = ({ currentStep, onStepClick }) => {
+  const { t } = useTranslation();
+
   const steps = [
-    { number: 1, title: 'Nhân khẩu học', icon: User },
-    { number: 2, title: 'Tài chính & Việc làm', icon: Wallet },
-    { number: 3, title: 'Nhu cầu Khoản vay', icon: FileText },
-    { number: 4, title: 'Kết quả Chấm điểm AI', icon: Award },
+    { number: 1, title: t('loanApplication.steps.demographics'), icon: User },
+    { number: 2, title: t('loanApplication.steps.financial'), icon: Wallet },
+    { number: 3, title: t('loanApplication.steps.intent'), icon: FileText },
+    { number: 4, title: t('loanApplication.steps.result'), icon: Award },
   ];
 
   return (

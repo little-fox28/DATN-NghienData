@@ -6,8 +6,8 @@ import logging
 import numpy as np
 import pandas as pd
 
-from .features import FeatureEngineer
-from .train import ModelTrainer
+from services.ml_engine.src.machine_learning.features import FeatureEngineer
+from services.ml_engine.src.machine_learning.train import ModelTrainer
 
 logger = logging.getLogger(__name__)
 

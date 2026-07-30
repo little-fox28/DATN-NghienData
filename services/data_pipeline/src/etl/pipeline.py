@@ -7,7 +7,7 @@ from .extract.monitor_data import CreditDataValidator
 from .transform.convert_xls_to_csv import convert_xls_to_csv
 from shared.utils.logger import get_logger
 from shared.utils.connector import SQLServerConnector
-from .load import DataLoader
+from services.data_pipeline.src.etl.load import DataLoader
 
 logger = get_logger(__name__)
 

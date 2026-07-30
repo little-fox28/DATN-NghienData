@@ -6,7 +6,7 @@ import pandas as pd
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 
-from .config import get_abs_path
+from services.ml_engine.src.machine_learning.config import get_abs_path
 
 logger = logging.getLogger(__name__)
 

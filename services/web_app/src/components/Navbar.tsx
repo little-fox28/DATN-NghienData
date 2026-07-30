@@ -1,26 +1,56 @@
+import { Layout, theme, Select, Space } from 'antd';
 import React from 'react';
-import { ShieldCheck, Cpu } from 'lucide-react';
+import { useAppContext } from '../contexts/AppProvider';
+import { useTranslation } from 'react-i18next';
+import { GlobalOutlined, BgColorsOutlined } from '@ant-design/icons';
+
+const { Header } = Layout;
 
 export const Navbar: React.FC = () => {
-  return (
-    <header className="navbar">
-      <div className="navbar-brand">
-        <div className="brand-icon">
-          <ShieldCheck size={22} color="#FFFFFF" />
-        </div>
-        <div>
-          <span>CREDIT RISK AI</span>
-          <span style={{ fontSize: '0.75rem', display: 'block', color: 'var(--text-muted)', fontWeight: 400 }}>
-            Hệ thống Thu thập Khoản vay & Chấm điểm Tín dụng
-          </span>
-        </div>
-      </div>
+  const {
+    token: { colorBgContainer, colorText, colorBorderSecondary },
+  } = theme.useToken();
+  const { language, setLanguage, themeMode, setThemeMode } = useAppContext();
+  const { t } = useTranslation();
 
-      <div className="navbar-badge">
-        <div className="pulse-dot" />
-        <Cpu size={14} />
-        <span>ML Core Engine Active</span>
+  return (
+    <Header style={{ background: colorBgContainer, padding: '0 24px', display: 'flex', alignItems: 'center', borderBottom: `1px solid ${colorBorderSecondary}`, lineHeight: 'normal' }}>
+      <div className="header-container">
+        <div className="brand-section">
+          <img src='/logo.png' alt='logo' width={'auto'} height={50} />
+          <div>
+            <h1 className="brand-title" style={{ color: colorText }}>{t('navbar.title')}</h1>
+            <span className="brand-subtitle">
+              {t('navbar.subtitle')}
+            </span>
+          </div>
+        </div>
+        <div className="actions-section">
+          <Space size="middle">
+            <Select
+              value={language}
+              onChange={setLanguage}
+              style={{ width: 130 }}
+              suffixIcon={<GlobalOutlined />}
+              options={[
+                { value: 'vi', label: t('settings.vi') },
+                { value: 'en', label: t('settings.en') },
+              ]}
+            />
+            <Select
+              value={themeMode}
+              onChange={setThemeMode}
+              style={{ width: 130 }}
+              suffixIcon={<BgColorsOutlined />}
+              options={[
+                { value: 'light', label: t('settings.light') },
+                { value: 'dark', label: t('settings.dark') },
+                { value: 'system', label: t('settings.system') },
+              ]}
+            />
+          </Space>
+        </div>
       </div>
-    </header>
+    </Header>
   );
 };

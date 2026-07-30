@@ -1,7 +1,7 @@
 import yaml
 from pathlib import Path
 # Thư mục gốc dự án (DATN/)
-ROOT_DIR = Path(__file__).resolve().parents[4]
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
 # Đường dẫn đến file cấu hình ML
 CONFIG_PATH = Path(__file__).resolve().parent / "config.yaml"
 def load_raw_config() -> dict:
