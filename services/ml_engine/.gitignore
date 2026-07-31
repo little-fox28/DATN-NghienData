@@ -1,4 +1,4 @@
-# Byte-compiled / optimized / DLL files
+# Byte-compiled / optimized files
 __pycache__/
 *.py[cod]
 *$py.class
@@ -8,8 +8,15 @@ __pycache__/
 .env.*
 !.env.example
 
-# Generated figures & temporary evaluation logs
-reports/figures/
+# Ignore generated binary models (keep folder structure via .gitkeep)
+models/*
+!models/.gitkeep
+
+# Ignore generated evaluation reports & figures
+reports/*
+!reports/.gitkeep
+
+# Logs & temp files
 *.log
 logs/
 .pytest_cache/

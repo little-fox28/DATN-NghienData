@@ -22,12 +22,26 @@ from services.ml_engine.src.machine_learning.predict import ModelPredictor
 from fastapi.middleware.cors import CORSMiddleware
 
 # Khởi tạo sẵn ModelPredictor cho bài toán mặc định (Credit Risk) khi khởi động API
-try:
-    default_config = get_task_config("credit_risk")
-    default_config["task_name"] = "credit_risk"
-    default_predictor = ModelPredictor(default_config)
-except Exception as err:
-    default_predictor = None
+def get_default_predictor():
+    try:
+        default_config = get_task_config("credit_risk")
+        default_config["task_name"] = "credit_risk"
+
+        # Auto-train fallback: Nếu chưa có file model artifacts, tự động train 1 lần duy nhất
+        model_file = Path(default_config["model_artifact_abs"])
+        encoder_file = Path(default_config["encoder_artifact_abs"])
+        if not model_file.exists() or not encoder_file.exists():
+            print("⚡ Model artifacts không tìm thấy. Tự động kích hoạt ML Pipeline để train model...")
+            from services.ml_engine.src.machine_learning.pipeline import MLPipeline
+            pipeline = MLPipeline(task_name="credit_risk", skip_preprocessing=True)
+            pipeline.run()
+
+        return ModelPredictor(default_config)
+    except Exception as err:
+        print(f"⚠️ Không thể khởi tạo default predictor: {err}")
+        return None
+
+default_predictor = get_default_predictor()
 
 app = FastAPI(
     title="Loan Application & Credit Risk API",
