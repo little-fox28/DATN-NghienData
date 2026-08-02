@@ -31,7 +31,7 @@ def get_default_predictor():
         model_file = Path(default_config["model_artifact_abs"])
         encoder_file = Path(default_config["encoder_artifact_abs"])
         if not model_file.exists() or not encoder_file.exists():
-            print("⚡ Model artifacts không tìm thấy. Tự động kích hoạt ML Pipeline để train model...")
+            print("⚡ Model artifacts not found. Trigger pipeline trainning ML model...")
             from services.ml_engine.src.machine_learning.pipeline import MLPipeline
             pipeline = MLPipeline(task_name="credit_risk", skip_preprocessing=True)
             pipeline.run()
