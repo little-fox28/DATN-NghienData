@@ -102,9 +102,12 @@
     },
     "buttons": {
       "prev": "Quay lại",
-      "next": "Tiếp theo",
+      "next": "Tiếp tục",
       "submit": "Chấm điểm AI ngay",
-      "reset": "Nhập hồ sơ vay mới"
+      "reset": "Tạo hồ sơ vay mới",
+      "saveToDb": "Tạo hồ sơ vay ngay",
+      "created": "Tạo hồ sơ vay thành công",
+      "errorSaveToDb": "Lỗi lưu dữ liệu"
     },
     "messages": {
       "success": "Chấm điểm tín dụng thành công!"

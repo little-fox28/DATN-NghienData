@@ -1,7 +1,7 @@
 import axios from 'axios';
-import type { LoanApplicationData, PredictApiResponse } from '../types/loan';
+import type { LoanApplicationData, PredictApiResponse, SaveEnrichedRecordPayload } from '../types/loan';
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -16,5 +16,10 @@ export const predictCreditRisk = async (
   task: string = 'credit_risk'
 ): Promise<PredictApiResponse> => {
   const response = await apiClient.post<PredictApiResponse>(`/api/v1/predict?task=${task}`, application);
+  return response.data;
+};
+
+export const saveEnrichedRecord = async (data: SaveEnrichedRecordPayload) => {
+  const response = await apiClient.post('/api/v1/enrich', data);
   return response.data;
 };

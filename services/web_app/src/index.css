@@ -63,7 +63,6 @@ body {
 .pulse-dot {
   width: 8px;
   height: 8px;
-<<<<<<< HEAD
   background: #34D399;
   border-radius: 50%;
   box-shadow: 0 0 8px #34D399;
@@ -299,7 +298,8 @@ body {
   border-top: 1px solid var(--card-border);
   margin-top: auto;
 }
-=======
+
+.pulse-dot-light {
   background: #52c41a;
   border-radius: 50%;
   box-shadow: 0 0 4px #52c41a;
@@ -371,4 +371,3 @@ body.dark-mode .form-container-card {
 }
 
 /* --- Gauge Stat Card removed to allow Antd to handle background automatically --- */
->>>>>>> feature/frontend
