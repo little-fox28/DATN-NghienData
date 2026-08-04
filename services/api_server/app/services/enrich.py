@@ -3,12 +3,12 @@ Enrich Service — Business logic cho việc đọc/ghi dữ liệu CSV enriched
 """
 import csv
 import io
-import uuid
 from datetime import datetime, date
 from pathlib import Path
 from typing import Optional
 
 from services.api_server.app.schemas.loan import EnrichPayload
+from services.api_server.app.utils.hash_utils import generate_client_id
 
 # Đường dẫn tới thư mục data/raw (4 cấp lên từ services/api_server/app/services/)
 DATA_RAW_DIR: Path = Path(__file__).resolve().parent.parent.parent.parent.parent / "data" / "raw"
@@ -58,7 +58,7 @@ def save_record(payload: EnrichPayload) -> dict:
     file_exists = file_path.exists()
 
     app_data = payload.application.model_dump()
-    client_id = f"ENRICH_{uuid.uuid4().hex[:12].upper()}"
+    client_id = generate_client_id(app_data)
 
     row = {
         "client_ID":                client_id,
