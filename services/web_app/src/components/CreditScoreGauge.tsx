@@ -5,7 +5,9 @@ import { useTranslation } from 'react-i18next';
 const { Title, Text } = Typography;
 
 interface CreditScoreGaugeProps {
-  score: number;       // 300 to 850
+  score: number;       // 381 to 553 (or custom)
+  minScore?: number;   // Default 381
+  maxScore?: number;   // Default 553
   pdScore: number;     // 0 to 1
   riskTier: string;
   decision: string;
@@ -13,6 +15,8 @@ interface CreditScoreGaugeProps {
 
 export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
   score,
+  minScore = 300,
+  maxScore = 850,
   pdScore,
   riskTier,
   decision,
@@ -20,8 +24,8 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
   const { t } = useTranslation();
   const { token } = theme.useToken();
 
-  // Normalize score to percentage (300 to 850 scale)
-  const percentage = Math.min(Math.max(((score - 300) / 550) * 100, 0), 100);
+  // Normalize score to percentage based on FICO scale (300 to 850)
+  const percentage = Math.min(Math.max(((score - minScore) / (maxScore - minScore)) * 100, 0), 100);
 
   const getDecisionAlert = () => {
     switch (decision) {
@@ -94,7 +98,9 @@ export const CreditScoreGauge: React.FC<CreditScoreGaugeProps> = ({
           }}>
             {score}
           </div>
-          <span style={{ fontSize: '13px', color: token.colorTextSecondary }}>{t('gauge.scale')}</span>
+          <span style={{ fontSize: '13px', color: token.colorTextSecondary }}>
+            {t('gauge.scale', { min: minScore, max: maxScore })}
+          </span>
         </div>
       </div>
 

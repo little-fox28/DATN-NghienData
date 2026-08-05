@@ -16,6 +16,7 @@ DATN/
 │   │   └── requirements.txt        # Dependencies riêng cho Data Engineering
 │   ├── ml_engine/                  # Domain 2: Machine Learning Engine
 │   │   ├── models/                 # Lưu trữ artifacts mô hình ML và encoders (.pkl, .joblib)
+│   │   ├── models_readable/        # Chứa bản dịch (JSON/TXT) của mô hình để dễ đọc
 │   │   ├── reports/                # Báo cáo kết quả ML (thông số kỹ thuật, biểu đồ)
 │   │   ├── src/
 │   │   │   └── machine_learning/   # Core ML (Preprocess, Feature, Train, Eval, Predict)

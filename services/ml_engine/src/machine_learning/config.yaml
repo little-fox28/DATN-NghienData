@@ -11,58 +11,85 @@ global:
 tasks:
   # ===================================================================
   # BÀI TOÁN 1: Dự báo Xác suất Nợ xấu (Credit Risk / Default Prediction)
+  # Cấu hình dựa theo Tài liệu BA - Novabank Credit Scorecard v1.0
   # ===================================================================
   credit_risk:
     task_name: "Credit Risk Default Prediction"
     task_type: "binary_classification"
     target_column: "loan_status"
     id_column: "client_ID"
-    
-    # Tiền xử lý
-    fillna_median_cols:
-      - "person_emp_length"
+
+    # -------------------------------------------------------------------
+    # Tiền xử lý (Preprocessing)
+    # BA: loan_int_rate & person_emp_length nếu NULL → gán nhóm "Missing"
+    #     (WoE Binner sẽ xử lý nhóm NaN thành một bin riêng, điểm = 0)
+    # -------------------------------------------------------------------
+    fillna_missing_cols:
       - "loan_int_rate"
+      - "person_emp_length"
+
+    # BA: Các biến bị loại bỏ (Drop) theo từng lý do nghiệp vụ:
+    # - PII/ID          : client_ID
+    # - Địa lý          : country, state, city, city_latitude, city_longitude
+    # - Trùng lặp LTI   : loan_percent_income (bản làm tròn của loan_to_income_ratio)
+    # - IV thấp (<2% DR): employment_type, education_level, credit_utilization_ratio
+    # - Confound        : past_delinquencies (bị confound bởi cb_person_default_on_file)
+    # - ECOA/FCA cấm   : gender, marital_status
+    # - Ngoài top 10   : cb_person_cred_hist_length, person_age
     drop_cols:
       - "client_ID"
-      - "city"
-      - "state"
       - "country"
+      - "state"
+      - "city"
       - "city_latitude"
       - "city_longitude"
+      - "loan_percent_income"
+      - "employment_type"
+      - "education_level"
+      - "credit_utilization_ratio"
+      - "past_delinquencies"
+      - "gender"
+      - "marital_status"
+      - "cb_person_cred_hist_length"
+      - "person_age"
+
     test_size: 0.2
     random_state: 42
 
-    # Danh sách đặc trưng (Feature Groups)
+    # -------------------------------------------------------------------
+    # 10 Biến được lựa chọn theo IV & nghiệp vụ (khung 5C)
+    # Nguồn: BA Document - Novabank Credit Scorecard
+    # -------------------------------------------------------------------
+    # Biến phân loại (Categorical / Ordinal / Binary)
     categorical_cols:
-      - "person_home_ownership"
-      - "loan_intent"
-      - "loan_grade"
-      - "cb_person_default_on_file"
-      - "gender"
-      - "marital_status"
-      - "education_level"
-      - "employment_type"
-    numerical_cols:
-      - "person_age"
-      - "person_income"
-      - "person_emp_length"
-      - "loan_amnt"
-      - "loan_int_rate"
-      - "loan_percent_income"
-      - "cb_person_cred_hist_length"
-      - "loan_to_income_ratio"
-      - "debt_to_income_ratio"
-      - "credit_utilization_ratio"
-      - "past_delinquencies"
+      - "loan_grade"              # 5C: Character — Hạng tín dụng (Ordinal: A > B > C...)
+      - "person_home_ownership"   # 5C: Capital    — Loại hình sở hữu nhà
+      - "cb_person_default_on_file" # 5C: Character — Lịch sử vỡ nợ (Binary: Y/N)
+      - "loan_intent"             # 5C: Conditions — Mục đích vay
 
+    # Biến số liên tục (Numerical)
+    numerical_cols:
+      - "loan_to_income_ratio"    # 5C: Capacity   — Tỷ lệ Khoản vay / Thu nhập (IV cao nhất)
+      - "debt_to_income_ratio"    # 5C: Capacity   — Tỷ lệ Nợ / Thu nhập
+      - "person_income"           # 5C: Capacity   — Thu nhập cá nhân
+      - "loan_int_rate"           # 5C: Conditions — Lãi suất khoản vay
+      - "person_emp_length"       # 5C: Capacity   — Thâm niên công tác
+      - "loan_amnt"               # 5C: Conditions — Số tiền vay
+
+    # -------------------------------------------------------------------
     # Mô hình & Lưu trữ Artifacts
+    # -------------------------------------------------------------------
     model_type: "xgboost"
     model_artifact: "services/ml_engine/models/credit_risk_model.joblib"
     encoder_artifact: "services/ml_engine/models/woe_binner.pkl"
     metrics_output: "services/ml_engine/reports/training_metrics.json"
     figures_dir: "services/ml_engine/reports/figures"
 
+    # -------------------------------------------------------------------
     # Siêu tham số mô hình (Hyperparameters)
+    # scale_pos_weight = 3.58 khớp với Target Odds từ tập dữ liệu:
+    #   25,467 Non-default / 7,108 Default ≈ 3.58
+    # -------------------------------------------------------------------
     params:
       n_estimators: 300
       max_depth: 5
@@ -73,8 +100,15 @@ tasks:
       eval_metric: "auc"
       random_state: 42
 
-    # Quy đổi điểm tín dụng (Scorecard)
+    # -------------------------------------------------------------------
+    # Quy đổi điểm tín dụng (Scorecard Calibration - Standard FICO)
+    # Công thức: Score = Target_Score - Factor × ln(Odds / Target_Odds)
+    # Factor = PDO / ln(2) = 20 / ln(2) ≈ 28.85
+    # -------------------------------------------------------------------
     scorecard:
-      target_score: 600
-      target_odds: 50
-      pdo: 20
+      target_score: 600       # Điểm chuẩn FICO
+      target_odds: 20         # Tỷ lệ cược chuẩn
+      pdo: 20                 # Points to Double the Odds (FICO standard)
+      score_factor: 28.85     # = PDO / ln(2)
+      score_min: 300          # Điểm tối thiểu FICO
+      score_max: 850          # Điểm tối đa FICO

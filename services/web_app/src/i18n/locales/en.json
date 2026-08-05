@@ -21,7 +21,7 @@
   },
   "dashboard": {
     "title": "System Overview (Dashboard)",
-    "welcome": "Welcome to the Credit Risk Assessment system powered by AI Core.",
+    "welcome": "Welcome to the Credit Risk Assessment system powered by Core.",
     "stats": {
       "processed": "Total Processed Applications",
       "highRisk": "High Risk Alerts",
@@ -101,10 +101,13 @@
       "title": "Approval Result & Credit Scoring"
     },
     "buttons": {
-      "prev": "Back",
+      "prev": "Previous",
       "next": "Next",
-      "submit": "Score with AI Now",
-      "reset": "New Loan Application"
+      "submit": "Submit Application",
+      "reset": "New Loan Application",
+      "saveToDb": "Create & Save Loan Profile",
+      "created": "Loan profile created successfully",
+      "errorSaveToDb": "Failed to save loan data"
     },
     "messages": {
       "success": "Credit scoring successful!"
@@ -117,7 +120,7 @@
       "manual": "MANUAL REVIEW REQUIRED",
       "rejected": "APPLICATION AUTOMATICALLY REJECTED"
     },
-    "scale": "Scale (300 - 850)",
+    "scale": "Score Scale ({{min}} - {{max}})",
     "pdScore": "Probability of Default (PD)",
     "riskTier": "Risk Tier",
     "tierName": "Tier {{tier}}"

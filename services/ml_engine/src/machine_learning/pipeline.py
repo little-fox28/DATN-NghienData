@@ -58,9 +58,10 @@ class MLPipeline:
             
             X_train, X_test, y_train, y_test = self.preprocessor.split_data(df)
 
-            # --- Bước 2: Feature Engineering ---
-            logger.info("[STEP 2/4] Encoding categorical features...")
-            self.feature_eng.build_encoder(X_train)
+            # --- Bước 2: Feature Engineering (WoE Binning) ---
+            logger.info("[STEP 2/4] WoE Binning & encoding features...")
+            # WoE là supervised encoding — cần y_train để tính WoE value theo tỷ lệ Default/Non-default
+            self.feature_eng.build_encoder(X_train, y_train)
             self.feature_eng.save_encoder()
             
             X_train_enc = self.feature_eng.transform(X_train)

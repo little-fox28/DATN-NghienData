@@ -42,3 +42,11 @@ export interface PredictApiResponse {
   };
   credit_risk_assessment: CreditRiskAssessment;
 }
+
+export interface SaveEnrichedRecordPayload {
+  application: LoanApplicationData;
+  loan_status: 0 | 1;
+  ml_pd_score: number;
+  ml_credit_score: number;
+  ml_decision: string;
+}

@@ -1,8 +1,8 @@
-import { CheckCircleOutlined, FileTextOutlined, LeftOutlined, ReloadOutlined, RightOutlined, SendOutlined, UserOutlined, WalletOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, DatabaseOutlined, FileTextOutlined, LeftOutlined, ReloadOutlined, RightOutlined, SendOutlined, UserOutlined, WalletOutlined } from '@ant-design/icons';
 import { App as AntApp, Button, Card, Col, Form, InputNumber, Row, Select, Steps, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { predictCreditRisk } from '../api/client';
+import { predictCreditRisk, saveEnrichedRecord } from '../api/client';
 import { CreditScoreGauge } from '../components/CreditScoreGauge';
 import type { LoanApplicationData, PredictApiResponse } from '../types/loan';
 
@@ -37,8 +37,9 @@ export const LoanApplicationPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [form] = Form.useForm<LoanApplicationData>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState<boolean>(false);
   const [result, setResult] = useState<PredictApiResponse | null>(null);
+  const [savedClientId, setSavedClientId] = useState<string | null>(null);
 
   useEffect(() => {
     form.setFieldsValue(initialFormData);
@@ -70,7 +71,6 @@ export const LoanApplicationPage: React.FC = () => {
     try {
       const values = await form.validateFields();
       setLoading(true);
-      setError(null);
 
       const person_income = values.person_income || 0;
       const loan_amnt = values.loan_amnt || 0;
@@ -100,7 +100,6 @@ export const LoanApplicationPage: React.FC = () => {
           errorMsg = t('loanApplication.errors.serverError');
         }
 
-        setError(errorMsg as string);
         notification.error({
           message: t('loanApplication.errors.systemError'),
           description: errorMsg as string,
@@ -117,8 +116,43 @@ export const LoanApplicationPage: React.FC = () => {
   const handleReset = () => {
     form.setFieldsValue(initialFormData);
     setResult(null);
-    setError(null);
+    setSavedClientId(null);
     setCurrentStep(0);
+  };
+
+  const handleSaveToDB = async () => {
+    if (!result) return;
+    try {
+      setSaving(true);
+      const values = form.getFieldsValue();
+      const person_income = values.person_income || 0;
+      const loan_amnt = values.loan_amnt || 0;
+      const formData = {
+        ...initialFormData,
+        ...values,
+        loan_percent_income: person_income > 0 ? Number((loan_amnt / person_income).toFixed(2)) : 0,
+        loan_to_income_ratio: person_income > 0 ? Number((loan_amnt / person_income).toFixed(2)) : 0,
+      };
+
+      const resp = await saveEnrichedRecord({
+        application: formData,
+        loan_status: -1 as unknown as 0 | 1, // Status will be labeled later in data view
+        ml_pd_score: result.credit_risk_assessment.pd_score,
+        ml_credit_score: result.credit_risk_assessment.credit_score,
+        ml_decision: result.credit_risk_assessment.decision,
+      });
+
+      setSavedClientId(resp.client_ID);
+      message.success(`${t('loanApplication.buttons.created')}`);
+    } catch (err: any) {
+      console.error(err);
+      notification.error({
+        message: t('loanApplication.buttons.errorSaveToDb'),
+        description: err?.response?.data?.detail || 'Không thể lưu hồ sơ vào cơ sở dữ liệu.',
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -180,7 +214,7 @@ export const LoanApplicationPage: React.FC = () => {
             <Row gutter={24}>
               <Col xs={24} md={12}>
                 <Form.Item name="person_income" label={t('loanApplication.step2.income')} rules={[{ required: true, message: t('loanApplication.errors.required') }]}>
-                  <InputNumber style={{ width: '100%' }} min={0} size="large" formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => Number(value!.replace(/\$\s?|(,*)/g, ''))} />
+                  <InputNumber style={{ width: '100%' }} min={0} size="large" formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => Number(value!.replace(/\$\s?|(,*)/g, '')) as any} />
                 </Form.Item>
               </Col>
               <Col xs={24} md={12}>
@@ -224,7 +258,7 @@ export const LoanApplicationPage: React.FC = () => {
             <Row gutter={24}>
               <Col xs={24} md={12}>
                 <Form.Item name="loan_amnt" label={t('loanApplication.step3.amount')} rules={[{ required: true, message: t('loanApplication.errors.required') }]}>
-                  <InputNumber style={{ width: '100%' }} min={0} size="large" formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => Number(value!.replace(/\$\s?|(,*)/g, ''))} />
+                  <InputNumber style={{ width: '100%' }} min={0} size="large" formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => Number(value!.replace(/\$\s?|(,*)/g, '')) as any} />
                 </Form.Item>
               </Col>
               <Col xs={24} md={12}>
@@ -297,9 +331,22 @@ export const LoanApplicationPage: React.FC = () => {
           )}
 
           {currentStep === 3 && (
-            <Button size="large" onClick={handleReset} icon={<ReloadOutlined />} style={{ margin: '0 auto' }}>
-              {t('loanApplication.buttons.reset')}
-            </Button>
+            <div style={{ display: 'flex', gap: 16, margin: '0 auto' }}>
+              <Button size="large" onClick={handleReset} icon={<ReloadOutlined />}>
+                {t('loanApplication.buttons.reset')}
+              </Button>
+              <Button
+                type="primary"
+                size="large"
+                onClick={handleSaveToDB}
+                loading={saving}
+                disabled={!!savedClientId}
+                icon={savedClientId ? <CheckCircleOutlined /> : <DatabaseOutlined />}
+              // style={{ backgroundColor: savedClientId ? '#52c41a' : undefined }}
+              >
+                {savedClientId ? t('loanApplication.buttons.created') : t('loanApplication.buttons.saveToDb')}
+              </Button>
+            </div>
           )}
         </div>
       </Card>

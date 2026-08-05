@@ -1,15 +1,17 @@
-# data
+# Data
 data/raw
 data/processed
 data/output
+data/outputs/
 
-# docs
+# Docs
 docs/03_notes/engineering/data_issues.txt
 
-# Python bytecode
+# Python bytecode & cache
 __pycache__/
 *.py[cod]
-*.pyd
+*$py.class
+**/__pycache__/
 
 # Virtual environments
 .venv/
@@ -45,9 +47,6 @@ notebook/.ipynb_checkpoints/
 .DS_Store
 Thumbs.db
 
-# Project data outputs
-data/processed/
-data/outputs/
-
 # Logs
 *.log
+logs/

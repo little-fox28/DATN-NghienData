@@ -21,7 +21,7 @@
   },
   "dashboard": {
     "title": "Tổng quan Hệ thống (Dashboard)",
-    "welcome": "Chào mừng bạn đến với hệ thống Đánh giá Rủi ro Tín dụng sử dụng AI Core.",
+    "welcome": "Chào mừng bạn đến với hệ thống Đánh giá Rủi ro Tín dụng sử dụng ML Core.",
     "stats": {
       "processed": "Tổng Hồ sơ Đã Xử lý",
       "highRisk": "Cảnh báo Rủi ro Cao",
@@ -102,9 +102,12 @@
     },
     "buttons": {
       "prev": "Quay lại",
-      "next": "Tiếp theo",
-      "submit": "Chấm điểm AI ngay",
-      "reset": "Nhập hồ sơ vay mới"
+      "next": "Tiếp tục",
+      "submit": "Chấm điểm ngay",
+      "reset": "Tạo hồ sơ vay mới",
+      "saveToDb": "Tạo hồ sơ vay ngay",
+      "created": "Tạo hồ sơ vay thành công",
+      "errorSaveToDb": "Lỗi lưu dữ liệu"
     },
     "messages": {
       "success": "Chấm điểm tín dụng thành công!"
@@ -117,7 +120,7 @@
       "manual": "CHUYỂN CÁN BỘ THẨM ĐỊNH THỦ CÔNG",
       "rejected": "HỒ SƠ BỊ TỪ CHỐI TỰ ĐỘNG"
     },
-    "scale": "Thang điểm (300 - 850)",
+    "scale": "Thang điểm ({{min}} - {{max}})",
     "pdScore": "Xác suất Vỡ nợ (PD)",
     "riskTier": "Phân hạng Rủi ro",
     "tierName": "Hạng {{tier}}"
