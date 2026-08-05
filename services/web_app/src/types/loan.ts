@@ -46,7 +46,7 @@ export interface PredictApiResponse {
 export interface SaveEnrichedRecordPayload {
   application: LoanApplicationData;
   loan_status: 0 | 1;
-  ai_pd_score: number;
-  ai_credit_score: number;
-  ai_decision: string;
+  ml_pd_score: number;
+  ml_credit_score: number;
+  ml_decision: string;
 }

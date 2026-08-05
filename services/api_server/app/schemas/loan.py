@@ -34,6 +34,6 @@ class EnrichPayload(BaseModel):
         -1, ge=-1, le=1,
         description="Nhãn thực tế: -1=Chưa gán nhãn, 0=Trả nợ tốt, 1=Nợ xấu"
     )
-    ai_pd_score: float = Field(..., description="Xác suất nợ xấu từ mô hình AI")
-    ai_credit_score: int = Field(..., description="Điểm tín dụng FICO từ mô hình AI")
-    ai_decision: str = Field(..., description="Quyết định từ mô hình AI")
+    ml_pd_score: float = Field(..., description="Xác suất nợ xấu từ mô hình ML")
+    ml_credit_score: int = Field(..., description="Điểm tín dụng FICO từ mô hình ML")
+    ml_decision: str = Field(..., description="Quyết định từ mô hình ML")

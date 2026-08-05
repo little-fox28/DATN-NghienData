@@ -173,7 +173,7 @@ class ModelPredictor:
             - credit_score   : Điểm tín dụng (381 – 553)
             - risk_tier      : Phân hạng rủi ro (LOW / MEDIUM_LOW / MEDIUM_HIGH / HIGH)
             - decision       : Quyết định tín dụng
-            - contributions  : Điểm đóng góp của từng biến (giải thích AI)
+            - contributions  : Điểm đóng góp của từng biến
             - top_factors    : Top yếu tố tích cực / tiêu cực
         """
         self._load_resources()

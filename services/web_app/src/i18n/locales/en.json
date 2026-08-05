@@ -21,7 +21,7 @@
   },
   "dashboard": {
     "title": "System Overview (Dashboard)",
-    "welcome": "Welcome to the Credit Risk Assessment system powered by AI Core.",
+    "welcome": "Welcome to the Credit Risk Assessment system powered by Core.",
     "stats": {
       "processed": "Total Processed Applications",
       "highRisk": "High Risk Alerts",

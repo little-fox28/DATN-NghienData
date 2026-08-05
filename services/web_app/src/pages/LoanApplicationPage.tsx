@@ -137,9 +137,9 @@ export const LoanApplicationPage: React.FC = () => {
       const resp = await saveEnrichedRecord({
         application: formData,
         loan_status: -1 as unknown as 0 | 1, // Status will be labeled later in data view
-        ai_pd_score: result.credit_risk_assessment.pd_score,
-        ai_credit_score: result.credit_risk_assessment.credit_score,
-        ai_decision: result.credit_risk_assessment.decision,
+        ml_pd_score: result.credit_risk_assessment.pd_score,
+        ml_credit_score: result.credit_risk_assessment.credit_score,
+        ml_decision: result.credit_risk_assessment.decision,
       });
 
       setSavedClientId(resp.client_ID);

@@ -21,7 +21,7 @@ ENRICHED_COLUMNS = [
     "loan_to_income_ratio", "debt_to_income_ratio",
     "cb_person_default_on_file", "cb_person_cred_hist_length",
     "gender", "marital_status", "education_level", "employment_type",
-    "ai_pd_score", "ai_credit_score", "ai_decision",
+    "ml_pd_score", "ml_credit_score", "ml_decision",
     "created_at", "record_date", "record_month",
 ]
 
@@ -80,9 +80,9 @@ def save_record(payload: EnrichPayload) -> dict:
         "marital_status":           app_data.get("marital_status"),
         "education_level":          app_data.get("education_level"),
         "employment_type":          app_data.get("employment_type"),
-        "ai_pd_score":              payload.ai_pd_score,
-        "ai_credit_score":          payload.ai_credit_score,
-        "ai_decision":              payload.ai_decision,
+        "ml_pd_score":              payload.ml_pd_score,
+        "ml_credit_score":          payload.ml_credit_score,
+        "ml_decision":              payload.ml_decision,
         "created_at":               now.isoformat(),
         "record_date":              now.strftime("%Y-%m-%d"),
         "record_month":             now.strftime("%Y-%m"),
