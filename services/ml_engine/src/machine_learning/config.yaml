@@ -52,6 +52,9 @@ tasks:
       - "marital_status"
       - "cb_person_cred_hist_length"
       - "person_age"
+      - "other_debt"
+      - "open_accounts"    
+      - "loan_term_months" 
 
     test_size: 0.2
     random_state: 42
