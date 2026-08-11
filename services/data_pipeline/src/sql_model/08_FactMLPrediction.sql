@@ -15,10 +15,10 @@ CREATE TABLE dbo.FactMLPrediction
 (
     PredictionKey    INT IDENTITY(1,1) NOT NULL,
     CustomerKey      INT NOT NULL,              -- FK → DimCustomer
-    is_test          TINYINT NOT NULL,          -- 0 = tập train | 1 = tập test
     pd_score         DECIMAL(9,6) NOT NULL,     -- Xác suất vỡ nợ (PD score)
     predicted_class  TINYINT NOT NULL,          -- Dự báo: 0=no default, 1=default
     actual           TINYINT NULL,              -- Thực tế loan_status (NULL nếu không có)
+    is_test          TINYINT NOT NULL,          -- 0 = tập train | 1 = tập test
 
     -- Primary Key
     CONSTRAINT PK_FactMLPrediction

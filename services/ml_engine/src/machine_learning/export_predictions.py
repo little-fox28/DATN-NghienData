@@ -121,7 +121,7 @@ def export_predictions(
     """
     Chạy WoE transform + XGBoost, xuất predictions.csv per-record cho Tableau.
 
-    Cột đầu ra: client_ID | is_test | 10 features | pd_score | predicted_class | actual
+    Cột đầu ra: client_ID | 10 features | pd_score | predicted_class | actual | is_test
     is_test: 0 = train, 1 = test (tái tạo split random_state từ config)
     """
     config = get_task_config(task_name)
@@ -184,9 +184,10 @@ def export_predictions(
         df["actual"] = df[target_col]
 
     # Chọn cột đầu ra
-    out_cols = ["client_ID", "is_test"] + FEATURES + ["pd_score", "predicted_class"]
+    out_cols = ["client_ID"] + FEATURES + ["pd_score", "predicted_class"]
     if "actual" in df.columns:
         out_cols.append("actual")
+    out_cols.append("is_test")
     out_cols = [c for c in out_cols if c in df.columns]
 
     result = df[out_cols].copy()

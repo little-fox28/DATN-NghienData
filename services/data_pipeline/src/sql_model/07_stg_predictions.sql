@@ -27,6 +27,7 @@ CREATE TABLE stg_predictions (
     -- Kết quả dự đoán
     pd_score                 DECIMAL(12,9),    -- Xác suất vỡ nợ
     predicted_class          TINYINT,          -- 0=no default, 1=default
-    actual                   TINYINT           -- loan_status thực tế
+    actual                   TINYINT,          -- 0=no default, 1=default
+    is_test                  TINYINT           -- 0 = train | 1 = test
 );
 GO
