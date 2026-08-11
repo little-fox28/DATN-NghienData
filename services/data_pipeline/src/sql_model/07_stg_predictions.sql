@@ -10,8 +10,6 @@ IF OBJECT_ID('stg_predictions', 'U') IS NOT NULL
 CREATE TABLE stg_predictions (
     -- Định danh
     client_id                VARCHAR(20),
-    is_test                  TINYINT,          -- 0 = train | 1 = test
-
     -- 10 Features (WoE input)
     loan_grade               VARCHAR(5),
     person_home_ownership    VARCHAR(20),
