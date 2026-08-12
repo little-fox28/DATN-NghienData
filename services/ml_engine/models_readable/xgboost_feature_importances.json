@@ -1,15 +1,15 @@
 {
-    "loan_to_income_ratio": 0.2157699018716812,
-    "loan_grade": 0.1832757443189621,
-    "person_home_ownership": 0.09973541647195816,
-    "loan_int_rate": 0.09928138554096222,
-    "person_income": 0.09460590779781342,
-    "debt_to_income_ratio": 0.05964597687125206,
-    "cb_person_default_on_file": 0.05900122597813606,
-    "person_emp_length": 0.050335440784692764,
-    "loan_intent": 0.04687024652957916,
-    "loan_amnt": 0.034007370471954346,
-    "other_debt": 0.02477291040122509,
-    "open_accounts": 0.016406407579779625,
-    "loan_term_months": 0.016292164102196693
+    "loan_to_income_ratio": 0.2326582819223404,
+    "loan_grade": 0.17514300346374512,
+    "loan_int_rate": 0.13497847318649292,
+    "person_income": 0.08528007566928864,
+    "person_home_ownership": 0.08317053318023682,
+    "cb_person_default_on_file": 0.06486561894416809,
+    "debt_to_income_ratio": 0.05722750723361969,
+    "person_emp_length": 0.05092361569404602,
+    "loan_intent": 0.04272942245006561,
+    "loan_amnt": 0.02898966148495674,
+    "other_debt": 0.021403126418590546,
+    "loan_term_months": 0.01145110372453928,
+    "open_accounts": 0.011179507710039616
 }
