@@ -48,7 +48,7 @@ class MLPipeline:
 
         try:
             # --- Bước 1: Preprocessing ---
-            logger.info("[STEP 1/4] Preprocessing data...")
+            logger.info("[STEP 1/5] Preprocessing data...")
             if self.skip_preprocessing:
                 import pandas as pd
                 logger.info(f"[SKIP] Loading existing cleaned data from: {self.preprocessor.processed_data_path}")
@@ -59,7 +59,7 @@ class MLPipeline:
             X_train, X_test, y_train, y_test = self.preprocessor.split_data(df)
 
             # --- Bước 2: Feature Engineering (WoE Binning) ---
-            logger.info("[STEP 2/4] WoE Binning & encoding features...")
+            logger.info("[STEP 2/5] WoE Binning & encoding features...")
             # WoE là supervised encoding — cần y_train để tính WoE value theo tỷ lệ Default/Non-default
             self.feature_eng.build_encoder(X_train, y_train)
             self.feature_eng.save_encoder()
@@ -68,18 +68,26 @@ class MLPipeline:
             X_test_enc = self.feature_eng.transform(X_test)
 
             # --- Bước 3: Training ---
-            logger.info(f"[STEP 3/4] Training model for task: {self.task_name}...")
+            logger.info(f"[STEP 3/5] Training model for task: {self.task_name}...")
             self.trainer.train(X_train_enc, y_train, X_test_enc, y_test)
             self.trainer.save_model()
 
             # --- Bước 4: Evaluation ---
-            logger.info("[STEP 4/4] Evaluating model...")
+            logger.info("[STEP 4/5] Evaluating model...")
             metrics = self.evaluator.evaluate(
                 model=self.trainer.model, 
                 X_test=X_test_enc, 
                 y_test=y_test, 
                 save=True
             )
+            # --- Bước 5: Generate Readable Models ---
+            logger.info("[STEP 5/5] Generating readable JSON models...")
+            try:
+                from services.ml_engine.models_readable.model_reader import create_readable_models
+                create_readable_models()
+                logger.info("Readable models generated successfully.")
+            except Exception as e:
+                logger.warning(f"Failed to generate readable models: {e}")
             
             logger.info("=" * 60)
             logger.info("PIPELINE COMPLETED SUCCESSFULLY!")

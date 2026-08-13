@@ -60,24 +60,57 @@ def create_readable_models():
                     json.dump(importances, f, indent=4)
                 print(f" [OK] Saved Feature Importances to: {out_feat}")
             
-            # 2.2 XGBoost Trees structure
+            # 2.2 XGBoost Trees structure (Mermaid Parsing - 3 Subgraphs in 1 File)
             if hasattr(model, "get_booster"):
                 booster = model.get_booster()
                 trees = booster.get_dump()
                 
-                out_trees = os.path.join(output_dir, "xgboost_trees_structure.txt")
-                with open(out_trees, "w", encoding="utf-8") as f:
-                    f.write(f"XGBOOST MODEL STRUCTURE\n")
-                    f.write(f"Total Trees: {len(trees)}\n")
-                    f.write("="*50 + "\n\n")
-                    # Chỉ in 3 cây đầu tiên để file không quá nặng, dễ xem
-                    for i, tree in enumerate(trees[:3]):
-                        f.write(f"--- TREE #{i} ---\n")
-                        f.write(tree)
-                        f.write("\n")
-                    f.write("\n(Note: Only showing first 3 trees out of 300 for readability)\n")
+                # Trích xuất 3 cây: Đầu, Giữa và Cuối
+                total_trees = len(trees)
+                target_indices = [0, total_trees // 2, total_trees - 1]
+                
+                out_mmd = os.path.join(output_dir, "xgboost_sampled_trees.mmd")
+                
+                with open(out_mmd, "w", encoding="utf-8") as f:
+                    f.write("graph TD\n")
+                    f.write("    %% Bản vẽ gộp 3 cây quyết định ở 3 giai đoạn học tập khác nhau\n\n")
                     
-                print(f" [OK] Saved XGBoost Trees (top 3) to: {out_trees}")
+                    for idx in target_indices:
+                        tree_text = trees[idx]
+                        
+                        f.write(f"    subgraph Tree_{idx} [\"Cây quyết định số {idx}\"]\n")
+                        f.write(f"        direction TB\n")
+                        
+                        lines = tree_text.strip().split('\n')
+                        for line in lines:
+                            line = line.strip()
+                            if not line:
+                                continue
+                                
+                            # Nhánh: "0:[loan_grade<1.5] yes=1,no=2,missing=1"
+                            if "yes=" in line:
+                                node_id = line.split(":")[0]
+                                condition = line.split("[")[1].split("]")[0]
+                                # Escaping HTML characters for Mermaid
+                                condition = condition.replace("<", "&lt;").replace(">", "&gt;")
+                                
+                                yes_id = line.split("yes=")[1].split(",")[0]
+                                no_id = line.split("no=")[1].split(",")[0]
+                                
+                                f.write(f'        T{idx}N{node_id}["{condition}"]\n')
+                                f.write(f'        T{idx}N{node_id} -- "yes" --> T{idx}N{yes_id}\n')
+                                f.write(f'        T{idx}N{node_id} -- "no" --> T{idx}N{no_id}\n')
+                                
+                            # Lá: "3:leaf=0.07142"
+                            elif "leaf=" in line:
+                                node_id = line.split(":")[0]
+                                leaf_val = line.split("leaf=")[1]
+                                f.write(f'        T{idx}N{node_id}(("Lá: {leaf_val}"))\n')
+                                f.write(f'        style T{idx}N{node_id} fill:#fca5a5,stroke:#b91c1c,stroke-width:2px\n')
+                                
+                        f.write("    end\n\n")
+                        
+                print(f" [OK] Saved Merged XGBoost Trees Diagram to: {out_mmd}")
                 
         except Exception as e:
             print(f" [ERROR] Could not read credit_risk_model.joblib: {e}")
