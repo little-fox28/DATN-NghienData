@@ -1,6 +1,7 @@
 """
 Tầng 3: Huấn luyện Mô hình (Model Training).
 """
+from typing import Optional
 import joblib
 import logging
 import pandas as pd
@@ -25,7 +26,7 @@ class ModelTrainer:
 
     def build_model(self) -> XGBClassifier:
         """Khởi tạo mô hình XGBoost từ tham số trong config."""
-        params = {k: v for k, v in self.model_params.items()}
+        params = self.model_params.copy()
         # XGBoost dùng tham số 'seed' cho tính ngẫu nhiên
         params["seed"] = params.pop("random_state", self.random_state)
         
@@ -33,7 +34,7 @@ class ModelTrainer:
         return self.model
 
     def train(self, X_train: pd.DataFrame, y_train: pd.Series,
-              X_val: pd.DataFrame = None, y_val: pd.Series = None) -> XGBClassifier:
+              X_val: Optional[pd.DataFrame] = None, y_val: Optional[pd.Series] = None) -> XGBClassifier:
         """Huấn luyện mô hình XGBoost."""
         if self.model is None:
             self.build_model()

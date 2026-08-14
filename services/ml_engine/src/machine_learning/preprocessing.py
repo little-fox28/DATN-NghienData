@@ -35,10 +35,13 @@ class DataPreprocessor:
         """Đọc tệp CSV dữ liệu thô."""
         path = Path(self.raw_data_path)
         if not path.exists():
-            # Fallback nếu tên file có khoảng trắng bị mã hoá thành %20
-            fallback = path.parent / "Credit Risk Data.csv"
+            # Fallback nếu tên file có khoảng trắng bị mã hoá URL (%20)
+            decoded_name = path.name.replace("%20", " ")
+            fallback = path.parent / decoded_name
             if fallback.exists():
                 path = fallback
+            else:
+                raise FileNotFoundError(f"Không tìm thấy file dữ liệu thô tại: {path} hoặc {fallback}")
         logger.info(f"Loading raw data from: {path}")
         df = pd.read_csv(path)
         logger.info(f"Loaded {len(df):,} records with {df.shape[1]} columns.")
@@ -102,7 +105,7 @@ class DataPreprocessor:
 
         return df
 
-    def split_data(self, df: pd.DataFrame):
+    def split_data(self, df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
         """Chia DataFrame thành tập Train và Test."""
         logger.info(f"Splitting data: test_size={self.test_size}, random_state={self.random_state}")
 

@@ -299,8 +299,11 @@ class FeatureEngineer:
         X_proc = self._prepare_features(X)
         return self.encoder.transform(X_proc)
 
-    def transform_with_contributions(self, X: pd.DataFrame,
-                                     score_factor: float = 72.13) -> tuple[pd.DataFrame, pd.DataFrame]:
+    def transform_with_contributions(
+        self,
+        X: pd.DataFrame,
+        score_factor: Optional[float] = None,
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Chuyển đổi WoE + tính đóng góp điểm của từng biến.
 
@@ -309,6 +312,9 @@ class FeatureEngineer:
         Returns:
             (X_woe, contributions_df)
         """
+        if score_factor is None:
+            score_factor = float(self.config.get("scorecard", {}).get("score_factor", 28.85))
+
         X_woe = self.transform(X)
         all_feature_cols = [c for c in (self.num_cols + self.cat_cols) if c in X_woe.columns]
         contributions = X_woe[all_feature_cols].apply(

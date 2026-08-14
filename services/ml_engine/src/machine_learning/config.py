@@ -1,23 +1,33 @@
+import math
 import yaml
 from pathlib import Path
+
 # Thư mục gốc dự án (DATN/)
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
 # Đường dẫn đến file cấu hình ML
 CONFIG_PATH = Path(__file__).resolve().parent / "config.yaml"
+
+
 def load_raw_config() -> dict:
     """Đọc toàn bộ file yaml thô."""
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
+
+
 def get_abs_path(relative_path: str) -> Path:
     """Chuyển đổi đường dẫn tương đối sang tuyệt đối."""
     return ROOT_DIR / relative_path
 
+
 # --- Load cấu hình tổng ---
 _raw_cfg = load_raw_config()
 GLOBAL_CFG = _raw_cfg.get("global", {})
+
+
 def get_task_config(task_name: str = "credit_risk") -> dict:
     """
     Trích xuất cấu hình cho một Bài toán cụ thể từ config.yaml.
+    Trả về bản copy để tránh làm thay đổi cấu hình toàn cục.
     
     Args:
         task_name: Tên bài toán ('credit_risk', 'loan_intent', 'interest_rate_pricing', ...)
@@ -29,7 +39,8 @@ def get_task_config(task_name: str = "credit_risk") -> dict:
     if task_name not in tasks:
         raise KeyError(f"Task '{task_name}' không tồn tại trong config.yaml. Các task hợp lệ: {list(tasks.keys())}")
     
-    task_cfg = tasks[task_name]
+    # Tạo copy độc lập để tránh mutate _raw_cfg
+    task_cfg = tasks[task_name].copy()
     
     # Tự động chuyển đổi các đường dẫn tương đối thành tuyệt đối
     task_cfg["raw_data_path"] = get_abs_path(GLOBAL_CFG.get("raw_data_path", "data/raw/Credit%20Risk%20Data.csv"))
@@ -38,10 +49,17 @@ def get_task_config(task_name: str = "credit_risk") -> dict:
     task_cfg["metrics_output_abs"] = get_abs_path(task_cfg["metrics_output"])
     task_cfg["figures_dir_abs"] = get_abs_path(task_cfg["figures_dir"])
     
+    # Đảm bảo scorecard config tính toán score_factor đồng bộ nếu cần
+    scorecard = task_cfg.get("scorecard", {}).copy()
+    if "pdo" in scorecard and "score_factor" not in scorecard:
+        scorecard["score_factor"] = round(scorecard["pdo"] / math.log(2), 4)
+    task_cfg["scorecard"] = scorecard
+    
     return task_cfg
     
+
 # --- Cấu hình tương thích mặc định cho Bài toán 1 (Credit Risk) ---
-DEFAULT_TASK_CFG = get_task_config("credit_risk")
+DEFAULT_TASK_CFG    = get_task_config("credit_risk")
 RAW_DATA_PATH       = DEFAULT_TASK_CFG["raw_data_path"]
 TARGET_COL          = DEFAULT_TASK_CFG["target_column"]
 ID_COL              = DEFAULT_TASK_CFG["id_column"]
@@ -59,3 +77,4 @@ FIGURES_DIR         = DEFAULT_TASK_CFG["figures_dir_abs"]
 SCORECARD_CFG       = DEFAULT_TASK_CFG["scorecard"]
 
 PROCESSED_DATA_PATH = get_abs_path("data/processed/df_clean.csv")
+

@@ -23,16 +23,6 @@ class ModelEvaluator:
         self.metrics_path = self.config.get("metrics_output_abs")
         self.task_name = self.config.get("task_name", "Unknown Task")
 
-    def _gini_score(self, y_true: pd.Series, y_prob: np.ndarray) -> float:
-        """Tính Gini Coefficient từ AUC: Gini = 2 * AUC - 1."""
-        auc = roc_auc_score(y_true, y_prob)
-        return 2 * auc - 1
-
-    def _ks_score(self, y_true: pd.Series, y_prob: np.ndarray) -> float:
-        """Tính KS Statistic (Kolmogorov–Smirnov)."""
-        fpr, tpr, _ = roc_curve(y_true, y_prob)
-        return float(np.max(tpr - fpr))
-
     def evaluate(self, model: XGBClassifier,
                  X_test: pd.DataFrame,
                  y_test: pd.Series,
@@ -43,14 +33,14 @@ class ModelEvaluator:
         y_prob = model.predict_proba(X_test)[:, 1]
         y_pred = model.predict(X_test)
 
-        auc   = roc_auc_score(y_test, y_prob)
-        gini  = self._gini_score(y_test, y_prob)
-        ks    = self._ks_score(y_test, y_prob)
+        auc = float(roc_auc_score(y_test, y_prob))
+        gini = 2.0 * auc - 1.0
 
-        # 1. Trích xuất dữ liệu vẽ đường ROC
+        # Tính toán roc_curve 1 lần duy nhất cho cả KS Statistic và đồ thị ROC
         fpr, tpr, _ = roc_curve(y_test, y_prob)
-        
-        # 2. Trích xuất dữ liệu Feature Importance
+        ks = float(np.max(tpr - fpr))
+
+        # Trích xuất dữ liệu Feature Importance
         if hasattr(model, "feature_names_in_"):
             feature_importance = dict(zip(
                 model.feature_names_in_, 
@@ -60,9 +50,9 @@ class ModelEvaluator:
             feature_importance = {}
 
         metrics = {
-            "auc":  round(float(auc),  4),
-            "gini": round(float(gini), 4),
-            "ks":   round(float(ks),   4),
+            "auc":  round(auc, 4),
+            "gini": round(gini, 4),
+            "ks":   round(ks, 4),
             "classification_report": classification_report(y_test, y_pred, output_dict=True),
             "roc_curve_data": {
                 "fpr": fpr.tolist(),
