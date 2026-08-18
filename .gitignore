@@ -6,6 +6,7 @@ data/outputs/
 
 # Docs
 docs/03_notes/engineering/data_issues.txt
+docs/*.md
 
 # Python bytecode & cache
 __pycache__/
