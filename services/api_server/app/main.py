@@ -54,6 +54,9 @@ def health_check():
 
 # ── Entrypoint ────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     print(f"🚀 Starting API on http://{HOST}:{PORT}")
     print(f"📖 Swagger Docs: http://{HOST}:{PORT}/docs")
     uvicorn.run("services.api_server.app.main:app", host=HOST, port=PORT, reload=True)
+
