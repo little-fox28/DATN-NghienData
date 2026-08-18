@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { predictCreditRisk, saveEnrichedRecord } from '../api/client';
 import { CreditScoreGauge } from '../components/CreditScoreGauge';
+import { RiskBasedPricingCard } from '../components/RiskBasedPricingCard';
 import type { LoanApplicationData, PredictApiResponse } from '../types/loan';
 
 const { Title, Text } = Typography;
@@ -306,6 +307,11 @@ export const LoanApplicationPage: React.FC = () => {
               pdScore={result.credit_risk_assessment.pd_score}
               riskTier={result.credit_risk_assessment.risk_tier}
               decision={result.credit_risk_assessment.decision}
+            />
+            <RiskBasedPricingCard
+              pricing={result.credit_risk_assessment.pricing_recommendation}
+              requestedRate={form.getFieldValue('loan_int_rate')}
+              riskTier={result.credit_risk_assessment.risk_tier}
             />
           </div>
         )}

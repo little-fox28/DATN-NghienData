@@ -25,11 +25,31 @@ export interface LoanApplicationData {
   credit_utilization_ratio: number;
 }
 
+export interface RiskBasedPricingRecommendation {
+  recommended_interest_rate: number;
+  base_rate: number;
+  risk_spread: number;
+  capital_discount: number;
+  intent_adjustment: number;
+  max_credit_limit: number;
+  requested_amount: number;
+  limit_status: 'WITHIN_LIMIT' | 'EXCEEDS_RECOMMENDED_LIMIT' | 'REJECTED';
+  loan_term_months?: number;
+  monthly_payment_estimate?: number;
+  total_interest_estimate?: number;
+}
+
 export interface CreditRiskAssessment {
   pd_score: number;
   credit_score: number;
-  risk_tier: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-  decision: 'APPROVED' | 'MANUAL_REVIEW' | 'REJECTED';
+  risk_tier: 'LOW' | 'MEDIUM_LOW' | 'MEDIUM_HIGH' | 'HIGH';
+  decision: 'APPROVED' | 'APPROVED_CONDITIONAL' | 'MANUAL_REVIEW' | 'REJECTED';
+  contributions?: Record<string, number>;
+  top_factors?: {
+    positive_factors: Array<{ feature: string; points: number }>;
+    negative_factors: Array<{ feature: string; points: number }>;
+  };
+  pricing_recommendation?: RiskBasedPricingRecommendation;
 }
 
 export interface PredictApiResponse {

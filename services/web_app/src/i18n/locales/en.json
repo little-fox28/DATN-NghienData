@@ -124,5 +124,33 @@
     "pdScore": "Probability of Default (PD)",
     "riskTier": "Risk Tier",
     "tierName": "Tier {{tier}}"
+  },
+  "pricing": {
+    "title": "Risk-Based Pricing Package & Dynamic Credit Limit",
+    "subtitle": "Automatically calculated based on FICO Score, Risk Tier, and Bank Credit Policy",
+    "recommendedAprLabel": "Approved Personalized Rate (APR)",
+    "year": "year",
+    "month": "month",
+    "savingsVsRequested": "Save -{{delta}}% vs proposed rate",
+    "surchargeVsRequested": "Risk surcharge +{{delta}}%",
+    "rateBreakdownTitle": "Rate Component Breakdown",
+    "components": {
+      "base": "Base Rate",
+      "riskSpread": "Risk Spread",
+      "capitalDiscount": "Homeownership Discount",
+      "intentAdj": "Loan Intent Adj"
+    },
+    "monthlyPayment": "Estimated Monthly Installment",
+    "totalInterest": "Total Estimated Interest",
+    "amortizationNote": "Calculated via standard Amortization method over {{term}} months",
+    "creditLimitTitle": "Dynamic Credit Limit Allocation",
+    "requested": "Requested Loan",
+    "maxLimit": "Max Credit Limit",
+    "limitStatus": {
+      "withinLimit": "Within Safe Credit Limit",
+      "exceedsLimit": "Exceeds Recommended Limit",
+      "rejected": "Credit Limit Denied"
+    },
+    "exceedsLimitAdvisory": "Advisory: Requested loan amount exceeds the maximum recommended credit limit (${{max}}). The bank advises disbursing up to the maximum limit."
   }
 }

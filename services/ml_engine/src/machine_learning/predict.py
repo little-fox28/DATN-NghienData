@@ -3,13 +3,15 @@ Tầng 5: Dự đoán (Inference).
 
 Kiến trúc "Model-based Score Scaling":
     Dữ liệu → WoE Transform → XGBoost → PD → FICO Score
-                   ↓
-         WoE Contribution (giải thích từng biến theo công thức BA)
+                   ↓                          ↓
+         WoE Contribution              Risk-Based Pricing Engine
+         (giải thích từng biến)        (APR + Limit + PMT Simulation)
 
 Ưu điểm so với Additive Scorecard thuần túy:
 - AUC cao hơn Logistic Regression (XGBoost bắt được phi tuyến, tương tác biến)
 - Vẫn có khả năng giải thích từng biến qua WoE Contribution
 - Dải điểm FICO được hiệu chỉnh theo thông số Novabank (Target Score, Odds, PDO)
+- Lãi suất cá nhân hóa theo Risk-Based Pricing (SPEC-ML-PRICING-2026-V1.0)
 """
 import math
 import logging
@@ -29,6 +31,7 @@ class ModelPredictor:
         """Khởi tạo với cấu hình bài toán."""
         self.config = config
         self.scorecard_cfg = self.config.get("scorecard", {})
+        self.pricing_cfg   = self.config.get("pricing_policy", {})
 
         # Sử dụng lại các class đã refactor để load model và encoder
         self.feature_eng = FeatureEngineer(self.config)
@@ -70,10 +73,10 @@ class ModelPredictor:
         """Phân loại khách hàng vào nhóm rủi ro và đưa ra quyết định theo chuẩn FICO.
 
         Ngưỡng FICO chuẩn:
-            >= 740 : Very Good / Exceptional → Tự động phê duyệt
-            670-739: Good                   → Phê duyệt có điều kiện
-            580-669: Fair                   → Thẩm định thủ công
-            < 580  : Poor                   → Từ chối tự động
+            >= 740 : Very Good / Exceptional     → Tự động phê duyệt
+            670-739: Good                        → Phê duyệt có điều kiện
+            580-669: Fair                        → Thẩm định thủ công
+            < 580  : Poor                        → Từ chối tự động
         """
         if credit_score >= 740:
             return "LOW", "APPROVED"
@@ -129,10 +132,129 @@ class ModelPredictor:
             "negative_factors": negative,   # Yếu tố rủi ro (điểm xấu)
         }
 
+    # ── RISK-BASED PRICING ENGINE ────────────────────────────────────────────
+
+    def _calculate_risk_based_pricing(
+        self,
+        record: dict,
+        risk_tier: str,
+        decision: str,
+    ) -> dict:
+        """Tính toán gói lãi suất cá nhân hóa và hạn mức tín dụng động.
+
+        Thuật toán:
+            APR = Base Rate + Δr_risk + Δr_capital + Δr_intent
+            Max Credit Limit = min(Annual Income × LTI Multiple, Hard Cap)
+            Monthly PMT = P × [r(1+r)^n / ((1+r)^n - 1)]
+
+        Chuẩn tuân thủ:
+            - ECOA/Fair Lending: Không dùng gender, marital_status, person_age
+            - Điều 468 BLDS Việt Nam: APR ≤ 20%/năm (chốt chặn pháp lý)
+            - SPEC-ML-PRICING-2026-V1.0
+
+        Args:
+            record:    Dict thông tin hồ sơ khách hàng gốc (raw input).
+            risk_tier: Phân tầng rủi ro từ mô hình ML ('LOW'/'MEDIUM_LOW'/...).
+            decision:  Phán quyết tín dụng ('APPROVED'/'REJECTED'/...).
+
+        Returns:
+            dict pricing_recommendation với đầy đủ các cấu phần lãi suất,
+            hạn mức tín dụng, trạng thái hạn mức và mô phỏng trả góp.
+        """
+        cfg = self.pricing_cfg
+
+        # ── 1. Tính APR Cá nhân hóa ─────────────────────────────────────────
+        base_rate = float(cfg.get("base_rate", 6.5))
+
+        # Biên độ bù rủi ro (Δr_risk) theo Risk Tier
+        risk_spreads = cfg.get("risk_spreads", {})
+        risk_spread = float(risk_spreads.get(risk_tier, 9.0))
+
+        # Chiết khấu sở hữu nhà (Δr_capital)
+        home_ownership = str(record.get("person_home_ownership", "RENT")).upper()
+        home_discounts = cfg.get("home_ownership_discounts", {})
+        capital_discount = float(home_discounts.get(home_ownership, 0.0))
+
+        # Hiệu chỉnh mục đích vay (Δr_intent)
+        loan_intent = str(record.get("loan_intent", "PERSONAL")).upper()
+        intent_adjustments = cfg.get("intent_adjustments", {})
+        intent_adjustment = float(intent_adjustments.get(loan_intent, 0.0))
+
+        # Tổng APR thô
+        raw_apr = base_rate + risk_spread + capital_discount + intent_adjustment
+
+        # Chốt chặn pháp lý (Statutory Cap — Điều 468 BLDS)
+        min_rate = float(cfg.get("min_rate", 6.0))
+        max_rate = float(cfg.get("max_rate", 24.0))
+        recommended_rate = round(max(min(raw_apr, max_rate), min_rate), 2)
+
+        # ── 2. Tính Hạn mức Tín dụng Tối đa (Dynamic Credit Limit) ──────────
+        annual_income = float(record.get("person_income", 0.0))
+        loan_amnt     = float(record.get("loan_amnt", 0.0))
+
+        # Hạn mức = 0 nếu bị từ chối hoàn toàn
+        if decision == "REJECTED":
+            max_credit_limit = 0.0
+            limit_status = "REJECTED"
+        else:
+            lti_caps  = cfg.get("max_lti_caps", {})
+            hard_caps = cfg.get("max_amount_caps", {})
+
+            lti_multiple = float(lti_caps.get(risk_tier, 0.08))
+            hard_cap     = float(hard_caps.get(risk_tier, 5000.0))
+
+            income_based_limit = annual_income * lti_multiple
+            max_credit_limit   = round(min(income_based_limit, hard_cap), 2)
+            max_credit_limit   = max(max_credit_limit, 1000.0)  # Sàn tối thiểu $1,000
+
+            # Đánh giá trạng thái so sánh giữa yêu cầu vay và hạn mức
+            if loan_amnt <= max_credit_limit:
+                limit_status = "WITHIN_LIMIT"
+            else:
+                limit_status = "EXCEEDS_RECOMMENDED_LIMIT"
+
+        # ── 3. Mô phỏng Lịch Trả nợ (Amortization PMT Simulator) ─────────────
+        # Số tiền giải ngân thực tế = min(loan_amnt, max_credit_limit)
+        effective_principal = (
+            min(loan_amnt, max_credit_limit)
+            if max_credit_limit > 0
+            else loan_amnt
+        )
+
+        loan_term_months = int(cfg.get("default_loan_term_months", 36))
+        monthly_rate     = recommended_rate / (12 * 100)
+
+        if monthly_rate > 0 and effective_principal > 0:
+            pmt_numerator   = monthly_rate * ((1 + monthly_rate) ** loan_term_months)
+            pmt_denominator = ((1 + monthly_rate) ** loan_term_months) - 1
+            monthly_payment = round(effective_principal * pmt_numerator / pmt_denominator, 2)
+        else:
+            monthly_payment = round(effective_principal / max(loan_term_months, 1), 2)
+
+        total_payment  = round(monthly_payment * loan_term_months, 2)
+        total_interest = round(total_payment - effective_principal, 2)
+
+        return {
+            # Lãi suất & Cấu phần Waterfall
+            "recommended_interest_rate": recommended_rate,
+            "base_rate":                 base_rate,
+            "risk_spread":               risk_spread,
+            "capital_discount":          capital_discount,
+            "intent_adjustment":         intent_adjustment,
+            # Hạn mức tín dụng
+            "max_credit_limit":          max_credit_limit,
+            "requested_amount":          loan_amnt,
+            "limit_status":              limit_status,
+            # Mô phỏng trả góp
+            "loan_term_months":          loan_term_months,
+            "monthly_payment_estimate":  monthly_payment,
+            "total_interest_estimate":   total_interest,
+        }
+
     # ── SCORING ─────────────────────────────────────────────────────────────
 
     def score_batch(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Chấm điểm tín dụng cho một batch khách hàng."""
+        """Chấm điểm tín dụng và tính định giá lãi suất cho một batch khách hàng."""
         logger.info(f"Scoring {len(df):,} records...")
 
         self._load_resources()
@@ -150,14 +272,23 @@ class ModelPredictor:
         y_prob = self.model.predict_proba(X_enc)[:, 1]
 
         results = []
-        for pd_val in y_prob:
+        for idx, pd_val in enumerate(y_prob):
             credit_score = self._pd_to_credit_score(pd_val)
             risk_tier, decision = self._assign_risk_tier(credit_score)
+
+            # Tính định giá lãi suất cho từng bản ghi
+            record = df.iloc[idx].to_dict()
+            pricing = self._calculate_risk_based_pricing(record, risk_tier, decision)
+
             results.append({
-                "pd_score":     round(float(pd_val), 4),
-                "credit_score": credit_score,
-                "risk_tier":    risk_tier,
-                "decision":     decision,
+                "pd_score":          round(float(pd_val), 4),
+                "credit_score":      credit_score,
+                "risk_tier":         risk_tier,
+                "decision":          decision,
+                "recommended_rate":  pricing["recommended_interest_rate"],
+                "max_credit_limit":  pricing["max_credit_limit"],
+                "limit_status":      pricing["limit_status"],
+                "monthly_payment":   pricing["monthly_payment_estimate"],
             })
 
         result_df = pd.DataFrame(results)
@@ -165,16 +296,17 @@ class ModelPredictor:
         return pd.concat([df.reset_index(drop=True), result_df], axis=1)
 
     def score_single(self, record: dict) -> dict:
-        """Chấm điểm tín dụng cho một hồ sơ khách hàng đơn lẻ.
+        """Chấm điểm tín dụng và tính định giá lãi suất cho một hồ sơ khách hàng đơn lẻ.
 
         Returns:
             dict gồm:
-            - pd_score       : Xác suất nợ xấu (0.0 – 1.0)
-            - credit_score   : Điểm tín dụng (381 – 553)
-            - risk_tier      : Phân hạng rủi ro (LOW / MEDIUM_LOW / MEDIUM_HIGH / HIGH)
-            - decision       : Quyết định tín dụng
-            - contributions  : Điểm đóng góp của từng biến
-            - top_factors    : Top yếu tố tích cực / tiêu cực
+            - pd_score            : Xác suất nợ xấu (0.0 – 1.0)
+            - credit_score        : Điểm tín dụng FICO (300 – 850)
+            - risk_tier           : Phân hạng rủi ro (LOW / MEDIUM_LOW / MEDIUM_HIGH / HIGH)
+            - decision            : Quyết định tín dụng
+            - contributions       : Điểm đóng góp của từng biến (WoE Contribution)
+            - top_factors         : Top yếu tố tích cực / tiêu cực
+            - pricing_recommendation : Gói lãi suất cá nhân hóa & hạn mức tín dụng động
         """
         self._load_resources()
 
@@ -196,7 +328,7 @@ class ModelPredictor:
         # Dự đoán PD bằng XGBoost
         pd_val = float(self.model.predict_proba(X_enc_model)[0, 1])
 
-        # Chuyển PD → Credit Score → Risk Tier
+        # Chuyển PD → Credit Score → Risk Tier & Decision
         credit_score = self._pd_to_credit_score(pd_val)
         risk_tier, decision = self._assign_risk_tier(credit_score)
 
@@ -204,11 +336,19 @@ class ModelPredictor:
         contributions = self._calculate_contributions(X_enc.iloc[0])
         top_factors   = self._get_top_factors(contributions, top_n=3)
 
+        # Tính định giá lãi suất cá nhân hóa (Risk-Based Pricing Engine)
+        pricing_recommendation = self._calculate_risk_based_pricing(
+            record=record,
+            risk_tier=risk_tier,
+            decision=decision,
+        )
+
         return {
-            "pd_score":     round(pd_val, 4),
-            "credit_score": credit_score,
-            "risk_tier":    risk_tier,
-            "decision":     decision,
-            "contributions": contributions,
-            "top_factors":   top_factors,
+            "pd_score":               round(pd_val, 4),
+            "credit_score":           credit_score,
+            "risk_tier":              risk_tier,
+            "decision":               decision,
+            "contributions":          contributions,
+            "top_factors":            top_factors,
+            "pricing_recommendation": pricing_recommendation,
         }

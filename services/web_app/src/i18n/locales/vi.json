@@ -124,5 +124,33 @@
     "pdScore": "Xác suất Vỡ nợ (PD)",
     "riskTier": "Phân hạng Rủi ro",
     "tierName": "Hạng {{tier}}"
+  },
+  "pricing": {
+    "title": "Gói Định giá Lãi suất Cá nhân hóa & Hạn mức Tín dụng",
+    "subtitle": "Được tự động tính toán dựa trên Điểm FICO, Phân tầng Rủi ro và Quy định của Ngân hàng",
+    "recommendedAprLabel": "Lãi suất Ưu đãi Được phê duyệt (APR)",
+    "year": "năm",
+    "month": "tháng",
+    "savingsVsRequested": "Tiết kiệm -{{delta}}% so với mức đề xuất",
+    "surchargeVsRequested": "Điều chỉnh +{{delta}}% bù đắp rủi ro",
+    "rateBreakdownTitle": "Cấu phần Lãi suất (Rate Breakdown)",
+    "components": {
+      "base": "Cơ sở (Base)",
+      "riskSpread": "Bù rủi ro",
+      "capitalDiscount": "Chiết khấu nhà ở",
+      "intentAdj": "Mục đích vay"
+    },
+    "monthlyPayment": "Trả góp Định kỳ Hàng tháng",
+    "totalInterest": "Tổng Lãi Dự thu Cả kỳ",
+    "amortizationNote": "Ước tính theo phương thức Amortization tiêu chuẩn kỳ hạn {{term}} tháng",
+    "creditLimitTitle": "Phân bổ Hạn mức Tín dụng Động",
+    "requested": "Số tiền xin vay",
+    "maxLimit": "Hạn mức tối đa",
+    "limitStatus": {
+      "withinLimit": "Nằm trong Hạn mức An toàn",
+      "exceedsLimit": "Vượt Hạn mức Khuyến nghị",
+      "rejected": "Từ chối cấp Hạn mức"
+    },
+    "exceedsLimitAdvisory": "Cảnh báo: Số tiền đề xuất vay vượt quá Hạn mức tối đa khuyến nghị (${{max}}). Ngân hàng đề xuất giải ngân theo hạn mức tối đa."
   }
 }
