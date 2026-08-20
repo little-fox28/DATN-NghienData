@@ -1,8 +1,7 @@
 import os
 from pathlib import Path
-from typing import Optional
 import pandas as pd
-
+from typing import Optional
 from .extract.fetch_data import download_kaggle_file
 from .extract.monitor_data import CreditDataValidator
 from .transform.convert_xls_to_csv import convert_xls_to_csv
@@ -11,9 +10,6 @@ from shared.utils.connector import SQLServerConnector
 from services.data_pipeline.src.etl.load import DataLoader
 
 logger = get_logger(__name__)
-
-# Thư mục gốc dự án (DATN/)
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
 
 
 class ETLPipeline:
@@ -24,18 +20,13 @@ class ETLPipeline:
     with Kaggle dataset extraction and followed by transformation.
     """
 
-    KAGGLE_DATASET = os.getenv("KAGGLE_DATASET", "alexdister/credit-risk-dataset")
-    TARGET_FILE = os.getenv("TARGET_FILE", "Credit%20Risk%20Data.csv")
+    KAGGLE_DATASET = "alexdister/credit-risk-dataset"
+    TARGET_FILE = "Credit%20Risk%20Data.csv"
     RAW_DATA_DIR = "data/raw"
     PROCESSED_DATA_DIR = "data/processed"
     TRANSFORMED_FILE = "transformed.csv"
 
-    def __init__(
-        self,
-        raw_data_dir: str = RAW_DATA_DIR,
-        processed_data_dir: str = PROCESSED_DATA_DIR,
-        skip_db: bool = False,
-    ) -> None:
+    def __init__(self, raw_data_dir: str = RAW_DATA_DIR, processed_data_dir: str = PROCESSED_DATA_DIR, skip_db: bool = False) -> None:
         """
         Initialize the ETL pipeline.
 
@@ -44,46 +35,37 @@ class ETLPipeline:
             processed_data_dir (str): Directory for storing processed/clean data.
             skip_db (bool): Whether to skip database integration.
         """
-        self.raw_data_dir = ROOT_DIR / raw_data_dir
-        self.processed_data_dir = ROOT_DIR / processed_data_dir
-        self.output_dir = ROOT_DIR / "data/output"
+        self.raw_data_dir = raw_data_dir
+        self.processed_data_dir = processed_data_dir
         self.skip_db = skip_db
 
-        self.sql_connector: Optional[SQLServerConnector] = None
+        self.sql_connector = None
         self.database_engine = None
 
         if not self.skip_db:
-            self._initialize_db()
+            # Database connection parameters
+            self.server = os.getenv("DB_SERVER")
+            self.database = os.getenv("DB_NAME")
+            self.user = os.getenv("DB_USER")
+            self.password = os.getenv("DB_PASS")
+            if not self.server or not self.database or not self.user or not self.password:
+                logger.error("Missing database credentials in .env. Pipeline initialization aborted.")
+                raise ValueError("Strict SQL Server Authentication requires DB_SERVER, DB_NAME, DB_USER, and DB_PASS.")
+
+            # Initialize SQL Server connector and engine
+            self.sql_connector = SQLServerConnector(
+                server=self.server, 
+                database=self.database,
+                user=self.user,
+                password=self.password
+            )
+            self.database_engine = self.sql_connector.get_engine()
 
         self.raw_data_path: Optional[Path] = None
-<<<<<<< Updated upstream
         self.transformed_data_path: Optional[Path] = Path("data/output") / "df_output.csv"
-=======
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-        self.transformed_data_path: Path = self.output_dir / "df_output.csv"
-        self.predictions_path: Path = self.output_dir / "predictions.csv"
->>>>>>> Stashed changes
+        self.predictions_path: Optional[Path] = Path("data/output") / "predictions.csv"
 
-    def _initialize_db(self) -> None:
-        """Khởi tạo kết nối cơ sở dữ liệu SQL Server."""
-        self.server = os.getenv("DB_SERVER")
-        self.database = os.getenv("DB_NAME")
-        self.user = os.getenv("DB_USER")
-        self.password = os.getenv("DB_PASS")
-        if not self.server or not self.database or not self.user or not self.password:
-            logger.error("Missing database credentials in .env. Pipeline initialization aborted.")
-            raise ValueError("Strict SQL Server Authentication requires DB_SERVER, DB_NAME, DB_USER, and DB_PASS.")
-
-        # Initialize SQL Server connector and engine
-        self.sql_connector = SQLServerConnector(
-            server=self.server,
-            database=self.database,
-            user=self.user,
-            password=self.password,
-        )
-        self.database_engine = self.sql_connector.get_engine()
-
-    def extract(self) -> Optional[pd.DataFrame]:
+    def extract(self) -> bool:
         """
         Execute the Extract phase.
         Downloads the dataset and scans for quality issues.
@@ -97,27 +79,28 @@ class ETLPipeline:
             self.raw_data_path = download_kaggle_file(
                 dataset_name=self.KAGGLE_DATASET,
                 file_name=self.TARGET_FILE,
-                destination_dir=str(self.raw_data_dir),
+                destination_dir=self.raw_data_dir
             )
 
             if not self.raw_data_path:
                 logger.error("Extract phase failed - file could not be obtained")
-                return None
+                return False
 
             # 2. Scan and Report
-            file_to_scan = Path(self.raw_data_path)
+            import pandas as pd
+            file_to_scan = self.raw_data_path
             if file_to_scan.is_dir():
                 files = list(file_to_scan.glob("*.csv")) + list(file_to_scan.glob("*.xls"))
                 if not files:
                     logger.error("No data files found for scanning.")
-                    return None
+                    return False
                 file_to_scan = files[0]
 
             logger.info(f"Scanning raw data: {file_to_scan}")
-            if file_to_scan.suffix.lower() == ".csv":
+            if file_to_scan.suffix.lower() == '.csv':
                 df_raw = pd.read_csv(file_to_scan)
             else:
-                df_raw = pd.read_excel(file_to_scan, engine="xlrd" if file_to_scan.suffix.lower() == ".xls" else None)
+                df_raw = pd.read_excel(file_to_scan, engine='xlrd' if file_to_scan.suffix.lower() == '.xls' else None)
 
             if df_raw.empty:
                 logger.error("Extracted raw data is empty.")
@@ -133,7 +116,7 @@ class ETLPipeline:
 
         except Exception as e:
             logger.error(f"Unexpected error during extract phase: {e}", exc_info=True)
-            return None
+            return False
 
     def transform(self, df_raw: pd.DataFrame) -> bool:
         """
@@ -152,10 +135,11 @@ class ETLPipeline:
         try:
             logger.info("Executing Data Quality Validation and Segregation...")
             validator = CreditDataValidator()
-
+            
             # Run Data Quality checks and split data ONCE
-            validator.segregate_and_save(df_raw, output_dir=str(self.processed_data_dir))
+            df_clean, _ = validator.segregate_and_save(df_raw, output_dir=self.processed_data_dir)
 
+            self.transformed_data_path = Path("data/output") / "df_output.csv"
             logger.info(f"Transform phase successful. Clean data saved at: {self.transformed_data_path}")
             return True
 
@@ -177,22 +161,19 @@ class ETLPipeline:
         if not self.transformed_data_path or not self.transformed_data_path.exists():
             logger.error("Load phase failed - no clean data found. Did Transform phase complete?")
             return False
-
+        
         # Initialize DataLoader and inject the connection Engine
         loader = DataLoader(engine=self.database_engine)
-
+        
         # Trigger the automated process: Load to Staging and distribute to Star Schema
         success = loader.load_to_staging_and_transform(
-            csv_file_path=self.transformed_data_path,
-            staging_table="stg_loan",
-            sp_name="sp_load_star_schema",
+            csv_file_path=self.transformed_data_path, 
+            staging_table='stg_loan',
+            sp_name='sp_load_star_schema'
         )
-
+        
         return success
 
-<<<<<<< Updated upstream
-    def run(self) -> bool:
-=======
     def load_predictions(self) -> bool:
         """
         Load ML prediction results into SQL Server
@@ -215,25 +196,28 @@ class ETLPipeline:
 
         success = loader.load_to_staging_and_transform(
             csv_file_path=self.predictions_path,
-            staging_table="stg_predictions",
-            sp_name="sp_load_ml_predictions",
+            staging_table='stg_predictions',
+            sp_name='sp_load_ml_predictions'
         )
 
         return success
 
     def run(self, load_ml: bool = False) -> bool:
->>>>>>> Stashed changes
         """
         Execute the complete ELT pipeline.
         Skips Load phase if no database configuration is provided.
+
+        Args:
+            load_ml (bool): If True, loads additional predictions.csv into FactMLPrediction
+                            after completing the load of the star schema.
         """
         logger.info("INITIATING ELT PIPELINE")
 
         # PHASE 1: EXTRACT (Load data directly to RAM)
         df_raw = self.extract()
-
-        # Stop pipeline if df_raw is empty or an error occurred
-        if df_raw is None:
+        
+        # Stop pipeline if df_raw is empty or an error occurred (returns False/None)
+        if df_raw is None or isinstance(df_raw, bool):
             logger.error("Pipeline aborted at Extract Phase.")
             return False
 
@@ -241,12 +225,17 @@ class ETLPipeline:
         if not self.transform(df_raw):
             logger.error("Pipeline aborted at Transform Phase.")
             return False
-
+            
         # PHASE 3: LOAD (Push clean data to SQL Server & build Star Schema)
         if not self.skip_db:
             if not self.load():
                 logger.error("Pipeline aborted at Load Phase.")
                 return False
+
+            # PHASE 4 (optional): LOAD ML PREDICTIONS
+            if load_ml:
+                if not self.load_predictions():
+                    logger.warning("ML Predictions load failed — pipeline continues.")
         else:
             logger.info("Skipping Load Phase as requested (--skip-db).")
 
@@ -254,4 +243,3 @@ class ETLPipeline:
         logger.info("ELT PIPELINE COMPLETED SUCCESSFULLY!")
         logger.info("=" * 60)
         return True
-
