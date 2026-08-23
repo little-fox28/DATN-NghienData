@@ -33,13 +33,9 @@ def _load_default_predictor() -> ModelPredictor | None:
         return None
 
 
-# Singleton predictor — khởi tạo một lần khi module được import
-default_predictor: ModelPredictor | None = _load_default_predictor()
-
-
 def score_application(record: dict, task: str = "credit_risk") -> dict:
     """
-    Chạy ML scoring cho một hồ sơ vay.
+    Chạy ML scoring cho một hồ sơ vay với cấu hình cập nhật từ config.yaml.
 
     Args:
         record: dict chứa thông tin hồ sơ (từ LoanApplication.model_dump())
@@ -48,10 +44,7 @@ def score_application(record: dict, task: str = "credit_risk") -> dict:
     Returns:
         dict kết quả scoring từ ModelPredictor.score_single()
     """
-    if task == "credit_risk" and default_predictor is not None:
-        return default_predictor.score_single(record)
-
-    # Dynamic predictor cho các task khác
     task_cfg = get_task_config(task)
     task_cfg["task_name"] = task
-    return ModelPredictor(task_cfg).score_single(record)
+    predictor = ModelPredictor(task_cfg)
+    return predictor.score_single(record)

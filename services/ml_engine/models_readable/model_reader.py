@@ -49,9 +49,13 @@ def create_readable_models():
         try:
             model = joblib.load(model_path)
             
+            # Trích xuất base XGBoost model nếu đang được bọc bởi CalibratedClassifierCV / FrozenEstimator
+            base_model = getattr(model, "estimator", model)
+            base_model = getattr(base_model, "estimator", base_model)
+            
             # 2.1 Feature Importances
-            if hasattr(model, "feature_importances_") and hasattr(model, "feature_names_in_"):
-                importances = dict(zip(model.feature_names_in_, model.feature_importances_))
+            if hasattr(base_model, "feature_importances_") and hasattr(base_model, "feature_names_in_"):
+                importances = dict(zip(base_model.feature_names_in_, base_model.feature_importances_))
                 # Sort by importance
                 importances = {k: float(v) for k, v in sorted(importances.items(), key=lambda item: item[1], reverse=True)}
                 
@@ -61,8 +65,8 @@ def create_readable_models():
                 print(f" [OK] Saved Feature Importances to: {out_feat}")
             
             # 2.2 XGBoost Trees structure (Mermaid Parsing - 3 Subgraphs in 1 File)
-            if hasattr(model, "get_booster"):
-                booster = model.get_booster()
+            if hasattr(base_model, "get_booster"):
+                booster = base_model.get_booster()
                 trees = booster.get_dump()
                 
                 # Trích xuất 3 cây: Đầu, Giữa và Cuối

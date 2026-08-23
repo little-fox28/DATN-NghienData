@@ -1,8 +1,8 @@
-import { Layout, theme, Select, Space } from 'antd';
+import { BgColorsOutlined, GlobalOutlined } from '@ant-design/icons';
+import { Layout, Select, Space, theme } from 'antd';
 import React from 'react';
-import { useAppContext } from '../contexts/AppProvider';
 import { useTranslation } from 'react-i18next';
-import { GlobalOutlined, BgColorsOutlined } from '@ant-design/icons';
+import { useAppContext } from '../contexts/AppProvider';
 
 const { Header } = Layout;
 
@@ -17,7 +17,7 @@ export const Navbar: React.FC = () => {
     <Header style={{ background: colorBgContainer, padding: '0 24px', display: 'flex', alignItems: 'center', borderBottom: `1px solid ${colorBorderSecondary}`, lineHeight: 'normal' }}>
       <div className="header-container">
         <div className="brand-section">
-          <img src='/logo.png' alt='logo' width={'auto'} height={50} />
+          <img src='/logo.png' alt='logo' width={90} height={"auto"} />
           <div>
             <h1 className="brand-title" style={{ color: colorText }}>{t('navbar.title')}</h1>
             <span className="brand-subtitle">

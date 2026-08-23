@@ -175,7 +175,11 @@ def export_predictions(
     # WoE transform + predict
     X     = df[FEATURES].copy()
     X_woe = woe_binner.transform(X)
-    X_woe = X_woe[model.feature_names_in_]
+    if hasattr(model, "feature_names_in_"):
+        for col in model.feature_names_in_:
+            if col not in X_woe.columns:
+                X_woe[col] = 0.0
+        X_woe = X_woe[model.feature_names_in_]
 
     df["pd_score"]        = model.predict_proba(X_woe)[:, 1]
     df["predicted_class"] = model.predict(X_woe)

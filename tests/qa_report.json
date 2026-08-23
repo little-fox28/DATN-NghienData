@@ -1,0 +1,525 @@
+{
+  "meta": {
+    "suite": "test_credit_risk_qa_suite.ipynb",
+    "api_url": "http://127.0.0.1:8000",
+    "run_start": "2026-08-23T14:30:40.097734",
+    "run_end": "2026-08-23T14:30:46.813785",
+    "duration_seconds": 6.72,
+    "model": "XGBoost credit_risk (156 trees, max_depth=5, scale_pos_weight=3.58)"
+  },
+  "summary": {
+    "total": 60,
+    "passed": 56,
+    "failed": 4,
+    "errored": 0,
+    "pass_rate_pct": 93.33
+  },
+  "findings": [
+    {
+      "id": "FINDING-001",
+      "severity": "HIGH",
+      "file": "tests/conftest.py#L118-123",
+      "title": "_VALID_TIER_DECISION_PAIRS[HIGH] is incomplete",
+      "description": "conftest.py maps HIGH -> REJECTED only. predict.py#L98-100 routes scores 570-579 to HIGH -> MANUAL_REVIEW.",
+      "fix": "Update conftest.py line 122 to: 'HIGH': {'MANUAL_REVIEW', 'REJECTED'}"
+    },
+    {
+      "id": "FINDING-002",
+      "severity": "MEDIUM",
+      "file": "tests/conftest.py#L127",
+      "title": "APR cap mismatch: conftest uses 24.0 but config.yaml sets 35.0",
+      "description": "_APR_MAX=24.0 in conftest does not match config.yaml max_rate=35.0.",
+      "fix": "Update conftest.py: _APR_MAX = 35.0"
+    },
+    {
+      "id": "FINDING-003",
+      "severity": "MEDIUM",
+      "file": "services/api_server/app/schemas/loan.py#L14",
+      "title": "loan_int_rate missing ge=0 constraint",
+      "description": "loan_int_rate: float has no ge=0.0 validation. Negative rates bypass schema and may crash WoE binner.",
+      "fix": "Add ge=0.0 to Field(...) declaration for loan_int_rate"
+    }
+  ],
+  "results": [
+    {
+      "id": "TC-INF-01",
+      "name": "Health Check — /health returns 200 + healthy",
+      "category": "C1_Infrastructure",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 13.5
+    },
+    {
+      "id": "TC-INF-02",
+      "name": "Root endpoint returns service metadata",
+      "category": "C1_Infrastructure",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 30.3
+    },
+    {
+      "id": "TC-INF-03",
+      "name": "[AUDIT] conftest HIGH-tier invariant incomplete — predict.py exposes dual state",
+      "category": "C1_Infrastructure",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 171.9
+    },
+    {
+      "id": "TC-INF-04",
+      "name": "Swagger /docs endpoint is accessible",
+      "category": "C1_Infrastructure",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 5.6
+    },
+    {
+      "id": "TC-INF-05",
+      "name": "OpenAPI schema includes /predict and /enrich paths",
+      "category": "C1_Infrastructure",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 91.1
+    },
+    {
+      "id": "TC-HP-01",
+      "name": "Prime Applicant — Grade A, OWN, EDUCATION -> APPROVED + APR=6.7%",
+      "category": "C2_HappyPath",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 142.1
+    },
+    {
+      "id": "TC-HP-02",
+      "name": "Standard Applicant — initialFormData baseline (no crash + valid tier)",
+      "category": "C2_HappyPath",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 120.1
+    },
+    {
+      "id": "TC-HP-03",
+      "name": "Sub-prime — Grade G, Y-default, DTI=0.85 -> REJECTED + limit=0",
+      "category": "C2_HappyPath",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 121.4
+    },
+    {
+      "id": "TC-HP-04",
+      "name": "HOMEIMPROVEMENT +0.2% intent adj + MORTGAGE -0.25% capital discount",
+      "category": "C2_HappyPath",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 118.1
+    },
+    {
+      "id": "TC-HP-05",
+      "name": "MEDICAL intent -> +0.3% intent_adjustment applied correctly",
+      "category": "C2_HappyPath",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 118.6
+    },
+    {
+      "id": "TC-HP-06",
+      "name": "VENTURE intent -> +0.5% intent_adjustment applied correctly",
+      "category": "C2_HappyPath",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 121.8
+    },
+    {
+      "id": "TC-ADV-01",
+      "name": "Grade A + Prior Default — must NOT be auto-approved",
+      "category": "C3_Adversarial",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 119.9
+    },
+    {
+      "id": "TC-ADV-02",
+      "name": "High Income + Catastrophic DTI=0.92 -> must not approve",
+      "category": "C3_Adversarial",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 115.2
+    },
+    {
+      "id": "TC-ADV-03",
+      "name": "Grade G + positive signals — loan_grade WoE must dominate",
+      "category": "C3_Adversarial",
+      "status": "FAIL",
+      "error": "Grade G must not approve. Got: APPROVED",
+      "elapsed_ms": 129.4
+    },
+    {
+      "id": "TC-ADV-04",
+      "name": "VENTURE + emp_length=0 + LTI=0.50 masked by Grade A",
+      "category": "C3_Adversarial",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 116.1
+    },
+    {
+      "id": "TC-ADV-05",
+      "name": "Monotonicity — PD(Grade G) > PD(Grade A) with all else equal",
+      "category": "C3_Adversarial",
+      "status": "FAIL",
+      "error": "MONOTONICITY VIOLATION: PD(G)=0.0965 must > PD(A)=0.1041",
+      "elapsed_ms": 232.1
+    },
+    {
+      "id": "TC-ADV-06",
+      "name": "Monotonicity — PD(DTI=0.85) > PD(DTI=0.15) with all else equal",
+      "category": "C3_Adversarial",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 235.5
+    },
+    {
+      "id": "TC-BVA-01",
+      "name": "FICO Boundary 740 — APPROVED vs APPROVED_CONDITIONAL coherence",
+      "category": "C4_BVA",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 117.7
+    },
+    {
+      "id": "TC-BVA-02",
+      "name": "FICO Boundary 670 — MEDIUM_LOW vs MEDIUM_HIGH coherence",
+      "category": "C4_BVA",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 177.8
+    },
+    {
+      "id": "TC-BVA-03",
+      "name": "FICO Boundary 580 — APPROVED_CONDITIONAL vs MANUAL_REVIEW/REJECTED",
+      "category": "C4_BVA",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 151.2
+    },
+    {
+      "id": "TC-BVA-04",
+      "name": "LTI exactly at LOW tier cap (40%) -> WITHIN_LIMIT + limit=$40,000",
+      "category": "C4_BVA",
+      "status": "FAIL",
+      "error": "",
+      "elapsed_ms": 127.7
+    },
+    {
+      "id": "TC-BVA-05",
+      "name": "LTI $1 over LOW cap -> EXCEEDS_RECOMMENDED_LIMIT, ML unchanged",
+      "category": "C4_BVA",
+      "status": "FAIL",
+      "error": "Limit breach must NOT downgrade ML decision.",
+      "elapsed_ms": 114.5
+    },
+    {
+      "id": "TC-BVA-06",
+      "name": "FICO floor clamp — worst-case must not go below 300",
+      "category": "C4_BVA",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 125.7
+    },
+    {
+      "id": "TC-GZ-01",
+      "name": "Gray Zone probe — FICO 570-579 must route to MANUAL_REVIEW (not REJECTED)",
+      "category": "C5_GrayZone",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 130.1
+    },
+    {
+      "id": "TC-GZ-02",
+      "name": "Gray zone MANUAL_REVIEW credit limit capped at $3,000",
+      "category": "C5_GrayZone",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 118.9
+    },
+    {
+      "id": "TC-GZ-03",
+      "name": "Gray zone pricing distinction — MANUAL_REVIEW vs REJECTED limit_status",
+      "category": "C5_GrayZone",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 125.4
+    },
+    {
+      "id": "TC-ROB-01",
+      "name": "Missing required field (loan_grade) -> HTTP 422 with field name",
+      "category": "C6_Robustness",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 7.3
+    },
+    {
+      "id": "TC-ROB-02",
+      "name": "Empty body -> 422 with all 11 required fields enumerated",
+      "category": "C6_Robustness",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 7.3
+    },
+    {
+      "id": "TC-ROB-03",
+      "name": "Wrong data type (loan_amnt='ten thousand') -> HTTP 422",
+      "category": "C6_Robustness",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 6.0
+    },
+    {
+      "id": "TC-ROB-04",
+      "name": "Negative interest rate (-5.0) -> must not cause HTTP 500",
+      "category": "C6_Robustness",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 140.3
+    },
+    {
+      "id": "TC-ROB-05",
+      "name": "Unknown loan_grade='Z' -> graceful WoE fallback (not HTTP 500)",
+      "category": "C6_Robustness",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 127.7
+    },
+    {
+      "id": "TC-ROB-06",
+      "name": "Extreme outlier income ($10M) -> WoE handles + $50K hard cap",
+      "category": "C6_Robustness",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 122.5
+    },
+    {
+      "id": "TC-ROB-07",
+      "name": "Extreme LTI=6.25 (loan=$500K) -> WoE clamps, no HTTP 500",
+      "category": "C6_Robustness",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 124.9
+    },
+    {
+      "id": "TC-ROB-08",
+      "name": "Near-zero income ($1) -> no division-by-zero + REJECTED",
+      "category": "C6_Robustness",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 120.1
+    },
+    {
+      "id": "TC-ROB-09",
+      "name": "Explicit null for optional field (debt_to_income_ratio) -> 200 or 422",
+      "category": "C6_Robustness",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 114.7
+    },
+    {
+      "id": "TC-ROB-10",
+      "name": "Zero employment length (0.0) -> not treated as NaN, no HTTP 500",
+      "category": "C6_Robustness",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 122.7
+    },
+    {
+      "id": "TC-ROB-11",
+      "name": "Path traversal in task param -> structured error, no traceback leak",
+      "category": "C6_Robustness",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 7.7
+    },
+    {
+      "id": "TC-ROB-12",
+      "name": "Statutory APR cap (<=35%) — worst case Grade G + DEBTCONSOLIDATION",
+      "category": "C6_Robustness",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 123.9
+    },
+    {
+      "id": "TC-PRC-01-EDUCATION",
+      "name": "Intent adjustment: EDUCATION -> -0.3%",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 124.9
+    },
+    {
+      "id": "TC-PRC-01-PERSONAL",
+      "name": "Intent adjustment: PERSONAL -> +0.0%",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 133.8
+    },
+    {
+      "id": "TC-PRC-01-HOMEIMPROVEMENT",
+      "name": "Intent adjustment: HOMEIMPROVEMENT -> +0.2%",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 122.2
+    },
+    {
+      "id": "TC-PRC-01-MEDICAL",
+      "name": "Intent adjustment: MEDICAL -> +0.3%",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 132.0
+    },
+    {
+      "id": "TC-PRC-01-VENTURE",
+      "name": "Intent adjustment: VENTURE -> +0.5%",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 120.8
+    },
+    {
+      "id": "TC-PRC-01-DEBTCONSOLIDATION",
+      "name": "Intent adjustment: DEBTCONSOLIDATION -> +0.8%",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 124.7
+    },
+    {
+      "id": "TC-PRC-02-OWN",
+      "name": "Capital discount: OWN -> -0.50%",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 140.7
+    },
+    {
+      "id": "TC-PRC-02-MORTGAGE",
+      "name": "Capital discount: MORTGAGE -> -0.25%",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 118.6
+    },
+    {
+      "id": "TC-PRC-02-RENT",
+      "name": "Capital discount: RENT -> +0.00%",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 122.1
+    },
+    {
+      "id": "TC-PRC-02-OTHER",
+      "name": "Capital discount: OTHER -> +0.00%",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 123.9
+    },
+    {
+      "id": "TC-PRC-03",
+      "name": "PMT formula arithmetic verification — PMT = P*[r(1+r)^n/((1+r)^n-1)]",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 122.7
+    },
+    {
+      "id": "TC-PRC-04",
+      "name": "WoE contribution signs — Grade A / default=N must be positive",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 129.9
+    },
+    {
+      "id": "TC-PRC-05",
+      "name": "Worst-case coherence vector — all fields consistent",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 125.2
+    },
+    {
+      "id": "TC-PRC-06",
+      "name": "Contribution keys — ECOA-protected/dropped features absent from response",
+      "category": "C7_PricingML",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 123.6
+    },
+    {
+      "id": "TC-ENR-01",
+      "name": "POST /enrich — save new record, returns client_ID + saved_to + created_at",
+      "category": "C8_EnrichAPI",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 13.3
+    },
+    {
+      "id": "TC-ENR-02",
+      "name": "GET /enrich/records — paginated list with total + page metadata",
+      "category": "C8_EnrichAPI",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 35.2
+    },
+    {
+      "id": "TC-ENR-03",
+      "name": "GET /enrich/stats — total + default_rate_pct + retrain fields",
+      "category": "C8_EnrichAPI",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 23.2
+    },
+    {
+      "id": "TC-ENR-04",
+      "name": "PATCH /enrich/records/{id}/label — update loan_status to 1 (default)",
+      "category": "C8_EnrichAPI",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 16.0
+    },
+    {
+      "id": "TC-ENR-05",
+      "name": "PATCH /label with invalid loan_status=99 -> HTTP 400",
+      "category": "C8_EnrichAPI",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 14.1
+    },
+    {
+      "id": "TC-ENR-06",
+      "name": "PATCH /label for non-existent client_ID -> HTTP 404",
+      "category": "C8_EnrichAPI",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 35.4
+    },
+    {
+      "id": "TC-ENR-07",
+      "name": "POST /enrich with loan_status=-99 -> HTTP 422 (out of range)",
+      "category": "C8_EnrichAPI",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 17.1
+    },
+    {
+      "id": "TC-ENR-08",
+      "name": "GET /enrich/export — returns valid CSV with correct headers",
+      "category": "C8_EnrichAPI",
+      "status": "PASS",
+      "error": "",
+      "elapsed_ms": 18.1
+    }
+  ]
+}

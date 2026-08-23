@@ -32,7 +32,7 @@ tasks:
     # - PII/ID          : client_ID
     # - Địa lý          : country, state, city, city_latitude, city_longitude
     # - Trùng lặp LTI   : loan_percent_income (bản làm tròn của loan_to_income_ratio)
-    # - IV thấp (<2% DR): employment_type, education_level, credit_utilization_ratio
+    # - IV thấp (< 2% DR): employment_type, education_level, credit_utilization_ratio
     # - Confound        : past_delinquencies (bị confound bởi cb_person_default_on_file)
     # - ECOA/FCA cấm   : gender, marital_status
     # - Ngoài top 10   : cb_person_cred_hist_length, person_age
@@ -76,6 +76,7 @@ tasks:
       - "debt_to_income_ratio"    # 5C: Capacity   — Tỷ lệ Nợ / Thu nhập
       - "person_income"           # 5C: Capacity   — Thu nhập cá nhân
       - "loan_int_rate"           # 5C: Conditions — Lãi suất khoản vay
+      - "loan_term_months"        # 5C: Conditions — Kỳ hạn khoản vay (tháng: 12, 24, 36, 60)
       - "person_emp_length"       # 5C: Capacity   — Thâm niên công tác
       - "loan_amnt"               # 5C: Conditions — Số tiền vay
 
@@ -102,16 +103,79 @@ tasks:
       scale_pos_weight: 3.58
       eval_metric: "auc"
       random_state: 42
+      monotone_constraints: "(1, 1, -1, 1, 1, -1, 1, 0, 0, 0, 0)"
 
     # -------------------------------------------------------------------
     # Quy đổi điểm tín dụng (Scorecard Calibration - Standard FICO)
-    # Công thức: Score = Target_Score - Factor × ln(Odds / Target_Odds)
-    # Factor = PDO / ln(2) = 20 / ln(2) ≈ 28.85
+    # Công thức: Score = Target_Score + Factor × ln(Odds / Target_Odds)
+    # Factor = PDO / ln(2) = 40 / ln(2) ≈ 57.71
     # -------------------------------------------------------------------
     scorecard:
-      target_score: 600       # Điểm chuẩn FICO
-      target_odds: 20         # Tỷ lệ cược chuẩn
-      pdo: 20                 # Points to Double the Odds (FICO standard)
-      score_factor: 28.85     # = PDO / ln(2)
+      target_score: 650       # Điểm chuẩn FICO (Median ~ 668)
+      target_odds: 3.58       # Tỷ lệ cược chuẩn danh mục (Non-default / Default ≈ 3.58)
+      pdo: 40                 # Points to Double the Odds
+      score_factor: 57.71     # = PDO / ln(2) = 40 / ln(2)
       score_min: 300          # Điểm tối thiểu FICO
       score_max: 850          # Điểm tối đa FICO
+
+    # -------------------------------------------------------------------
+    # Chính sách Định giá Lãi suất Cá nhân hóa (Risk-Based Pricing Policy)
+    # Thuật toán: APR = Base Rate + Risk Spread + Capital Discount + Intent Adj
+    # Tham chiếu: SPEC-ML-PRICING-2026-V1.0 (docs/06_risk_based_pricing...)
+    # Tuân thủ: Điều 468 Bộ luật Dân sự VN (≤ 20%/năm), ECOA Fair Lending
+    # -------------------------------------------------------------------
+    pricing_policy:
+      # Lãi suất cơ sở (Cost of Funds + Operating Margin)
+      base_rate: 6.5
+
+      # Biên độ bù rủi ro theo Risk Tier (Δr_risk)
+      # Bù đắp Expected Loss: PD × LGD tương ứng từng tầng FICO
+      risk_spreads:
+        LOW:         1.0    # FICO ≥ 740 — Tier VIP Prime
+        MEDIUM_LOW:  2.5    # FICO 670-739 — Tier Standard
+        MEDIUM_HIGH: 5.0    # FICO 580-669 — Tier Sub-prime
+        HIGH:        9.0    # FICO < 580 — Tier High-Risk
+
+      # Chiết khấu sở hữu nhà (Δr_capital)
+      # Thưởng cho khách hàng có tài sản tích lũy và ổn định cư trú
+      home_ownership_discounts:
+        OWN:      -0.5     # Sở hữu nhà riêng → giảm 0.5%
+        MORTGAGE: -0.25    # Đang thế chấp   → giảm 0.25%
+        RENT:      0.0     # Thuê nhà         → không thay đổi
+        OTHER:     0.0     # Khác             → không thay đổi
+
+      # Hiệu chỉnh mục đích vay (Δr_intent)
+      # Phạt/thưởng theo rủi ro dòng tiền của từng mục đích vay
+      intent_adjustments:
+        EDUCATION:       -0.3   # Ưu đãi xã hội — Giáo dục
+        PERSONAL:         0.0   # Tiêu dùng thông thường
+        HOMEIMPROVEMENT:  0.2   # Cải thiện nhà ở
+        MEDICAL:          0.3   # Y tế khẩn cấp
+        VENTURE:          0.5   # Kinh doanh — Rủi ro cao
+        DEBTCONSOLIDATION: 0.8  # Đảo nợ — Rủi ro cao nhất
+
+      # Hệ số LTI tối đa và trần hạn mức theo Risk Tier
+      # Max Limit = min(Annual Income × LTI Multiple, Hard Cap)
+      max_lti_caps:
+        LOW:         0.40   # Tối đa 40% thu nhập năm
+        MEDIUM_LOW:  0.30   # Tối đa 30% thu nhập năm
+        MEDIUM_HIGH: 0.18   # Tối đa 18% thu nhập năm
+        HIGH:        0.08   # Tối đa 8% thu nhập năm (cận biên)
+
+      max_amount_caps:
+        LOW:         50000  # Trần hạn mức tuyệt đối ($)
+        MEDIUM_LOW:  35000
+        MEDIUM_HIGH: 18000
+        HIGH:         5000
+
+      # -------------------------------------------------------------------
+      # Chốt chặn pháp lý (Statutory Rate Cap - US/UK/Canada Jurisdictions)
+      # - Canada: Hình sự hóa APR > 35% (Criminal Code of Canada, 2023 update).
+      # - US: Luật cho vay nặng lãi (Usury laws) thay đổi theo bang, mốc 36% là chuẩn an toàn liên bang (ví dụ: MLA).
+      # - UK: FCA quản lý rủi ro tín dụng tiêu dùng, APR 36% là ngưỡng phân định rủi ro tiêu chuẩn.
+      # -------------------------------------------------------------------
+      min_rate: 6.0
+      max_rate: 35.0
+
+      # Thời hạn khoản vay mặc định (tháng) cho mô phỏng PMT
+      default_loan_term_months: 36

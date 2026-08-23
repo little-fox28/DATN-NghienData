@@ -95,34 +95,145 @@
       "gradeE": "Grade E",
       "gradeF": "Grade F",
       "gradeG": "Grade G (High Risk)",
-      "intRate": "Proposed Interest Rate (%)"
+      "intRate": "Proposed Interest Rate (%)",
+      "term": "Loan Term (Months)",
+      "month12": "12 months (1 year)",
+      "month24": "24 months (2 years)",
+      "month36": "36 months (3 years - Default)",
+      "month48": "48 months (4 years)",
+      "month60": "60 months (5 years)"
     },
     "result": {
       "title": "Approval Result & Credit Scoring"
     },
     "buttons": {
       "prev": "Previous",
-      "next": "Next",
-      "submit": "Submit Application",
-      "reset": "New Loan Application",
-      "saveToDb": "Create & Save Loan Profile",
-      "created": "Loan profile created successfully",
-      "errorSaveToDb": "Failed to save loan data"
+      "next": "Continue",
+      "submit": "Score Now",
+      "reset": "Create New Application",
+      "saveToDb": "Save Application Now",
+      "created": "Application Created Successfully",
+      "errorSaveToDb": "Data Saving Error",
+      "approveLimit": "Approve Probing Limit",
+      "approveDirect": "Approve Credit Limit",
+      "modifyTerms": "Modify Terms",
+      "reject": "Reject"
     },
     "messages": {
-      "success": "Credit scoring successful!"
+      "success": "Credit scoring completed successfully!"
     }
   },
   "gauge": {
     "decision": {
-      "approved": "APPLICATION AUTOMATICALLY APPROVED",
-      "approved_conditional": "APPROVED CONDITIONALLY (HIGHER RATE)",
-      "manual": "MANUAL REVIEW REQUIRED",
-      "rejected": "APPLICATION AUTOMATICALLY REJECTED"
+      "approved": "AUTOMATICALLY APPROVED",
+      "approved_conditional": "CONDITIONALLY APPROVED (RATE ADJUSTED)",
+      "manual": "MANUAL UNDERWRITER REVIEW",
+      "rejected": "AUTOMATICALLY REJECTED"
     },
     "scale": "Score Scale ({{min}} - {{max}})",
     "pdScore": "Probability of Default (PD)",
     "riskTier": "Risk Tier",
     "tierName": "Tier {{tier}}"
+  },
+  "pricing": {
+    "title": "Personalized Risk-Based Pricing & Credit Limit Package",
+    "subtitle": "Automatically calculated based on FICO Score, Risk Tier, and Bank Regulatory Framework",
+    "recommendedAprLabel": "RECOMMENDED INTEREST RATE (APR)",
+    "year": "year",
+    "month": "month",
+    "savingsVsRequested": "Save -{{delta}}% vs requested rate",
+    "surchargeVsRequested": "Adjusted +{{delta}}% risk compensation",
+    "rateBreakdownTitle": "Interest Rate Components (Rate Breakdown)",
+    "components": {
+      "base": "Base Rate",
+      "riskSpread": "Risk Spread",
+      "capitalDiscount": "Home Ownership Discount",
+      "intentAdj": "Purpose Adjustment"
+    },
+    "monthlyPayment": "Estimated Monthly Payment",
+    "totalInterest": "Total Expected Interest",
+    "amortizationNote": "Estimated using standard Amortization method with {{term}}-month loan term",
+    "creditLimitTitle": "Probing Credit Limit Allocation",
+    "requested": "Requested Amount",
+    "maxLimit": "Max Limit",
+    "limitStatus": {
+      "withinLimit": "Within Safe Credit Limit",
+      "exceedsLimit": "Exceeds Recommended Limit",
+      "rejected": "Credit Limit Denied"
+    },
+    "exceedsLimitAdvisory": "Warning: Requested loan amount exceeds the maximum recommended limit (${{max}}). Bank recommends disbursement according to the maximum limit."
+  },
+  "riskDashboard": {
+    "header": {
+      "applicationId": "Application ID",
+      "decisionStatus": "Decision Status"
+    },
+    "decision": {
+      "manualReview": "MANUAL UNDERWRITER REVIEW",
+      "manualReviewDesc": "Application falls into the borderline risk zone (570–579). Additional document verification and CIC credit bureau authentication required before final approval.",
+      "approved": "AUTOMATICALLY APPROVED",
+      "approvedDesc": "Credit score exceeds FICO standard threshold, and debt ratios are within safe regulatory limits.",
+      "approvedConditional": "CONDITIONALLY APPROVED (RATE ADJUSTED)",
+      "approvedConditionalDesc": "Credit approved subject to risk spread adjustment or controlled disbursement limits.",
+      "rejected": "AUTOMATICALLY REJECTED",
+      "rejectedDesc": "Probability of default exceeds allowable risk appetite or serious past delinquencies recorded."
+    },
+    "coreMetrics": {
+      "ficoScore": "FICO Score",
+      "ficoScale": "Scale 300 – 850",
+      "pdScore": "Probability of Default",
+      "pdThreshold": "Threshold: 5.00%",
+      "pdWarning": "High Risk (PD > 5.0%)",
+      "pdSafe": "Safe Zone (PD ≤ 5.0%)",
+      "riskTier": "Risk Tier",
+      "creditClassification": "Credit Classification",
+      "tierHigh": "High Risk",
+      "tierMedHigh": "Medium-High",
+      "tierMedLow": "Medium-Low",
+      "tierLow": "Low Risk",
+      "tierBorderline": "Borderline Buffer Zone"
+    },
+    "explainability": {
+      "title": "Explainability (Top Factors)",
+      "subtitle": "Analysis of Weight of Evidence (WoE) contribution of each metric to the final credit score",
+      "positiveSignals": "Positive Signals",
+      "negativeSignals": "Negative Signals",
+      "positiveDesc": "Factors increasing credit score and reducing default probability",
+      "negativeDesc": "Adverse factors significantly dragging down the credit score",
+      "pts": "pts",
+      "emptyPositive": "No outstanding positive signals recorded",
+      "emptyNegative": "No abnormal risk factors detected"
+    },
+    "pricingAndLimit": {
+      "title": "Pricing & Limit Recommendation",
+      "subtitle": "Risk-Based Pricing policy adhering to statutory rate caps & tiered credit limits",
+      "aprLabel": "RECOMMENDED INTEREST RATE (APR)",
+      "baseRate": "Base Rate",
+      "riskSpread": "Risk Spread",
+      "monthlyPayment": "Monthly Payment",
+      "totalInterest": "Total Interest",
+      "loanTerm": "Loan Term",
+      "limitAllocation": "Requested Amount / ML Recommended Limit",
+      "limitAllocationDesc": "Ratio of approved credit limit vs requested loan amount",
+      "limitCutNote": "70% limit reduction applied due to High Risk tier (Probing limit: $3,000 / Requested: $10,000)",
+      "underwriterNote": "Underwriter Guidance: Apply milestone-based disbursement (Tranches) and request last 6 months bank statement."
+    },
+    "features": {
+      "debt_to_income_ratio": "Debt-to-Income Ratio (DTI)",
+      "person_income": "Annual Income",
+      "loan_percent_income": "Loan-to-Income Ratio (LTI)",
+      "loan_to_income_ratio": "Loan-to-Income Ratio",
+      "person_home_ownership": "Home Ownership Status",
+      "person_emp_length": "Employment Length",
+      "person_age": "Applicant Age",
+      "loan_amnt": "Requested Loan Amount",
+      "loan_int_rate": "Application Interest Rate",
+      "loan_intent": "Loan Intent / Purpose",
+      "loan_grade": "Loan Grade",
+      "cb_person_default_on_file": "Historical Default (CIC)",
+      "cb_person_cred_hist_length": "Credit History Length",
+      "credit_utilization_ratio": "Credit Utilization Ratio (CUR)",
+      "past_delinquencies": "Past Delinquency Count"
+    }
   }
 }
