@@ -73,6 +73,7 @@ tasks:
       - "debt_to_income_ratio"    # 5C: Capacity   — Tỷ lệ Nợ / Thu nhập
       - "person_income"           # 5C: Capacity   — Thu nhập cá nhân
       - "loan_int_rate"           # 5C: Conditions — Lãi suất khoản vay
+      - "loan_term_months"        # 5C: Conditions — Kỳ hạn khoản vay (tháng: 12, 24, 36, 60)
       - "person_emp_length"       # 5C: Capacity   — Thâm niên công tác
       - "loan_amnt"               # 5C: Conditions — Số tiền vay
 
@@ -99,17 +100,18 @@ tasks:
       scale_pos_weight: 3.58
       eval_metric: "auc"
       random_state: 42
+      monotone_constraints: "(1, 1, -1, 1, 1, -1, 1, 0, 0, 0, 0)"
 
     # -------------------------------------------------------------------
     # Quy đổi điểm tín dụng (Scorecard Calibration - Standard FICO)
-    # Công thức: Score = Target_Score - Factor × ln(Odds / Target_Odds)
-    # Factor = PDO / ln(2) = 20 / ln(2) ≈ 28.85
+    # Công thức: Score = Target_Score + Factor × ln(Odds / Target_Odds)
+    # Factor = PDO / ln(2) = 40 / ln(2) ≈ 57.71
     # -------------------------------------------------------------------
     scorecard:
-      target_score: 600       # Điểm chuẩn FICO
-      target_odds: 20         # Tỷ lệ cược chuẩn
-      pdo: 20                 # Points to Double the Odds (FICO standard)
-      score_factor: 28.85     # = PDO / ln(2)
+      target_score: 650       # Điểm chuẩn FICO (Median ~ 668)
+      target_odds: 3.58       # Tỷ lệ cược chuẩn danh mục (Non-default / Default ≈ 3.58)
+      pdo: 40                 # Points to Double the Odds
+      score_factor: 57.71     # = PDO / ln(2) = 40 / ln(2)
       score_min: 300          # Điểm tối thiểu FICO
       score_max: 850          # Điểm tối đa FICO
 
@@ -163,10 +165,14 @@ tasks:
         MEDIUM_HIGH: 18000
         HIGH:         5000
 
-      # Chốt chặn pháp lý (Statutory Rate Cap)
-      # Điều 468 BLDS Việt Nam: ≤ 20%/năm
+      # -------------------------------------------------------------------
+      # Chốt chặn pháp lý (Statutory Rate Cap - US/UK/Canada Jurisdictions)
+      # - Canada: Hình sự hóa APR > 35% (Criminal Code of Canada, 2023 update).
+      # - US: Luật cho vay nặng lãi (Usury laws) thay đổi theo bang, mốc 36% là chuẩn an toàn liên bang (ví dụ: MLA).
+      # - UK: FCA quản lý rủi ro tín dụng tiêu dùng, APR 36% là ngưỡng phân định rủi ro tiêu chuẩn.
+      # -------------------------------------------------------------------
       min_rate: 6.0
-      max_rate: 24.0
+      max_rate: 35.0
 
       # Thời hạn khoản vay mặc định (tháng) cho mô phỏng PMT
       default_loan_term_months: 36

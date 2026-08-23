@@ -199,6 +199,9 @@ def export_predictions(
     X = df[features].copy()
     X_woe = woe_binner.transform(X)
     if hasattr(model, "feature_names_in_"):
+        for col in model.feature_names_in_:
+            if col not in X_woe.columns:
+                X_woe[col] = 0.0
         X_woe = X_woe[model.feature_names_in_]
 
     df["pd_score"] = model.predict_proba(X_woe)[:, 1]

@@ -52,38 +52,52 @@ class ModelPredictor:
 
     def _pd_to_credit_score(self, pd_value: float) -> int:
         """Chuyển đổi Xác suất Nợ xấu (PD) sang Điểm Tín dụng chuẩn FICO (300 – 850).
-
-        Công thức FICO-style (chuẩn BIS 2004):
-            Score = Target_Score - Factor × ln(Odds / Target_Odds)
-            Factor = PDO / ln(2)
+        
+        Công thức FICO-style (chuẩn nội suy tỷ lệ cược An toàn):
+        Odds = (1 - PD) / PD
+        Offset = Target_Score - Factor * ln(Target_Odds)
+        Score = Offset + Factor * ln(Odds)
         """
+        import math
+        
         target_score = self.scorecard_cfg.get("target_score", 600)
         target_odds  = self.scorecard_cfg.get("target_odds", 20)
         pdo          = self.scorecard_cfg.get("pdo", 20)
         score_min    = self.scorecard_cfg.get("score_min", 300)
         score_max    = self.scorecard_cfg.get("score_max", 850)
 
-        pd_value = max(min(pd_value, 0.9999), 0.0001)
-        odds     = pd_value / (1 - pd_value)
-        factor   = pdo / math.log(2)
-        score    = int(round(target_score - factor * math.log(odds / target_odds)))
+        # Xử lý an toàn cận biên (Safe Math)
+        pd_value = max(min(pd_value, 1.0 - 1e-9), 1e-9)
+        
+        # Đảo trục logic sang tỷ lệ Good/Bad
+        odds_good_bad = (1.0 - pd_value) / pd_value
+        factor        = pdo / math.log(2)
+        
+        # Tính toán điểm nội suy với Base Offset
+        offset = target_score - (factor * math.log(target_odds))
+        score  = int(round(offset + factor * math.log(odds_good_bad)))
+        
         return max(min(score, score_max), score_min)
 
     def _assign_risk_tier(self, credit_score: int) -> tuple[str, str]:
-        """Phân loại khách hàng vào nhóm rủi ro và đưa ra quyết định theo chuẩn FICO.
+        """Phân loại khách hàng vào nhóm rủi ro và đưa ra quyết định tín dụng.
 
-        Ngưỡng FICO chuẩn:
-            >= 740 : Very Good / Exceptional     → Tự động phê duyệt
-            670-739: Good                        → Phê duyệt có điều kiện
-            580-669: Fair                        → Thẩm định thủ công
-            < 580  : Poor                        → Từ chối tự động
+        Quy tắc phân tầng FICO cập nhật (hỗ trợ Buffer Zone / Gray Zone):
+            >= 740 : Very Good / Exceptional     → Tự động phê duyệt (APPROVED)
+            670-739: Good                        → Phê duyệt có điều kiện (APPROVED_CONDITIONAL)
+            580-669: Fair                        → Phê duyệt có điều kiện (APPROVED_CONDITIONAL)
+            570-579: Borderline / Gray Zone      → Thẩm định thủ công (MANUAL_REVIEW)
+            < 570  : Poor / High Risk            → Từ chối tự động (REJECTED)
         """
         if credit_score >= 740:
             return "LOW", "APPROVED"
         elif credit_score >= 670:
             return "MEDIUM_LOW", "APPROVED_CONDITIONAL"
         elif credit_score >= 580:
-            return "MEDIUM_HIGH", "MANUAL_REVIEW"
+            return "MEDIUM_HIGH", "APPROVED_CONDITIONAL"
+        # [NEW RULE]: Buffer Zone (570 - 579) - Route borderline profiles to manual underwriting
+        elif credit_score >= 570:
+            return "HIGH", "MANUAL_REVIEW"
         else:
             return "HIGH", "REJECTED"
 
@@ -196,6 +210,17 @@ class ModelPredictor:
         if decision == "REJECTED":
             max_credit_limit = 0.0
             limit_status = "REJECTED"
+        elif decision == "MANUAL_REVIEW":
+            # [GRAY ZONE]: Hạn mức tạm tính / thăm dò tối đa $3,000 cho hồ sơ chờ thẩm định viên
+            lti_caps  = cfg.get("max_lti_caps", {})
+            hard_caps = cfg.get("max_amount_caps", {})
+
+            lti_multiple = float(lti_caps.get(risk_tier, 0.08))
+            hard_cap     = min(float(hard_caps.get(risk_tier, 5000.0)), 3000.0)  # Thăm dò tối đa $3,000
+
+            income_based_limit = annual_income * lti_multiple
+            max_credit_limit   = round(min(income_based_limit, hard_cap), 2)
+            limit_status       = "MANUAL_REVIEW"
         else:
             lti_caps  = cfg.get("max_lti_caps", {})
             hard_caps = cfg.get("max_amount_caps", {})

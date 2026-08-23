@@ -3,439 +3,459 @@ graph TD
 
     subgraph Tree_0 ["Cây quyết định số 0"]
         direction TB
-        T0N0["loan_grade&lt;0.117360003"]
+        T0N0["loan_to_income_ratio&lt;0.164555997"]
         T0N0 -- "yes" --> T0N1
         T0N0 -- "no" --> T0N2
-        T0N1["loan_intent&lt;-0.187492996"]
+        T0N1["debt_to_income_ratio&lt;0.422589988"]
         T0N1 -- "yes" --> T0N3
         T0N1 -- "no" --> T0N4
-        T0N3["person_home_ownership&lt;1.27764201"]
+        T0N3["other_debt&lt;4288.65039"]
         T0N3 -- "yes" --> T0N7
         T0N3 -- "no" --> T0N8
-        T0N7(("Lá: 0.0956375077"))
-        style T0N7 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N8["loan_grade&lt;-1.71288705"]
-        T0N8 -- "yes" --> T0N15
-        T0N8 -- "no" --> T0N16
-        T0N15(("Lá: 0.0906643569"))
+        T0N7["debt_to_income_ratio&lt;0.00180099998"]
+        T0N7 -- "yes" --> T0N15
+        T0N7 -- "no" --> T0N16
+        T0N15(("Lá: 0.0868926719"))
         style T0N15 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N16["other_debt&lt;2771.33228"]
-        T0N16 -- "yes" --> T0N29
-        T0N16 -- "no" --> T0N30
-        T0N29(("Lá: 0.027851183"))
-        style T0N29 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N30(("Lá: -0.0908294171"))
-        style T0N30 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N4["person_home_ownership&lt;0.737325013"]
+        T0N16["other_debt&lt;3574.08057"]
+        T0N16 -- "yes" --> T0N31
+        T0N16 -- "no" --> T0N32
+        T0N31(("Lá: 0.0716007277"))
+        style T0N31 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N32(("Lá: 0.0391327105"))
+        style T0N32 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N8["debt_to_income_ratio&lt;0.00180099998"]
+        T0N8 -- "yes" --> T0N17
+        T0N8 -- "no" --> T0N18
+        T0N17["other_debt&lt;8806.57812"]
+        T0N17 -- "yes" --> T0N33
+        T0N17 -- "no" --> T0N34
+        T0N33(("Lá: 0.067645669"))
+        style T0N33 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N34(("Lá: 0.0494829118"))
+        style T0N34 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N18["loan_amnt&lt;0.0233200006"]
+        T0N18 -- "yes" --> T0N35
+        T0N18 -- "no" --> T0N36
+        T0N35(("Lá: 0.031715747"))
+        style T0N35 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N36(("Lá: -0.00852795318"))
+        style T0N36 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N4["other_debt&lt;2717.05103"]
         T0N4 -- "yes" --> T0N9
         T0N4 -- "no" --> T0N10
-        T0N9["person_income&lt;0.224141002"]
-        T0N9 -- "yes" --> T0N17
-        T0N9 -- "no" --> T0N18
-        T0N17["loan_intent&lt;0.135196999"]
-        T0N17 -- "yes" --> T0N31
-        T0N17 -- "no" --> T0N32
-        T0N31(("Lá: 0.0968211591"))
-        style T0N31 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N32(("Lá: 0.0802867934"))
-        style T0N32 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N18["loan_to_income_ratio&lt;0.164555997"]
-        T0N18 -- "yes" --> T0N33
-        T0N18 -- "no" --> T0N34
-        T0N33(("Lá: 0.088262178"))
-        style T0N33 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N34(("Lá: 0.0479112901"))
-        style T0N34 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N10["loan_grade&lt;-1.91839504"]
-        T0N10 -- "yes" --> T0N19
-        T0N10 -- "no" --> T0N20
-        T0N19["loan_grade&lt;-2.21647"]
-        T0N19 -- "yes" --> T0N35
-        T0N19 -- "no" --> T0N36
-        T0N35(("Lá: 0.0906643569"))
-        style T0N35 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N36(("Lá: 0.0445674695"))
-        style T0N36 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N20["loan_to_income_ratio&lt;0.164555997"]
-        T0N20 -- "yes" --> T0N37
-        T0N20 -- "no" --> T0N38
-        T0N37(("Lá: 0.0167765897"))
+        T0N9["loan_amnt&lt;0.166329995"]
+        T0N9 -- "yes" --> T0N19
+        T0N9 -- "no" --> T0N20
+        T0N19["other_debt&lt;2351.27026"]
+        T0N19 -- "yes" --> T0N37
+        T0N19 -- "no" --> T0N38
+        T0N37(("Lá: 0.0771829188"))
         style T0N37 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N38(("Lá: -0.0379284397"))
+        T0N38(("Lá: 0.0350339897"))
         style T0N38 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N2["loan_to_income_ratio&lt;0.164555997"]
+        T0N20["open_accounts&lt;9"]
+        T0N20 -- "yes" --> T0N39
+        T0N20 -- "no" --> T0N40
+        T0N39(("Lá: 0.0282245222"))
+        style T0N39 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N40(("Lá: -0.0209852848"))
+        style T0N40 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N10["open_accounts&lt;15"]
+        T0N10 -- "yes" --> T0N21
+        T0N10 -- "no" --> T0N22
+        T0N21["open_accounts&lt;9"]
+        T0N21 -- "yes" --> T0N41
+        T0N21 -- "no" --> T0N42
+        T0N41(("Lá: -0.0121050952"))
+        style T0N41 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N42(("Lá: -0.045805838"))
+        style T0N42 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N22["other_debt&lt;3302.43115"]
+        T0N22 -- "yes" --> T0N43
+        T0N22 -- "no" --> T0N44
+        T0N43(("Lá: 0.062802285"))
+        style T0N43 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N44(("Lá: 0.00511943735"))
+        style T0N44 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N2["other_debt&lt;9078.95312"]
         T0N2 -- "yes" --> T0N5
         T0N2 -- "no" --> T0N6
-        T0N5["person_home_ownership&lt;0.737325013"]
+        T0N5["debt_to_income_ratio&lt;0.78193599"]
         T0N5 -- "yes" --> T0N11
         T0N5 -- "no" --> T0N12
-        T0N11["debt_to_income_ratio&lt;0.422589988"]
-        T0N11 -- "yes" --> T0N21
-        T0N11 -- "no" --> T0N22
-        T0N21["debt_to_income_ratio&lt;0.00180099998"]
-        T0N21 -- "yes" --> T0N39
-        T0N21 -- "no" --> T0N40
-        T0N39(("Lá: 0.0813326538"))
-        style T0N39 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N40(("Lá: 0.0550335348"))
-        style T0N40 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N22["other_debt&lt;2072.29004"]
-        T0N22 -- "yes" --> T0N41
-        T0N22 -- "no" --> T0N42
-        T0N41(("Lá: 0.0203359853"))
-        style T0N41 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N42(("Lá: -0.0633578524"))
-        style T0N42 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N12["loan_amnt&lt;0.293662995"]
-        T0N12 -- "yes" --> T0N23
-        T0N12 -- "no" --> T0N24
-        T0N23["person_income&lt;-0.0674929991"]
-        T0N23 -- "yes" --> T0N43
-        T0N23 -- "no" --> T0N44
-        T0N43(("Lá: -0.0114265475"))
-        style T0N43 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N44(("Lá: -0.0525475554"))
-        style T0N44 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N24["other_debt&lt;5035.45361"]
-        T0N24 -- "yes" --> T0N45
-        T0N24 -- "no" --> T0N46
-        T0N45(("Lá: 0.0707147196"))
+        T0N11["other_debt&lt;3574.08057"]
+        T0N11 -- "yes" --> T0N23
+        T0N11 -- "no" --> T0N24
+        T0N23["loan_amnt&lt;0.166329995"]
+        T0N23 -- "yes" --> T0N45
+        T0N23 -- "no" --> T0N46
+        T0N45(("Lá: 0.0649569854"))
         style T0N45 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N46(("Lá: -0.0613017343"))
+        T0N46(("Lá: 0.00237475825"))
         style T0N46 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N6["person_income&lt;-0.0674929991"]
+        T0N24["debt_to_income_ratio&lt;0.422589988"]
+        T0N24 -- "yes" --> T0N47
+        T0N24 -- "no" --> T0N48
+        T0N47(("Lá: 0.010965094"))
+        style T0N47 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N48(("Lá: -0.0159489103"))
+        style T0N48 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N12["other_debt&lt;2838.09106"]
+        T0N12 -- "yes" --> T0N25
+        T0N12 -- "no" --> T0N26
+        T0N25["open_accounts&lt;8"]
+        T0N25 -- "yes" --> T0N49
+        T0N25 -- "no" --> T0N50
+        T0N49(("Lá: -0.014660947"))
+        style T0N49 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N50(("Lá: 0.0139595373"))
+        style T0N50 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N26["other_debt&lt;7048.39307"]
+        T0N26 -- "yes" --> T0N51
+        T0N26 -- "no" --> T0N52
+        T0N51(("Lá: -0.0333816968"))
+        style T0N51 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N52(("Lá: -0.0541378818"))
+        style T0N52 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N6["loan_to_income_ratio&lt;0.666467011"]
         T0N6 -- "yes" --> T0N13
         T0N6 -- "no" --> T0N14
-        T0N13["loan_amnt&lt;0.293662995"]
-        T0N13 -- "yes" --> T0N25
-        T0N13 -- "no" --> T0N26
-        T0N25["loan_to_income_ratio&lt;0.433557987"]
-        T0N25 -- "yes" --> T0N47
-        T0N25 -- "no" --> T0N48
-        T0N47(("Lá: 0.0600247495"))
-        style T0N47 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N48(("Lá: -0.0157912783"))
-        style T0N48 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N26["loan_intent&lt;0.230130002"]
-        T0N26 -- "yes" --> T0N49
-        T0N26 -- "no" --> T0N50
-        T0N49(("Lá: -0.0148748159"))
-        style T0N49 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N50(("Lá: -0.0585677028"))
-        style T0N50 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N14["loan_grade&lt;0.413450986"]
-        T0N14 -- "yes" --> T0N27
-        T0N14 -- "no" --> T0N28
-        T0N27["person_home_ownership&lt;1.27764201"]
-        T0N27 -- "yes" --> T0N51
-        T0N27 -- "no" --> T0N52
-        T0N51(("Lá: -0.0388073064"))
-        style T0N51 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N52(("Lá: -0.0987227559"))
-        style T0N52 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N28["loan_intent&lt;0.419492006"]
-        T0N28 -- "yes" --> T0N53
-        T0N28 -- "no" --> T0N54
-        T0N53(("Lá: -0.0718657523"))
+        T0N13["loan_to_income_ratio&lt;0.433557987"]
+        T0N13 -- "yes" --> T0N27
+        T0N13 -- "no" --> T0N28
+        T0N27["other_debt&lt;9243.3584"]
+        T0N27 -- "yes" --> T0N53
+        T0N27 -- "no" --> T0N54
+        T0N53(("Lá: 0.0112809241"))
         style T0N53 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T0N54(("Lá: -0.101850621"))
+        T0N54(("Lá: -0.0282825921"))
         style T0N54 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N28["other_debt&lt;19979.4883"]
+        T0N28 -- "yes" --> T0N55
+        T0N28 -- "no" --> T0N56
+        T0N55(("Lá: -0.0334566236"))
+        style T0N55 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N56(("Lá: -0.0467114374"))
+        style T0N56 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N14["other_debt&lt;15732.1484"]
+        T0N14 -- "yes" --> T0N29
+        T0N14 -- "no" --> T0N30
+        T0N29["debt_to_income_ratio&lt;0.56567502"]
+        T0N29 -- "yes" --> T0N57
+        T0N29 -- "no" --> T0N58
+        T0N57(("Lá: -0.0246641953"))
+        style T0N57 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N58(("Lá: -0.0519958138"))
+        style T0N58 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N30["loan_amnt&lt;0.293662995"]
+        T0N30 -- "yes" --> T0N59
+        T0N30 -- "no" --> T0N60
+        T0N59(("Lá: -0.054448586"))
+        style T0N59 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T0N60(("Lá: -0.0692547187"))
+        style T0N60 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
     end
 
-    subgraph Tree_150 ["Cây quyết định số 150"]
+    subgraph Tree_78 ["Cây quyết định số 78"]
         direction TB
-        T150N0["loan_int_rate&lt;0.071039997"]
-        T150N0 -- "yes" --> T150N1
-        T150N0 -- "no" --> T150N2
-        T150N1["loan_to_income_ratio&lt;0.894563019"]
-        T150N1 -- "yes" --> T150N3
-        T150N1 -- "no" --> T150N4
-        T150N3["loan_grade&lt;-2.21647"]
-        T150N3 -- "yes" --> T150N7
-        T150N3 -- "no" --> T150N8
-        T150N7(("Lá: 0.0446739011"))
-        style T150N7 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N8["other_debt&lt;6625.07471"]
-        T150N8 -- "yes" --> T150N15
-        T150N8 -- "no" --> T150N16
-        T150N15["loan_grade&lt;0.117360003"]
-        T150N15 -- "yes" --> T150N29
-        T150N15 -- "no" --> T150N30
-        T150N29(("Lá: 0.00209181895"))
-        style T150N29 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N30(("Lá: -0.022756353"))
-        style T150N30 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N16["loan_intent&lt;-0.187492996"]
-        T150N16 -- "yes" --> T150N31
-        T150N16 -- "no" --> T150N32
-        T150N31(("Lá: 0.0155309802"))
-        style T150N31 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N32(("Lá: -0.00211705919"))
-        style T150N32 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N4["loan_intent&lt;0.230130002"]
-        T150N4 -- "yes" --> T150N9
-        T150N4 -- "no" --> T150N10
-        T150N9["person_emp_length&lt;0.350728989"]
-        T150N9 -- "yes" --> T150N17
-        T150N9 -- "no" --> T150N18
-        T150N17["other_debt&lt;6140.46973"]
-        T150N17 -- "yes" --> T150N33
-        T150N17 -- "no" --> T150N34
-        T150N33(("Lá: 0.00362748909"))
-        style T150N33 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N34(("Lá: -0.0305043403"))
-        style T150N34 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N18["person_income&lt;0.49852401"]
-        T150N18 -- "yes" --> T150N35
-        T150N18 -- "no" --> T150N36
-        T150N35(("Lá: -0.096821472"))
-        style T150N35 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N36(("Lá: -0.0360534452"))
-        style T150N36 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N10["other_debt&lt;21441.5312"]
-        T150N10 -- "yes" --> T150N19
-        T150N10 -- "no" --> T150N20
-        T150N19["other_debt&lt;6725.72607"]
-        T150N19 -- "yes" --> T150N37
-        T150N19 -- "no" --> T150N38
-        T150N37(("Lá: -0.025035942"))
-        style T150N37 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N38(("Lá: 0.0271920767"))
-        style T150N38 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N20(("Lá: -0.0518529825"))
-        style T150N20 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N2["loan_amnt&lt;0.166329995"]
-        T150N2 -- "yes" --> T150N5
-        T150N2 -- "no" --> T150N6
-        T150N5["other_debt&lt;4390.95117"]
-        T150N5 -- "yes" --> T150N11
-        T150N5 -- "no" --> T150N12
-        T150N11["loan_to_income_ratio&lt;0.666467011"]
-        T150N11 -- "yes" --> T150N21
-        T150N11 -- "no" --> T150N22
-        T150N21["other_debt&lt;4288.65039"]
-        T150N21 -- "yes" --> T150N39
-        T150N21 -- "no" --> T150N40
-        T150N39(("Lá: 0.0188676249"))
-        style T150N39 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N40(("Lá: 0.0580256656"))
-        style T150N40 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N22["open_accounts&lt;12"]
-        T150N22 -- "yes" --> T150N41
-        T150N22 -- "no" --> T150N42
-        T150N41(("Lá: -0.00491411146"))
-        style T150N41 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N42(("Lá: 0.021350041"))
-        style T150N42 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N12["loan_intent&lt;0.230130002"]
-        T150N12 -- "yes" --> T150N23
-        T150N12 -- "no" --> T150N24
-        T150N23["loan_to_income_ratio&lt;0.666467011"]
-        T150N23 -- "yes" --> T150N43
-        T150N23 -- "no" --> T150N44
-        T150N43(("Lá: 6.62186285e-05"))
-        style T150N43 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N44(("Lá: 0.01218055"))
-        style T150N44 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N24["loan_amnt&lt;0.0233200006"]
-        T150N24 -- "yes" --> T150N45
-        T150N24 -- "no" --> T150N46
-        T150N45(("Lá: 0.00547178695"))
-        style T150N45 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N46(("Lá: -0.0133681586"))
-        style T150N46 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N6["loan_intent&lt;-0.187492996"]
-        T150N6 -- "yes" --> T150N13
-        T150N6 -- "no" --> T150N14
-        T150N13["open_accounts&lt;9"]
-        T150N13 -- "yes" --> T150N25
-        T150N13 -- "no" --> T150N26
-        T150N25["other_debt&lt;3679.33667"]
-        T150N25 -- "yes" --> T150N47
-        T150N25 -- "no" --> T150N48
-        T150N47(("Lá: 0.0079473285"))
-        style T150N47 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N48(("Lá: -0.0205758996"))
-        style T150N48 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N26["loan_grade&lt;0.977505982"]
-        T150N26 -- "yes" --> T150N49
-        T150N26 -- "no" --> T150N50
-        T150N49(("Lá: 0.00985957496"))
-        style T150N49 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N50(("Lá: -0.0127221243"))
-        style T150N50 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N14["loan_intent&lt;0.135196999"]
-        T150N14 -- "yes" --> T150N27
-        T150N14 -- "no" --> T150N28
-        T150N27["other_debt&lt;15471.501"]
-        T150N27 -- "yes" --> T150N51
-        T150N27 -- "no" --> T150N52
-        T150N51(("Lá: 0.0229285378"))
-        style T150N51 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N52(("Lá: -0.0377541147"))
-        style T150N52 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N28["other_debt&lt;16950.7949"]
-        T150N28 -- "yes" --> T150N53
-        T150N28 -- "no" --> T150N54
-        T150N53(("Lá: -0.00465231529"))
-        style T150N53 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T150N54(("Lá: 0.0349936932"))
-        style T150N54 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N0["other_debt&lt;3574.08057"]
+        T78N0 -- "yes" --> T78N1
+        T78N0 -- "no" --> T78N2
+        T78N1["loan_to_income_ratio&lt;0.666467011"]
+        T78N1 -- "yes" --> T78N3
+        T78N1 -- "no" --> T78N4
+        T78N3["other_debt&lt;1163.05249"]
+        T78N3 -- "yes" --> T78N7
+        T78N3 -- "no" --> T78N8
+        T78N7["loan_to_income_ratio&lt;0.433557987"]
+        T78N7 -- "yes" --> T78N15
+        T78N7 -- "no" --> T78N16
+        T78N15["loan_term_months&lt;0.00648899982"]
+        T78N15 -- "yes" --> T78N31
+        T78N15 -- "no" --> T78N32
+        T78N31(("Lá: 0.0208898485"))
+        style T78N31 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N32(("Lá: 0.0558471866"))
+        style T78N32 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N16["loan_term_months&lt;0.0180549994"]
+        T78N16 -- "yes" --> T78N33
+        T78N16 -- "no" --> T78N34
+        T78N33(("Lá: 0.0479444899"))
+        style T78N33 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N34(("Lá: -0.0404939689"))
+        style T78N34 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N8["loan_amnt&lt;0.166329995"]
+        T78N8 -- "yes" --> T78N17
+        T78N8 -- "no" --> T78N18
+        T78N17["loan_to_income_ratio&lt;0.164555997"]
+        T78N17 -- "yes" --> T78N35
+        T78N17 -- "no" --> T78N36
+        T78N35(("Lá: 0.0108081726"))
+        style T78N35 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N36(("Lá: 0.0241785683"))
+        style T78N36 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N18["debt_to_income_ratio&lt;0.00180099998"]
+        T78N18 -- "yes" --> T78N37
+        T78N18 -- "no" --> T78N38
+        T78N37(("Lá: 0.0108081726"))
+        style T78N37 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N38(("Lá: 0.000536122185"))
+        style T78N38 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N4["open_accounts&lt;12"]
+        T78N4 -- "yes" --> T78N9
+        T78N4 -- "no" --> T78N10
+        T78N9["loan_to_income_ratio&lt;0.894563019"]
+        T78N9 -- "yes" --> T78N19
+        T78N9 -- "no" --> T78N20
+        T78N19["other_debt&lt;3302.43115"]
+        T78N19 -- "yes" --> T78N39
+        T78N19 -- "no" --> T78N40
+        T78N39(("Lá: -0.0280264262"))
+        style T78N39 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N40(("Lá: 0.0197071712"))
+        style T78N40 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N20["open_accounts&lt;7"]
+        T78N20 -- "yes" --> T78N41
+        T78N20 -- "no" --> T78N42
+        T78N41(("Lá: 0.018053703"))
+        style T78N41 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N42(("Lá: -0.0125079099"))
+        style T78N42 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N10["loan_term_months&lt;0.0180549994"]
+        T78N10 -- "yes" --> T78N21
+        T78N10 -- "no" --> T78N22
+        T78N21["other_debt&lt;2957.7395"]
+        T78N21 -- "yes" --> T78N43
+        T78N21 -- "no" --> T78N44
+        T78N43(("Lá: 0.0143565089"))
+        style T78N43 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N44(("Lá: -0.0457778461"))
+        style T78N44 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N22["other_debt&lt;2072.29004"]
+        T78N22 -- "yes" --> T78N45
+        T78N22 -- "no" --> T78N46
+        T78N45(("Lá: -0.0100661665"))
+        style T78N45 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N46(("Lá: 0.0449385159"))
+        style T78N46 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N2["other_debt&lt;14816.7627"]
+        T78N2 -- "yes" --> T78N5
+        T78N2 -- "no" --> T78N6
+        T78N5["other_debt&lt;14432.1787"]
+        T78N5 -- "yes" --> T78N11
+        T78N5 -- "no" --> T78N12
+        T78N11["other_debt&lt;3786.23877"]
+        T78N11 -- "yes" --> T78N23
+        T78N11 -- "no" --> T78N24
+        T78N23["open_accounts&lt;8"]
+        T78N23 -- "yes" --> T78N47
+        T78N23 -- "no" --> T78N48
+        T78N47(("Lá: 0.00439833989"))
+        style T78N47 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N48(("Lá: -0.0353928246"))
+        style T78N48 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N24["other_debt&lt;3993.07886"]
+        T78N24 -- "yes" --> T78N49
+        T78N24 -- "no" --> T78N50
+        T78N49(("Lá: 0.0153948683"))
+        style T78N49 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N50(("Lá: -0.000697285752"))
+        style T78N50 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N12["loan_amnt&lt;0.293662995"]
+        T78N12 -- "yes" --> T78N25
+        T78N12 -- "no" --> T78N26
+        T78N25["other_debt&lt;14552.9717"]
+        T78N25 -- "yes" --> T78N51
+        T78N25 -- "no" --> T78N52
+        T78N51(("Lá: 0.0507511869"))
+        style T78N51 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N52(("Lá: 0.0128893247"))
+        style T78N52 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N26["open_accounts&lt;14"]
+        T78N26 -- "yes" --> T78N53
+        T78N26 -- "no" --> T78N54
+        T78N53(("Lá: -0.0613198243"))
+        style T78N53 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N54(("Lá: -0.00544731924"))
+        style T78N54 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N6["other_debt&lt;23971.8027"]
+        T78N6 -- "yes" --> T78N13
+        T78N6 -- "no" --> T78N14
+        T78N13["loan_amnt&lt;0.293662995"]
+        T78N13 -- "yes" --> T78N27
+        T78N13 -- "no" --> T78N28
+        T78N27["other_debt&lt;15471.501"]
+        T78N27 -- "yes" --> T78N55
+        T78N27 -- "no" --> T78N56
+        T78N55(("Lá: -0.0143563375"))
+        style T78N55 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N56(("Lá: -0.0038187902"))
+        style T78N56 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N28["other_debt&lt;15471.501"]
+        T78N28 -- "yes" --> T78N57
+        T78N28 -- "no" --> T78N58
+        T78N57(("Lá: -0.0143563375"))
+        style T78N57 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N58(("Lá: -0.0335089676"))
+        style T78N58 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N14["other_debt&lt;31225.1621"]
+        T78N14 -- "yes" --> T78N29
+        T78N14 -- "no" --> T78N30
+        T78N29["debt_to_income_ratio&lt;0.56567502"]
+        T78N29 -- "yes" --> T78N59
+        T78N29 -- "no" --> T78N60
+        T78N59(("Lá: 0.0011157695"))
+        style T78N59 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N60(("Lá: 0.0276481267"))
+        style T78N60 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N30["loan_term_months&lt;0.0180549994"]
+        T78N30 -- "yes" --> T78N61
+        T78N30 -- "no" --> T78N62
+        T78N61(("Lá: -0.0239362214"))
+        style T78N61 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T78N62(("Lá: 0.00868059229"))
+        style T78N62 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
     end
 
-    subgraph Tree_299 ["Cây quyết định số 299"]
+    subgraph Tree_155 ["Cây quyết định số 155"]
         direction TB
-        T299N0["loan_to_income_ratio&lt;0.164555997"]
-        T299N0 -- "yes" --> T299N1
-        T299N0 -- "no" --> T299N2
-        T299N1["open_accounts&lt;11"]
-        T299N1 -- "yes" --> T299N3
-        T299N1 -- "no" --> T299N4
-        T299N3["loan_amnt&lt;0.293662995"]
-        T299N3 -- "yes" --> T299N7
-        T299N3 -- "no" --> T299N8
-        T299N7["person_income&lt;-0.0674929991"]
-        T299N7 -- "yes" --> T299N15
-        T299N7 -- "no" --> T299N16
-        T299N15["person_home_ownership&lt;0.737325013"]
-        T299N15 -- "yes" --> T299N31
-        T299N15 -- "no" --> T299N32
-        T299N31(("Lá: 0.016037114"))
-        style T299N31 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N32(("Lá: -0.00370927644"))
-        style T299N32 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N16["person_emp_length&lt;0.350728989"]
-        T299N16 -- "yes" --> T299N33
-        T299N16 -- "no" --> T299N34
-        T299N33(("Lá: -0.00535476813"))
-        style T299N33 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N34(("Lá: 0.00979476701"))
-        style T299N34 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N8["person_home_ownership&lt;-0.259072006"]
-        T299N8 -- "yes" --> T299N17
-        T299N8 -- "no" --> T299N18
-        T299N17["person_emp_length&lt;0.109826997"]
-        T299N17 -- "yes" --> T299N35
-        T299N17 -- "no" --> T299N36
-        T299N35(("Lá: -0.0114216134"))
-        style T299N35 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N36(("Lá: -0.0943261087"))
-        style T299N36 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N18["other_debt&lt;2771.33228"]
-        T299N18 -- "yes" --> T299N37
-        T299N18 -- "no" --> T299N38
-        T299N37(("Lá: 0.0510018468"))
-        style T299N37 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N38(("Lá: 0.00809331983"))
-        style T299N38 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N4["other_debt&lt;3786.23877"]
-        T299N4 -- "yes" --> T299N9
-        T299N4 -- "no" --> T299N10
-        T299N9["open_accounts&lt;12"]
-        T299N9 -- "yes" --> T299N19
-        T299N9 -- "no" --> T299N20
-        T299N19["loan_amnt&lt;0.293662995"]
-        T299N19 -- "yes" --> T299N39
-        T299N19 -- "no" --> T299N40
-        T299N39(("Lá: -0.0475211814"))
-        style T299N39 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N40(("Lá: 0.0194155294"))
-        style T299N40 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N20["person_emp_length&lt;-0.140423"]
-        T299N20 -- "yes" --> T299N41
-        T299N20 -- "no" --> T299N42
-        T299N41(("Lá: 0.0369261876"))
-        style T299N41 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N42(("Lá: 0.0112320473"))
-        style T299N42 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N10["loan_amnt&lt;0.166329995"]
-        T299N10 -- "yes" --> T299N21
-        T299N10 -- "no" --> T299N22
-        T299N21["other_debt&lt;14192.6738"]
-        T299N21 -- "yes" --> T299N43
-        T299N21 -- "no" --> T299N44
-        T299N43(("Lá: -8.09162229e-05"))
-        style T299N43 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N44(("Lá: -0.0295370109"))
-        style T299N44 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N22["other_debt&lt;8036.80518"]
-        T299N22 -- "yes" --> T299N45
-        T299N22 -- "no" --> T299N46
-        T299N45(("Lá: -0.0463805944"))
-        style T299N45 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N46(("Lá: 0.00712956814"))
-        style T299N46 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N2["other_debt&lt;1695.8457"]
-        T299N2 -- "yes" --> T299N5
-        T299N2 -- "no" --> T299N6
-        T299N5["open_accounts&lt;12"]
-        T299N5 -- "yes" --> T299N11
-        T299N5 -- "no" --> T299N12
-        T299N11["other_debt&lt;1163.05249"]
-        T299N11 -- "yes" --> T299N23
-        T299N11 -- "no" --> T299N24
-        T299N23["loan_term_months&lt;36"]
-        T299N23 -- "yes" --> T299N47
-        T299N23 -- "no" --> T299N48
-        T299N47(("Lá: 0.0355530567"))
-        style T299N47 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N48(("Lá: -0.00665785605"))
-        style T299N48 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N24["open_accounts&lt;5"]
-        T299N24 -- "yes" --> T299N49
-        T299N24 -- "no" --> T299N50
-        T299N49(("Lá: -0.0181350671"))
-        style T299N49 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N50(("Lá: -0.0573613159"))
-        style T299N50 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N12["loan_int_rate&lt;1.10804296"]
-        T299N12 -- "yes" --> T299N25
-        T299N12 -- "no" --> T299N26
-        T299N25["loan_to_income_ratio&lt;0.433557987"]
-        T299N25 -- "yes" --> T299N51
-        T299N25 -- "no" --> T299N52
-        T299N51(("Lá: 0.0253277328"))
-        style T299N51 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N52(("Lá: -0.0467359088"))
-        style T299N52 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N26(("Lá: 0.0509276055"))
-        style T299N26 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N6["loan_int_rate&lt;1.10804296"]
-        T299N6 -- "yes" --> T299N13
-        T299N6 -- "no" --> T299N14
-        T299N13["other_debt&lt;1807.46399"]
-        T299N13 -- "yes" --> T299N27
-        T299N13 -- "no" --> T299N28
-        T299N27["person_emp_length&lt;-0.140423"]
-        T299N27 -- "yes" --> T299N53
-        T299N27 -- "no" --> T299N54
-        T299N53(("Lá: 0.000961940852"))
-        style T299N53 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N54(("Lá: 0.0369177945"))
-        style T299N54 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N28["loan_int_rate&lt;0.36749801"]
-        T299N28 -- "yes" --> T299N55
-        T299N28 -- "no" --> T299N56
-        T299N55(("Lá: -0.000107665059"))
-        style T299N55 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N56(("Lá: 0.00417595217"))
-        style T299N56 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N14["open_accounts&lt;2"]
-        T299N14 -- "yes" --> T299N29
-        T299N14 -- "no" --> T299N30
-        T299N29["person_income&lt;-0.0674929991"]
-        T299N29 -- "yes" --> T299N57
-        T299N29 -- "no" --> T299N58
-        T299N57(("Lá: -0.0345178694"))
-        style T299N57 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N58(("Lá: 0.0469199419"))
-        style T299N58 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N30["person_home_ownership&lt;-0.259072006"]
-        T299N30 -- "yes" --> T299N59
-        T299N30 -- "no" --> T299N60
-        T299N59(("Lá: 0.000815177453"))
-        style T299N59 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
-        T299N60(("Lá: -0.0200518966"))
-        style T299N60 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N0["loan_to_income_ratio&lt;0.666467011"]
+        T155N0 -- "yes" --> T155N1
+        T155N0 -- "no" --> T155N2
+        T155N1["other_debt&lt;1163.05249"]
+        T155N1 -- "yes" --> T155N3
+        T155N1 -- "no" --> T155N4
+        T155N3["loan_to_income_ratio&lt;0.433557987"]
+        T155N3 -- "yes" --> T155N7
+        T155N3 -- "no" --> T155N8
+        T155N7["loan_term_months&lt;0.00648899982"]
+        T155N7 -- "yes" --> T155N15
+        T155N7 -- "no" --> T155N16
+        T155N15(("Lá: 0.0124490624"))
+        style T155N15 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N16(("Lá: 0.0397320539"))
+        style T155N16 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N8["open_accounts&lt;7"]
+        T155N8 -- "yes" --> T155N17
+        T155N8 -- "no" --> T155N18
+        T155N17(("Lá: 0.0176293459"))
+        style T155N17 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N18(("Lá: -0.0108619845"))
+        style T155N18 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N4["other_debt&lt;20546.2012"]
+        T155N4 -- "yes" --> T155N9
+        T155N4 -- "no" --> T155N10
+        T155N9["other_debt&lt;14065.542"]
+        T155N9 -- "yes" --> T155N19
+        T155N9 -- "no" --> T155N20
+        T155N19["other_debt&lt;13909.5732"]
+        T155N19 -- "yes" --> T155N31
+        T155N19 -- "no" --> T155N32
+        T155N31(("Lá: -0.00097099843"))
+        style T155N31 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N32(("Lá: -0.0399457179"))
+        style T155N32 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N20["open_accounts&lt;14"]
+        T155N20 -- "yes" --> T155N33
+        T155N20 -- "no" --> T155N34
+        T155N33(("Lá: 0.00865943823"))
+        style T155N33 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N34(("Lá: -0.0154081574"))
+        style T155N34 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N10["person_income&lt;0.972459972"]
+        T155N10 -- "yes" --> T155N21
+        T155N10 -- "no" --> T155N22
+        T155N21["loan_term_months&lt;0.0180549994"]
+        T155N21 -- "yes" --> T155N35
+        T155N21 -- "no" --> T155N36
+        T155N35(("Lá: -0.0456206091"))
+        style T155N35 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N36(("Lá: -0.0140465274"))
+        style T155N36 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N22["other_debt&lt;31225.1621"]
+        T155N22 -- "yes" --> T155N37
+        T155N22 -- "no" --> T155N38
+        T155N37(("Lá: 0.000792220177"))
+        style T155N37 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N38(("Lá: -0.0140465274"))
+        style T155N38 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N2["other_debt&lt;26310.5137"]
+        T155N2 -- "yes" --> T155N5
+        T155N2 -- "no" --> T155N6
+        T155N5["other_debt&lt;23176.6133"]
+        T155N5 -- "yes" --> T155N11
+        T155N5 -- "no" --> T155N12
+        T155N11["other_debt&lt;21441.5312"]
+        T155N11 -- "yes" --> T155N23
+        T155N11 -- "no" --> T155N24
+        T155N23["other_debt&lt;20820.6523"]
+        T155N23 -- "yes" --> T155N39
+        T155N23 -- "no" --> T155N40
+        T155N39(("Lá: 0.00273543294"))
+        style T155N39 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N40(("Lá: 0.0356531404"))
+        style T155N40 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N24["debt_to_income_ratio&lt;0.422589988"]
+        T155N24 -- "yes" --> T155N41
+        T155N24 -- "no" --> T155N42
+        T155N41(("Lá: 0.0280112382"))
+        style T155N41 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N42(("Lá: -0.0283800792"))
+        style T155N42 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N12["open_accounts&lt;11"]
+        T155N12 -- "yes" --> T155N25
+        T155N12 -- "no" --> T155N26
+        T155N25["other_debt&lt;23533.3027"]
+        T155N25 -- "yes" --> T155N43
+        T155N25 -- "no" --> T155N44
+        T155N43(("Lá: 0.0783568621"))
+        style T155N43 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N44(("Lá: 0.0206512678"))
+        style T155N44 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N26["loan_term_months&lt;0.00648899982"]
+        T155N26 -- "yes" --> T155N45
+        T155N26 -- "no" --> T155N46
+        T155N45(("Lá: -0.0521541238"))
+        style T155N45 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N46(("Lá: 0.00433748728"))
+        style T155N46 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N6["open_accounts&lt;7"]
+        T155N6 -- "yes" --> T155N13
+        T155N6 -- "no" --> T155N14
+        T155N13["loan_term_months&lt;0.0180549994"]
+        T155N13 -- "yes" --> T155N27
+        T155N13 -- "no" --> T155N28
+        T155N27["other_debt&lt;28427.6816"]
+        T155N27 -- "yes" --> T155N47
+        T155N27 -- "no" --> T155N48
+        T155N47(("Lá: -0.0639135763"))
+        style T155N47 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N48(("Lá: 0.00500784209"))
+        style T155N48 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N28["open_accounts&lt;5"]
+        T155N28 -- "yes" --> T155N49
+        T155N28 -- "no" --> T155N50
+        T155N49(("Lá: 0.0063710683"))
+        style T155N49 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N50(("Lá: 0.0607264899"))
+        style T155N50 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N14["other_debt&lt;28427.6816"]
+        T155N14 -- "yes" --> T155N29
+        T155N14 -- "no" --> T155N30
+        T155N29["debt_to_income_ratio&lt;0.56567502"]
+        T155N29 -- "yes" --> T155N51
+        T155N29 -- "no" --> T155N52
+        T155N51(("Lá: -0.0380968302"))
+        style T155N51 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N52(("Lá: 0.0376034528"))
+        style T155N52 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N30["debt_to_income_ratio&lt;0.56567502"]
+        T155N30 -- "yes" --> T155N53
+        T155N30 -- "no" --> T155N54
+        T155N53(("Lá: -0.00509890122"))
+        style T155N53 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
+        T155N54(("Lá: -0.0478952117"))
+        style T155N54 fill:#fca5a5,stroke:#b91c1c,stroke-width:2px
     end
 

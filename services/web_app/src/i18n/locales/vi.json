@@ -95,7 +95,13 @@
       "gradeE": "Grade E",
       "gradeF": "Grade F",
       "gradeG": "Grade G (Rủi ro cao)",
-      "intRate": "Lãi suất Đề xuất (%)"
+      "intRate": "Lãi suất Đề xuất (%)",
+      "term": "Kỳ hạn Vay (Tháng)",
+      "month12": "12 tháng (1 năm)",
+      "month24": "24 tháng (2 năm)",
+      "month36": "36 tháng (3 năm - Mặc định)",
+      "month48": "48 tháng (4 năm)",
+      "month60": "60 tháng (5 năm)"
     },
     "result": {
       "title": "Kết quả Phê duyệt & Chấm điểm Tín dụng"
@@ -107,7 +113,11 @@
       "reset": "Tạo hồ sơ vay mới",
       "saveToDb": "Tạo hồ sơ vay ngay",
       "created": "Tạo hồ sơ vay thành công",
-      "errorSaveToDb": "Lỗi lưu dữ liệu"
+      "errorSaveToDb": "Lỗi lưu dữ liệu",
+      "approveLimit": "Phê duyệt Hạn mức Thăm dò",
+      "approveDirect": "Chấp thuận Phê duyệt Hạn mức",
+      "modifyTerms": "Điều chỉnh Điều khoản",
+      "reject": "Từ chối Hồ sơ"
     },
     "messages": {
       "success": "Chấm điểm tín dụng thành công!"
@@ -128,23 +138,23 @@
   "pricing": {
     "title": "Gói Định giá Lãi suất Cá nhân hóa & Hạn mức Tín dụng",
     "subtitle": "Được tự động tính toán dựa trên Điểm FICO, Phân tầng Rủi ro và Quy định của Ngân hàng",
-    "recommendedAprLabel": "Lãi suất Ưu đãi Được phê duyệt (APR)",
+    "recommendedAprLabel": "LÃI SUẤT ĐỀ XUẤT (APR)",
     "year": "năm",
     "month": "tháng",
     "savingsVsRequested": "Tiết kiệm -{{delta}}% so với mức đề xuất",
     "surchargeVsRequested": "Điều chỉnh +{{delta}}% bù đắp rủi ro",
     "rateBreakdownTitle": "Cấu phần Lãi suất (Rate Breakdown)",
     "components": {
-      "base": "Cơ sở (Base)",
-      "riskSpread": "Bù rủi ro",
-      "capitalDiscount": "Chiết khấu nhà ở",
-      "intentAdj": "Mục đích vay"
+      "base": "Lãi suất Cơ sở (Base Rate)",
+      "riskSpread": "Biên độ Rủi ro (Risk Spread)",
+      "capitalDiscount": "Chiết khấu Nhà ở",
+      "intentAdj": "Hiệu chỉnh Mục đích"
     },
-    "monthlyPayment": "Trả góp Định kỳ Hàng tháng",
-    "totalInterest": "Tổng Lãi Dự thu Cả kỳ",
+    "monthlyPayment": "Ước tính Trả góp Hàng tháng",
+    "totalInterest": "Tổng Tiền lãi Dự thu Cả kỳ",
     "amortizationNote": "Ước tính theo phương thức Amortization tiêu chuẩn kỳ hạn {{term}} tháng",
-    "creditLimitTitle": "Phân bổ Hạn mức Tín dụng Động",
-    "requested": "Số tiền xin vay",
+    "creditLimitTitle": "Phân bổ Hạn mức Tín dụng Thăm dò",
+    "requested": "Yêu cầu vay",
     "maxLimit": "Hạn mức tối đa",
     "limitStatus": {
       "withinLimit": "Nằm trong Hạn mức An toàn",
@@ -152,5 +162,78 @@
       "rejected": "Từ chối cấp Hạn mức"
     },
     "exceedsLimitAdvisory": "Cảnh báo: Số tiền đề xuất vay vượt quá Hạn mức tối đa khuyến nghị (${{max}}). Ngân hàng đề xuất giải ngân theo hạn mức tối đa."
+  },
+  "riskDashboard": {
+    "header": {
+      "applicationId": "Mã Hồ sơ Vay",
+      "decisionStatus": "Trạng thái Quyết định"
+    },
+    "decision": {
+      "manualReview": "CHUYỂN CÁN BỘ THẨM ĐỊNH THỦ CÔNG",
+      "manualReviewDesc": "Hồ sơ nằm trong vùng đệm rủi ro (Borderline 570–579). Cần kiểm tra chứng từ bổ sung & xác thực CIC trước khi ra quyết định phê duyệt cuối cùng.",
+      "approved": "HỒ SƠ ĐƯỢC PHÊ DUYỆT TỰ ĐỘNG",
+      "approvedDesc": "Điểm tín dụng vượt ngưỡng an toàn chuẩn FICO, tỷ lệ nợ trong hạn mức cho phép.",
+      "approvedConditional": "PHÊ DUYỆT CÓ ĐIỀU KIỆN (TĂNG LÃI SUẤT)",
+      "approvedConditionalDesc": "Chấp thuận cấp tín dụng kèm điều kiện tăng biên độ rủi ro (Risk Spread) hoặc kiểm soát hạn mức giải ngân.",
+      "rejected": "HỒ SƠ BỊ TỪ CHỐI TỰ ĐỘNG",
+      "rejectedDesc": "Xác suất vỡ nợ vượt ngưỡng chịu đựng rủi ro hoặc có lịch sử nợ xấu nghiêm trọng."
+    },
+    "coreMetrics": {
+      "ficoScore": "Điểm Tín dụng FICO",
+      "ficoScale": "Thang đo chuẩn (300 - 850)",
+      "pdScore": "Xác suất Vỡ nợ (PD)",
+      "pdThreshold": "Ngưỡng cảnh báo: 5.00%",
+      "pdWarning": "Rủi ro Cao (PD > 5.0%)",
+      "pdSafe": "Ngưỡng An toàn (PD ≤ 5.0%)",
+      "riskTier": "Phân hạng Rủi ro",
+      "creditClassification": "Phân loại Tín dụng",
+      "tierHigh": "Rủi ro Cao",
+      "tierMedHigh": "Trung bình Cao",
+      "tierMedLow": "Trung bình Thấp",
+      "tierLow": "Rủi ro Thấp",
+      "tierBorderline": "Vùng đệm rủi ro"
+    },
+    "explainability": {
+      "title": "Giải thích Mô hình (Top Factors)",
+      "subtitle": "Phân tích mức độ đóng góp (WoE Contribution) của từng chỉ số vào điểm tín dụng",
+      "positiveSignals": "Tín hiệu Tích cực",
+      "negativeSignals": "Tín hiệu Rủi ro",
+      "positiveDesc": "Các yếu tố làm tăng điểm tín dụng và giảm xác suất rủi ro",
+      "negativeDesc": "Các yếu tố tiêu cực kéo giảm điểm tín dụng đáng kể",
+      "pts": "điểm",
+      "emptyPositive": "Không ghi nhận tín hiệu tích cực vượt trội",
+      "emptyNegative": "Không ghi nhận yếu tố rủi ro bất thường"
+    },
+    "pricingAndLimit": {
+      "title": "Định giá Lãi suất & Đề xuất Hạn mức",
+      "subtitle": "Chính sách Risk-Based Pricing tuân thủ chốt chặn pháp lý & trần hạn mức phân tầng",
+      "aprLabel": "LÃI SUẤT ĐỀ XUẤT (APR)",
+      "baseRate": "Lãi suất Cơ sở (Base)",
+      "riskSpread": "Biên độ Rủi ro (Risk Spread)",
+      "monthlyPayment": "Ước tính Trả góp Hàng tháng",
+      "totalInterest": "Tổng Lãi Dự thu Cả kỳ",
+      "loanTerm": "Kỳ hạn Vay",
+      "limitAllocation": "Số tiền Yêu cầu / Hạn mức Khuyến nghị (ML)",
+      "limitAllocationDesc": "Tỷ lệ cấp hạn mức thực tế so với số tiền đề xuất vay",
+      "limitCutNote": "Cắt giảm 70% hạn mức do thuộc phân tầng Rủi ro Cao (Hạn mức thăm dò: $3,000 / Yêu cầu: $10,000)",
+      "underwriterNote": "Chỉ dẫn Thẩm định viên: Áp dụng cơ chế giải ngân từng phần (Tranche-based) và yêu cầu bổ sung sao kê thu nhập 6 tháng gần nhất."
+    },
+    "features": {
+      "debt_to_income_ratio": "Tỷ lệ Nợ/Thu nhập (DTI)",
+      "person_income": "Thu nhập Hàng năm",
+      "loan_percent_income": "Tỷ lệ Vay/Thu nhập (LTI)",
+      "loan_to_income_ratio": "Tỷ lệ Vay/Thu nhập",
+      "person_home_ownership": "Tình trạng Nhà ở",
+      "person_emp_length": "Thâm niên Làm việc",
+      "person_age": "Độ tuổi Khách hàng",
+      "loan_amnt": "Số tiền Đề xuất Vay",
+      "loan_int_rate": "Lãi suất Khoản vay",
+      "loan_intent": "Mục đích Vay vốn",
+      "loan_grade": "Hạng Khoản vay",
+      "cb_person_default_on_file": "Lịch sử Nợ xấu (CIC)",
+      "cb_person_cred_hist_length": "Độ dài Lịch sử Tín dụng",
+      "credit_utilization_ratio": "Tỷ lệ Sử dụng Hạn mức (CUR)",
+      "past_delinquencies": "Số lần Trễ hạn Quá khứ"
+    }
   }
 }

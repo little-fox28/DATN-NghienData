@@ -15,6 +15,7 @@ class LoanApplication(BaseModel):
     loan_percent_income: float = Field(..., example=0.15, description="Tỷ lệ nợ/thu nhập")
     cb_person_default_on_file: str = Field(..., example="N", description="Lịch sử vỡ nợ (Y/N)")
     cb_person_cred_hist_length: int = Field(..., example=3, description="Độ dài lịch sử tín dụng (năm)")
+    loan_term_months: int = Field(36, example=36, description="Kỳ hạn khoản vay (tháng: 12, 24, 36, 48, 60)")
 
     # Các trường bổ sung (optional với giá trị mặc định)
     gender: Optional[str] = Field("MALE", example="MALE")

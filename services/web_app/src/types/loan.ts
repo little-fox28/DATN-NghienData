@@ -19,6 +19,7 @@ export interface LoanApplicationData {
   loan_grade: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
   loan_amnt: number;
   loan_int_rate: number;
+  loan_term_months?: number;
   loan_percent_income: number;
   loan_to_income_ratio: number;
   debt_to_income_ratio: number;

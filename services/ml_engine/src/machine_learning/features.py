@@ -326,8 +326,35 @@ class FeatureEngineer:
     # ── PRIVATE ─────────────────────────────────────────────────────────────
 
     def _prepare_features(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Chuẩn bị DataFrame: đảm bảo đủ các cột cần thiết."""
+        """Chuẩn bị DataFrame: tạo biến tương tác nghiệp vụ & đảm bảo đủ các cột."""
         X_out = X.copy()
+
+        # 1. Feature Engineering: Tương tác giữa Thu nhập và Sở hữu nhà (Housing Affordability)
+        if "person_home_ownership" in X_out.columns:
+            def segment_housing(row):
+                ownership = str(row.get("person_home_ownership", "RENT")).upper()
+                try:
+                    income = float(row.get("person_income", 0.0))
+                except (ValueError, TypeError):
+                    income = 0.0
+                try:
+                    dti = float(row.get("debt_to_income_ratio", 0.0))
+                except (ValueError, TypeError):
+                    dti = 0.0
+
+                if ownership == "RENT" and income >= 100000 and dti <= 0.35:
+                    return "RENT_PRIME"
+                return ownership
+
+            X_out["person_home_ownership"] = X_out.apply(segment_housing, axis=1)
+
+        # 2. Xử lý mặc định cho loan_term_months nếu thiếu
+        if "loan_term_months" in self.num_cols:
+            if "loan_term_months" not in X_out.columns:
+                X_out["loan_term_months"] = 36
+            else:
+                X_out["loan_term_months"] = X_out["loan_term_months"].fillna(36)
+
         for col in self.cat_cols:
             if col not in X_out.columns:
                 X_out[col] = np.nan

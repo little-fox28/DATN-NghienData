@@ -1,12 +1,13 @@
 """
 Tầng 3: Huấn luyện Mô hình (Model Training).
 """
-from typing import Optional
+from typing import Optional, Union, Any
 import joblib
 import logging
 import pandas as pd
 from pathlib import Path
 from xgboost import XGBClassifier
+from sklearn.calibration import CalibratedClassifierCV
 
 logger = logging.getLogger(__name__)
 
@@ -34,21 +35,46 @@ class ModelTrainer:
         return self.model
 
     def train(self, X_train: pd.DataFrame, y_train: pd.Series,
-              X_val: Optional[pd.DataFrame] = None, y_val: Optional[pd.Series] = None) -> XGBClassifier:
-        """Huấn luyện mô hình XGBoost."""
+              X_val: Optional[pd.DataFrame] = None, y_val: Optional[pd.Series] = None) -> CalibratedClassifierCV:
+        """Huấn luyện mô hình XGBoost và hiệu chuẩn xác suất (Probability Calibration)."""
         if self.model is None:
             self.build_model()
             
-        logger.info(f"Training XGBoost model with {X_train.shape[1]} features on {len(X_train):,} records...")
+        logger.info(f"Training base XGBoost model with {X_train.shape[1]} features on {len(X_train):,} records...")
 
+        # 1. Huấn luyện mô hình XGBoost cơ sở
         eval_set = [(X_val, y_val)] if X_val is not None and y_val is not None else None
         self.model.fit(
             X_train, y_train,
             eval_set=eval_set,
             verbose=False,
         )
+        logger.info("Base XGBoost model trained successfully.")
 
-        logger.info("Model training completed successfully.")
+        # 2. Hiệu chuẩn xác suất bằng CalibratedClassifierCV (Platt Scaling / sigmoid)
+        logger.info("Applying probability calibration via CalibratedClassifierCV (method='sigmoid')...")
+        try:
+            from sklearn.frozen import FrozenEstimator
+            calibrated_model = CalibratedClassifierCV(
+                estimator=FrozenEstimator(self.model),
+                method="sigmoid"
+            )
+        except ImportError:
+            # Tương thích ngược với các phiên bản scikit-learn cũ hơn (< 1.4)
+            calibrated_model = CalibratedClassifierCV(
+                estimator=self.model,
+                method="sigmoid",
+                cv="prefit"
+            )
+
+        # Fit calibrator trên tập validation (nếu có) hoặc tập train
+        if X_val is not None and y_val is not None:
+            calibrated_model.fit(X_val, y_val)
+        else:
+            calibrated_model.fit(X_train, y_train)
+
+        self.model = calibrated_model
+        logger.info("Probability calibration completed successfully.")
         return self.model
 
     def save_model(self) -> None:

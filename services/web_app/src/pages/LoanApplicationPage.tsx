@@ -3,8 +3,7 @@ import { App as AntApp, Button, Card, Col, Form, InputNumber, Row, Select, Steps
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { predictCreditRisk, saveEnrichedRecord } from '../api/client';
-import { CreditScoreGauge } from '../components/CreditScoreGauge';
-import { RiskBasedPricingCard } from '../components/RiskBasedPricingCard';
+import { CreditRiskAssessmentDashboard } from '../components/CreditRiskAssessmentDashboard';
 import type { LoanApplicationData, PredictApiResponse } from '../types/loan';
 
 const { Title, Text } = Typography;
@@ -26,9 +25,10 @@ const initialFormData: LoanApplicationData = {
   loan_grade: 'B',
   loan_amnt: 10000,
   loan_int_rate: 11.14,
+  loan_term_months: 36,
   loan_percent_income: 0.15,
   loan_to_income_ratio: 0.15,
-  debt_to_income_ratio: 0.25,
+  debt_to_income_ratio: 0.12,
   credit_utilization_ratio: 0.35,
 };
 
@@ -79,8 +79,9 @@ export const LoanApplicationPage: React.FC = () => {
       const updatedData: LoanApplicationData = {
         ...initialFormData,
         ...values,
-        loan_percent_income: person_income > 0 ? Number((loan_amnt / person_income).toFixed(2)) : 0,
-        loan_to_income_ratio: person_income > 0 ? Number((loan_amnt / person_income).toFixed(2)) : 0,
+        loan_percent_income: person_income > 0 ? Number((loan_amnt / person_income).toFixed(4)) : 0,
+        loan_to_income_ratio: person_income > 0 ? Number((loan_amnt / person_income).toFixed(4)) : 0,
+        debt_to_income_ratio: values.debt_to_income_ratio ?? 0.12,
       };
 
       const apiResult = await predictCreditRisk(updatedData, 'credit_risk');
@@ -157,7 +158,7 @@ export const LoanApplicationPage: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 800, margin: '0 auto' }}>
+    <div style={{ maxWidth: 960, margin: '0 auto' }}>
       <Steps current={currentStep} items={steps} style={{ marginBottom: 40 }} />
 
       <Card bordered={false} className="form-container-card">
@@ -292,6 +293,17 @@ export const LoanApplicationPage: React.FC = () => {
                   <InputNumber style={{ width: '100%' }} min={0} step={0.1} size="large" />
                 </Form.Item>
               </Col>
+              <Col xs={24} md={12}>
+                <Form.Item name="loan_term_months" label={t('loanApplication.step3.term', 'Kỳ hạn Vay (Tháng)')} rules={[{ required: true, message: t('loanApplication.errors.required') }]}>
+                  <Select size="large">
+                    <Option value={12}>{t('loanApplication.step3.month12', '12 tháng (1 năm)')}</Option>
+                    <Option value={24}>{t('loanApplication.step3.month24', '24 tháng (2 năm)')}</Option>
+                    <Option value={36}>{t('loanApplication.step3.month36', '36 tháng (3 năm - Mặc định)')}</Option>
+                    <Option value={48}>{t('loanApplication.step3.month48', '48 tháng (4 năm)')}</Option>
+                    <Option value={60}>{t('loanApplication.step3.month60', '60 tháng (5 năm)')}</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
             </Row>
           </div>
         </Form>
@@ -302,16 +314,17 @@ export const LoanApplicationPage: React.FC = () => {
             <Title level={4} style={{ textAlign: 'center', marginBottom: 24 }}>
               {t('loanApplication.result.title')}
             </Title>
-            <CreditScoreGauge
-              score={result.credit_risk_assessment.credit_score}
-              pdScore={result.credit_risk_assessment.pd_score}
-              riskTier={result.credit_risk_assessment.risk_tier}
-              decision={result.credit_risk_assessment.decision}
-            />
-            <RiskBasedPricingCard
-              pricing={result.credit_risk_assessment.pricing_recommendation}
+            <CreditRiskAssessmentDashboard
+              assessment={result.credit_risk_assessment}
+              requestedAmount={form.getFieldValue('loan_amnt')}
               requestedRate={form.getFieldValue('loan_int_rate')}
-              riskTier={result.credit_risk_assessment.risk_tier}
+              income={form.getFieldValue('person_income')}
+              intent={form.getFieldValue('loan_intent')}
+              applicationId={savedClientId || 'APP-2026-0882'}
+              rawFeatures={form.getFieldsValue()}
+              onApproveProbingLimit={handleSaveToDB}
+              onModifyTerms={() => setCurrentStep(2)}
+              onReject={() => message.info(t('loanApplication.buttons.reject'))}
             />
           </div>
         )}
