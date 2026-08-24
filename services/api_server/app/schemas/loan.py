@@ -18,12 +18,13 @@ class LoanApplication(BaseModel):
     loan_term_months: int = Field(36, example=36, description="Kỳ hạn khoản vay (tháng: 12, 24, 36, 48, 60)")
 
     # Các trường bổ sung (optional với giá trị mặc định)
+    client_ID: Optional[str] = Field(None, example="CUST_32582", description="Mã định danh khách hàng")
     gender: Optional[str] = Field("MALE", example="MALE")
     marital_status: Optional[str] = Field("SINGLE", example="SINGLE")
     education_level: Optional[str] = Field("BACHELOR", example="BACHELOR")
     employment_type: Optional[str] = Field("FULL_TIME", example="FULL_TIME")
     loan_to_income_ratio: Optional[float] = Field(0.15, example=0.15)
-    debt_to_income_ratio: Optional[float] = Field(0.25, example=0.25)
+    debt_to_income_ratio: Optional[float] = Field(0.12, example=0.12)
     credit_utilization_ratio: Optional[float] = Field(0.35, example=0.35)
     past_delinquencies: Optional[int] = Field(0, example=0)
 
@@ -107,6 +108,8 @@ class PredictApiResponse(BaseModel):
     """Phản hồi chuẩn của API endpoint POST /api/v1/predict."""
     success: bool = Field(True)
     task: str = Field("credit_risk")
+    client_id: Optional[str] = Field(None, description="Mã định danh khách hàng")
+    application_id: Optional[str] = Field(None, description="Mã hồ sơ vay chuẩn hóa")
     credit_risk_assessment: CreditRiskAssessment
 
 

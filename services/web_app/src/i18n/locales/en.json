@@ -117,7 +117,13 @@
       "approveLimit": "Approve Probing Limit",
       "approveDirect": "Approve Credit Limit",
       "modifyTerms": "Modify Terms",
-      "reject": "Reject"
+      "reject": "Reject Application",
+      "confirmApproveTitle": "Confirm Credit Limit Approval?",
+      "confirmApproveDesc": "Are you sure you want to approve this loan application and save it to the system?",
+      "confirmRejectTitle": "Confirm Application Rejection?",
+      "confirmRejectDesc": "Are you sure you want to reject this loan application?",
+      "confirmYes": "Confirm",
+      "confirmNo": "Cancel"
     },
     "messages": {
       "success": "Credit scoring completed successfully!"

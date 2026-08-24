@@ -1,31 +1,25 @@
-import hashlib
-import hmac
-import os
+import zlib
 from datetime import datetime
 
-# Sử dụng biến môi trường cho Secret Key, nếu không có thì dùng giá trị mặc định cho dev
-SECRET_KEY = os.getenv("CLIENT_HASH_SECRET", "credit-risk-default-secret-key").encode()
+RAW_DATA_BASE_COUNT = 32581
 
-def generate_client_id(app_data: dict) -> str:
+
+def get_next_client_id(offset: int = 0) -> str:
+    """Sinh mã khách hàng tuần tự tiếp nối tệp gốc (CUST_32582, CUST_32583...)."""
+    next_index = RAW_DATA_BASE_COUNT + offset + 1
+    return f"CUST_{next_index:05d}"
+
+
+def generate_application_id(client_id: str, channel: str = "O") -> str:
     """
-    Tạo Client ID bằng thuật toán HMAC-SHA256.
-    Lấy ra chuỗi hex 32 ký tự để đảm bảo giả danh hóa và tính duy nhất.
+    Sinh Mã Hồ sơ Vay chuẩn hóa: LN-{CHANNEL}{YYMMDD}-{CLIENT_SHORT}-{CRC16}
+    Ví dụ: LN-O260824-C32582-A8F2
     """
-    # Ghép các trường thông tin cơ bản kết hợp timestamp để đảm bảo ID không trùng lặp (duy nhất)
-    raw_string = "|".join([
-        str(app_data.get("person_age", "")),
-        str(app_data.get("gender", "")),
-        str(app_data.get("person_income", "")),
-        str(app_data.get("education_level", "")),
-        datetime.now().isoformat(),
-    ])
-    
-    # Băm dữ liệu bằng HMAC-SHA256 (tổng độ dài là 64 ký tự hex)
-    # Lấy 32 ký tự đầu tiên theo yêu cầu
-    digest = hmac.new(
-        SECRET_KEY, 
-        raw_string.encode("utf-8"), 
-        hashlib.sha256
-    ).hexdigest()[:32].upper()
-    
-    return f"ENRICH_{digest}"
+    now = datetime.now()
+    date_str = now.strftime("%y%m%d")
+    clean_client = client_id.replace("CUST_", "C") if "CUST_" in client_id else client_id
+    payload = f"{channel}|{date_str}|{client_id}|{now.microsecond}"
+    checksum = f"{zlib.crc32(payload.encode('utf-8')) & 0xFFFF:04X}"
+    return f"LN-{channel}{date_str}-{clean_client}-{checksum}"
+
+

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Popconfirm } from 'antd';
 import type { CreditRiskAssessment, RiskBasedPricingRecommendation } from '../types/loan';
 
 export interface CreditRiskAssessmentDashboardProps {
@@ -9,6 +10,7 @@ export interface CreditRiskAssessmentDashboardProps {
   income?: number;
   intent?: string;
   applicationId?: string;
+  clientId?: string;
   rawFeatures?: Record<string, any>;
   onApproveProbingLimit?: () => void;
   onModifyTerms?: () => void;
@@ -22,6 +24,7 @@ export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboa
   income = 0,
   intent,
   applicationId = 'N/A',
+  clientId,
   rawFeatures,
   onApproveProbingLimit,
   onModifyTerms,
@@ -56,11 +59,9 @@ export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboa
   const maxLimit = pricing.max_credit_limit ?? 0;
   const reqAmount = pricing.requested_amount || requestedAmount || 0;
 
-  // Dynamic limit calculation: Requested Amount vs ML Recommended Max Limit
   const limitPercent = maxLimit > 0 ? Math.min(Math.round((reqAmount / maxLimit) * 100), 100) : 0;
   const isWithinLimit = maxLimit > 0 ? reqAmount <= maxLimit : false;
 
-  // Format real raw feature values dynamically from user inputs
   const formatRawValue = (featureKey: string): string => {
     const val = rawFeatures?.[featureKey] ?? (
       featureKey === 'person_income' ? income :
@@ -100,7 +101,6 @@ export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboa
     return rawVal ? `${baseName} (${rawVal})` : baseName;
   };
 
-  // Extract positive/negative factors purely from real assessment payload
   const positiveFactors = top_factors?.positive_factors
     ? top_factors.positive_factors
     : contributions
@@ -151,7 +151,6 @@ export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboa
     }
   };
 
-  // Dynamic FICO score styling based on score brackets
   const getFicoScoreStyle = (score: number) => {
     if (score >= 740) return 'text-emerald-600 dark:text-emerald-400';
     if (score >= 670) return 'text-teal-600 dark:text-teal-400';
@@ -159,7 +158,6 @@ export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboa
     return 'text-rose-500 dark:text-rose-400';
   };
 
-  // Dynamic PD score styling based on default probability threshold
   const getPdScoreStyle = (pd: number) => {
     if (pd <= 0.02) return 'text-emerald-600 dark:text-emerald-400';
     if (pd <= 0.05) return 'text-teal-600 dark:text-teal-400';
@@ -167,7 +165,6 @@ export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboa
     return 'text-rose-500 dark:text-rose-400';
   };
 
-  // Dynamic Risk Tier styling
   const getRiskTierStyle = (tier: string) => {
     switch (tier.toUpperCase()) {
       case 'LOW':
@@ -199,13 +196,22 @@ export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboa
 
   return (
     <div className="w-full space-y-4 text-slate-800 dark:text-gray-100 font-sans">
-      {/* 1. Header / Status */}
       <div className="bg-white dark:bg-[#141414] border border-gray-200 dark:border-[#2a2a2a] rounded-lg p-4 shadow-xs flex items-center justify-between transition-colors">
-        <div>
-          <span className="text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 font-medium">
-            {t('riskDashboard.header.applicationId', 'Mã Hồ sơ Vay')}
-          </span>
-          <div className="text-base font-semibold text-slate-900 dark:text-white mt-0.5">{applicationId}</div>
+        <div className="flex items-center gap-6">
+          <div>
+            <span className="text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 font-medium">
+              {t('riskDashboard.header.applicationId', 'Mã Hồ sơ Vay')}
+            </span>
+            <div className="text-base font-semibold text-slate-900 dark:text-white mt-0.5">{applicationId}</div>
+          </div>
+          {clientId && (
+            <div className="border-l border-gray-200 dark:border-[#2a2a2a] pl-6">
+              <span className="text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 font-medium">
+                {t('riskDashboard.header.clientId', 'Mã Khách hàng')}
+              </span>
+              <div className="text-base font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5">{clientId}</div>
+            </div>
+          )}
         </div>
         <div className="text-right">
           <span className="text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 font-medium block">
@@ -362,15 +368,24 @@ export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboa
         </div>
       </div>
 
-      {/* 6. Action Workspace (Underwriter Decision Buttons) */}
+      {/* 6. Action Workspace (Underwriter Decision Buttons with Anti-Mistake Popconfirm) */}
       <div className="flex flex-wrap items-center justify-end gap-3 pt-3">
-        <button
-          type="button"
-          onClick={onReject}
-          className="px-4 py-2 text-sm font-medium rounded-lg border border-rose-300 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500/20 cursor-pointer"
+        <Popconfirm
+          title={t('loanApplication.buttons.confirmRejectTitle', 'Xác nhận Từ chối Hồ sơ?')}
+          description={t('loanApplication.buttons.confirmRejectDesc', 'Bạn có chắc chắn muốn từ chối hồ sơ vay này?')}
+          okText={t('loanApplication.buttons.confirmYes', 'Xác nhận')}
+          cancelText={t('loanApplication.buttons.confirmNo', 'Hủy')}
+          okButtonProps={{ danger: true }}
+          onConfirm={onReject}
+          placement="topLeft"
         >
-          {t('loanApplication.buttons.reject', 'Từ chối Hồ sơ')}
-        </button>
+          <button
+            type="button"
+            className="px-4 py-2 text-sm font-medium rounded-lg border border-rose-300 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500/20 cursor-pointer"
+          >
+            {t('loanApplication.buttons.reject', 'Từ chối Hồ sơ')}
+          </button>
+        </Popconfirm>
 
         <button
           type="button"
@@ -380,19 +395,24 @@ export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboa
           {t('loanApplication.buttons.modifyTerms', 'Điều chỉnh Điều khoản')}
         </button>
 
-        <button
-          type="button"
-          onClick={onApproveProbingLimit}
-          className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors shadow-xs focus:outline-none cursor-pointer ${
-            decision === 'APPROVED' || decision === 'APPROVED_CONDITIONAL'
-              ? 'bg-emerald-600 hover:bg-emerald-700 text-white focus:ring-2 focus:ring-emerald-500/40'
-              : 'bg-amber-400 hover:bg-amber-500 text-slate-950 focus:ring-2 focus:ring-amber-500/40'
-          }`}
+        <Popconfirm
+          title={t('loanApplication.buttons.confirmApproveTitle', 'Xác nhận Phê duyệt Hạn mức?')}
+          description={t('loanApplication.buttons.confirmApproveDesc', 'Bạn có chắc chắn muốn phê duyệt hồ sơ vay này và lưu vào hệ thống?')}
+          okText={t('loanApplication.buttons.confirmYes', 'Xác nhận')}
+          cancelText={t('loanApplication.buttons.confirmNo', 'Hủy')}
+          okButtonProps={{ className: 'bg-cyan-600 hover:bg-cyan-700' }}
+          onConfirm={onApproveProbingLimit}
+          placement="topLeft"
         >
-          {decision === 'APPROVED' || decision === 'APPROVED_CONDITIONAL'
-            ? t('loanApplication.buttons.approveDirect', 'Chấp thuận Phê duyệt Hạn mức')
-            : t('loanApplication.buttons.approveLimit', 'Phê duyệt Hạn mức Thăm dò')}
-        </button>
+          <button
+            type="button"
+            className="px-4 py-2 text-sm font-semibold rounded-lg transition-colors shadow-xs focus:outline-none cursor-pointer bg-cyan-600 hover:bg-cyan-700 active:bg-cyan-800 text-white dark:bg-cyan-500 dark:hover:bg-cyan-600 focus:ring-2 focus:ring-cyan-500/40"
+          >
+            {decision === 'APPROVED' || decision === 'APPROVED_CONDITIONAL'
+              ? t('loanApplication.buttons.approveDirect', 'Chấp thuận Phê duyệt Hạn mức')
+              : t('loanApplication.buttons.approveLimit', 'Phê duyệt Hạn mức Thăm dò')}
+          </button>
+        </Popconfirm>
       </div>
     </div>
   );

@@ -8,14 +8,15 @@ from pathlib import Path
 from typing import Optional
 
 from services.api_server.app.schemas.loan import EnrichPayload
-from services.api_server.app.utils.hash_utils import generate_client_id
+from services.api_server.app.utils.hash_utils import (
+    get_next_client_id,
+    generate_application_id,
+)
 
-# Đường dẫn tới thư mục data/raw (4 cấp lên từ services/api_server/app/services/)
 DATA_RAW_DIR: Path = Path(__file__).resolve().parent.parent.parent.parent.parent / "data" / "raw"
 
-# Thứ tự cột chuẩn của file CSV enriched
 ENRICHED_COLUMNS = [
-    "client_ID", "person_age", "person_income", "person_home_ownership",
+    "application_id", "client_ID", "person_age", "person_income", "person_home_ownership",
     "person_emp_length", "loan_intent", "loan_grade", "loan_amnt",
     "loan_int_rate", "loan_status", "loan_percent_income",
     "loan_to_income_ratio", "debt_to_income_ratio",
@@ -27,41 +28,41 @@ ENRICHED_COLUMNS = [
 
 
 def get_file_path(target_date: Optional[date] = None) -> Path:
-    """Trả về đường dẫn file enriched CSV theo ngày (mỗi ngày 1 file)."""
     d = target_date or date.today()
     return DATA_RAW_DIR / f"enriched_loan_data_{d.strftime('%Y%m%d')}.csv"
 
 
 def read_all_records() -> list[dict]:
-    """Đọc toàn bộ file enriched_loan_data_*.csv trong data/raw/, mới nhất trước."""
+    """Đọc toàn bộ file enriched_loan_data_*.csv trong data/raw/."""
     all_records: list[dict] = []
     if not DATA_RAW_DIR.exists():
         return all_records
     for f in sorted(DATA_RAW_DIR.glob("enriched_loan_data_*.csv"), reverse=True):
         try:
             with open(f, "r", encoding="utf-8") as csv_file:
-                all_records.extend(dict(row) for row in csv.DictReader(csv_file))
+                for row in csv.DictReader(csv_file):
+                    r = dict(row)
+                    r["display_client_ID"] = r.get("client_ID", "")
+                    all_records.append(r)
         except Exception:
             continue
     return all_records
 
 
 def save_record(payload: EnrichPayload) -> dict:
-    """
-    Lưu một hồ sơ mới vào CSV theo ngày.
-
-    Returns:
-        dict với client_ID, saved_to, created_at
-    """
+    """Lưu hồ sơ vào CSV với Client ID chuẩn CUST_... và Application ID."""
     now = datetime.now()
     file_path = get_file_path(now.date())
     file_exists = file_path.exists()
 
     app_data = payload.application.model_dump()
-    client_id = generate_client_id(app_data)
+    existing_count = len(read_all_records())
+    raw_client_id = app_data.get("client_ID") or get_next_client_id(offset=existing_count)
+    application_id = generate_application_id(raw_client_id, channel="O")
 
     row = {
-        "client_ID":                client_id,
+        "application_id":           application_id,
+        "client_ID":                raw_client_id,
         "person_age":               app_data.get("person_age"),
         "person_income":            app_data.get("person_income"),
         "person_home_ownership":    app_data.get("person_home_ownership"),
@@ -90,15 +91,16 @@ def save_record(payload: EnrichPayload) -> dict:
 
     DATA_RAW_DIR.mkdir(parents=True, exist_ok=True)
     with open(file_path, "a", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=ENRICHED_COLUMNS)
+        writer = csv.DictWriter(f, fieldnames=ENRICHED_COLUMNS, extrasaction="ignore")
         if not file_exists:
             writer.writeheader()
         writer.writerow(row)
 
     return {
-        "client_ID":  client_id,
-        "saved_to":   str(file_path.relative_to(DATA_RAW_DIR.parent.parent)),
-        "created_at": row["created_at"],
+        "client_ID":       raw_client_id,
+        "application_id":  application_id,
+        "saved_to":        str(file_path.relative_to(DATA_RAW_DIR.parent.parent)),
+        "created_at":      row["created_at"],
     }
 
 

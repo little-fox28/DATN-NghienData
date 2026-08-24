@@ -20,6 +20,7 @@ export interface LoanApplicationData {
   loan_amnt: number;
   loan_int_rate: number;
   loan_term_months?: number;
+  client_ID?: string;
   loan_percent_income: number;
   loan_to_income_ratio: number;
   debt_to_income_ratio: number;
@@ -56,6 +57,8 @@ export interface CreditRiskAssessment {
 export interface PredictApiResponse {
   success: boolean;
   task: string;
+  client_id?: string;
+  application_id?: string;
   application_summary: {
     income: number;
     loan_amount: number;

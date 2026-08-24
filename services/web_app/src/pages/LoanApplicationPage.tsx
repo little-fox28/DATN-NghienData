@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, DatabaseOutlined, FileTextOutlined, LeftOutlined, ReloadOutlined, RightOutlined, SendOutlined, UserOutlined, WalletOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, FileTextOutlined, LeftOutlined, RightOutlined, SendOutlined, UserOutlined, WalletOutlined } from '@ant-design/icons';
 import { App as AntApp, Button, Card, Col, Form, InputNumber, Row, Select, Steps, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,7 +38,6 @@ export const LoanApplicationPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [form] = Form.useForm<LoanApplicationData>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [saving, setSaving] = useState<boolean>(false);
   const [result, setResult] = useState<PredictApiResponse | null>(null);
   const [savedClientId, setSavedClientId] = useState<string | null>(null);
 
@@ -86,6 +85,9 @@ export const LoanApplicationPage: React.FC = () => {
 
       const apiResult = await predictCreditRisk(updatedData, 'credit_risk');
       setResult(apiResult);
+      if (apiResult.client_id) {
+        setSavedClientId(apiResult.client_id);
+      }
       setCurrentStep(3);
       message.success(t('loanApplication.messages.success'));
     } catch (err: any) {
@@ -93,7 +95,6 @@ export const LoanApplicationPage: React.FC = () => {
       if (!err.errorFields) {
         let errorMsg = err?.response?.data?.detail;
 
-        // Handle FastAPI validation array response to prevent React crash (White page)
         if (Array.isArray(errorMsg)) {
           errorMsg = errorMsg.map((e: any) => `${e.loc?.join(' -> ')}: ${e.msg}`).join('; ');
         } else if (typeof errorMsg === 'object' && errorMsg !== null) {
@@ -125,26 +126,28 @@ export const LoanApplicationPage: React.FC = () => {
   const handleSaveToDB = async () => {
     if (!result) return;
     try {
-      setSaving(true);
       const values = form.getFieldsValue();
       const person_income = values.person_income || 0;
       const loan_amnt = values.loan_amnt || 0;
       const formData = {
         ...initialFormData,
         ...values,
-        loan_percent_income: person_income > 0 ? Number((loan_amnt / person_income).toFixed(2)) : 0,
-        loan_to_income_ratio: person_income > 0 ? Number((loan_amnt / person_income).toFixed(2)) : 0,
+        loan_percent_income: person_income > 0 ? Number((loan_amnt / person_income).toFixed(4)) : 0,
+        loan_to_income_ratio: person_income > 0 ? Number((loan_amnt / person_income).toFixed(4)) : 0,
+        debt_to_income_ratio: values.debt_to_income_ratio ?? 0.12,
       };
 
       const resp = await saveEnrichedRecord({
         application: formData,
-        loan_status: -1 as unknown as 0 | 1, // Status will be labeled later in data view
+        loan_status: -1 as unknown as 0 | 1,
         ml_pd_score: result.credit_risk_assessment.pd_score,
         ml_credit_score: result.credit_risk_assessment.credit_score,
         ml_decision: result.credit_risk_assessment.decision,
       });
 
-      setSavedClientId(resp.client_ID);
+      if (resp.client_ID) {
+        setSavedClientId(resp.client_ID);
+      }
       message.success(`${t('loanApplication.buttons.created')}`);
     } catch (err: any) {
       console.error(err);
@@ -152,8 +155,6 @@ export const LoanApplicationPage: React.FC = () => {
         message: t('loanApplication.buttons.errorSaveToDb'),
         description: err?.response?.data?.detail || 'Không thể lưu hồ sơ vào cơ sở dữ liệu.',
       });
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -320,11 +321,15 @@ export const LoanApplicationPage: React.FC = () => {
               requestedRate={form.getFieldValue('loan_int_rate')}
               income={form.getFieldValue('person_income')}
               intent={form.getFieldValue('loan_intent')}
-              applicationId={savedClientId || 'APP-2026-0882'}
+              applicationId={result.application_id || 'LN-O-PENDING'}
+              clientId={result.client_id || savedClientId || undefined}
               rawFeatures={form.getFieldsValue()}
               onApproveProbingLimit={handleSaveToDB}
               onModifyTerms={() => setCurrentStep(2)}
-              onReject={() => message.info(t('loanApplication.buttons.reject'))}
+              onReject={() => {
+                message.info(t('loanApplication.buttons.reject'));
+                handleReset();
+              }}
             />
           </div>
         )}
@@ -348,7 +353,7 @@ export const LoanApplicationPage: React.FC = () => {
               {t('loanApplication.buttons.submit')}
             </Button>
           )}
-
+          {/* 
           {currentStep === 3 && (
             <div style={{ display: 'flex', gap: 16, margin: '0 auto' }}>
               <Button size="large" onClick={handleReset} icon={<ReloadOutlined />}>
@@ -366,7 +371,7 @@ export const LoanApplicationPage: React.FC = () => {
                 {savedClientId ? t('loanApplication.buttons.created') : t('loanApplication.buttons.saveToDb')}
               </Button>
             </div>
-          )}
+          )} */}
         </div>
       </Card>
     </div>

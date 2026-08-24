@@ -10,18 +10,22 @@ router = APIRouter(prefix="/api/v1", tags=["Credit Risk Scoring"])
 
 @router.post("/predict", summary="Chấm điểm tín dụng cho một hồ sơ vay")
 def predict_credit_risk(application: LoanApplication, task: str = "credit_risk"):
-    """
-    Nhận thông tin khoản vay, gọi ML core để tính toán:
-    - PD Score (Xác suất vỡ nợ)
-    - Credit Score (300–850)
-    - Risk Tier (LOW / MEDIUM / HIGH / CRITICAL)
-    - Decision (APPROVED / MANUAL_REVIEW / REJECTED)
-    """
     try:
-        result = score_application(application.model_dump(), task)
+        from services.api_server.app.services.enrich import read_all_records
+        from services.api_server.app.utils.hash_utils import get_next_client_id, generate_application_id
+
+        app_data = application.model_dump()
+        result = score_application(app_data, task)
+
+        existing_count = len(read_all_records())
+        client_id = application.client_ID or get_next_client_id(offset=existing_count)
+        application_id = generate_application_id(client_id, channel="O")
+
         return {
             "success": True,
             "task": task,
+            "client_id": client_id,
+            "application_id": application_id,
             "application_summary": {
                 "income":      application.person_income,
                 "loan_amount": application.loan_amnt,

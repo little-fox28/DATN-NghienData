@@ -117,7 +117,13 @@
       "approveLimit": "Phê duyệt Hạn mức Thăm dò",
       "approveDirect": "Chấp thuận Phê duyệt Hạn mức",
       "modifyTerms": "Điều chỉnh Điều khoản",
-      "reject": "Từ chối Hồ sơ"
+      "reject": "Từ chối Hồ sơ",
+      "confirmApproveTitle": "Xác nhận Phê duyệt Hạn mức?",
+      "confirmApproveDesc": "Bạn có chắc chắn muốn phê duyệt hồ sơ vay này và lưu vào hệ thống?",
+      "confirmRejectTitle": "Xác nhận Từ chối Hồ sơ?",
+      "confirmRejectDesc": "Bạn có chắc chắn muốn từ chối hồ sơ vay này?",
+      "confirmYes": "Xác nhận",
+      "confirmNo": "Hủy"
     },
     "messages": {
       "success": "Chấm điểm tín dụng thành công!"
