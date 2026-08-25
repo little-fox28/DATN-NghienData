@@ -4,8 +4,10 @@
     "subtitle": "Hệ thống Thu thập Khoản vay & Chấm điểm Tín dụng"
   },
   "menu": {
-    "dashboard": "Dashboard Thống kê",
-    "apply": "Tạo Hồ sơ Vay mới"
+    "dashboard": "Bảng Điều Khiển",
+    "overview": "Tổng Quan Danh Mục",
+    "underwriting": "Hàng Đợi Thẩm Định",
+    "apply": "Tạo Hồ Sơ Vay Mới"
   },
   "footer": {
     "copyright": "© 2026 DATN — Credit Risk & Loan Origination System | Developed by NghienData Team"
@@ -20,14 +22,76 @@
     "en": "English"
   },
   "dashboard": {
-    "title": "Tổng quan Hệ thống (Dashboard)",
-    "welcome": "Chào mừng bạn đến với hệ thống Đánh giá Rủi ro Tín dụng sử dụng ML Core.",
-    "stats": {
-      "processed": "Tổng Hồ sơ Đã Xử lý",
-      "highRisk": "Cảnh báo Rủi ro Cao",
-      "reappraisal": "Đang Thẩm định Lại"
+    "title": "Bảng Điều Khiển Quản Trị Rủi Ro Tín Dụng",
+    "subtitle": "Giám sát Danh mục Cho vay, Phân tích XAI Đóng góp WoE và Hàng đợi Thẩm định Rủi ro",
+    "banner": {
+      "underwritingTitle": "Không Gian Thẩm Định Hồ Sơ & Mổ Xẻ Chi Tiết XAI",
+      "underwritingDesc": "Truy cập hàng đợi xử lý hồ sơ vay trực tuyến, đánh giá tín hiệu rủi ro FICO và thẩm định phê duyệt thủ công.",
+      "goToUnderwriting": "Mở Hàng Đợi Thẩm Định"
     },
-    "futureNote": "Báo cáo chi tiết biểu đồ sẽ được bổ sung trong các phiên bản sau."
+    "kpi": {
+      "totalVolume": "Tổng Dư Nợ Danh Mục",
+      "applications": "hồ sơ",
+      "defaultRate": "Tỷ Lệ Nợ Xấu (NPL)",
+      "riskAppetite": "Khẩu vị rủi ro: < 22%",
+      "avgRate": "Lãi Suất Bình Quân (APR)",
+      "riskAdjusted": "Biên độ bù đắp rủi ro",
+      "avgFico": "Điểm FICO Bình Quân",
+      "ficoTier": "Phân hạng: Standard Tier",
+      "manualQueue": "Hồ Sơ Cần Thẩm Định",
+      "borderlineDesc": "Vùng đệm rủi ro (Grade C-D)",
+      "actionRequired": "Cần rà soát",
+      "badgeStable": "Ổn định",
+      "badgeWarning": "Cảnh báo",
+      "tierB": "Tier B"
+    },
+    "riskTiers": {
+      "title": "Phân Tầng Rủi Ro & Phễu Quyết Định",
+      "subtitle": "Phân bổ theo Chuẩn Thang điểm FICO và Chính sách Phê duyệt ML",
+      "records": "hồ sơ",
+      "gradeEscalation": "Ma Trận Leo Thang Rủi Ro theo Hạng Tín Dụng (A → G)",
+      "nplRatio": "Tỷ lệ nợ xấu tăng vọt từ Grade D",
+      "tierLow": "Rất Thấp (Prime)",
+      "tierMedLow": "Thấp - Tiêu Chuẩn",
+      "tierMedHigh": "Trung Bình Cao",
+      "tierHigh": "Rủi Ro Cao (Subprime)"
+    },
+    "loanTerms": {
+      "title": "Tương Quan Kỳ Hạn Vay & Trọng Số WoE",
+      "subtitle": "Đóng góp điểm tín dụng FICO & Tỷ lệ nợ xấu tích lũy",
+      "volumePrefix": "Dư nợ:",
+      "note36": "Kỳ hạn chuẩn ngân hàng",
+      "note12": "Rủi ro thấp nhất (+0.38)",
+      "noteLong": "Rủi ro tích lũy kỳ hạn dài"
+    },
+    "exposure": {
+      "title": "Tập Trung Dư Nợ & Rủi Ro Theo Mục Đích Vay",
+      "subtitle": "Phân bổ danh mục theo Mục đích vay vốn & Tình trạng Nhà ở",
+      "intentTitle": "Mục đích Vay (Loan Intent)",
+      "housingTitle": "Sở hữu Nhà ở (Home Ownership)",
+      "rent": "Thuê nhà (RENT)",
+      "mortgage": "Thế chấp (MORTGAGE)",
+      "own": "Sở hữu riêng (OWN)",
+      "other": "Khác (OTHER)"
+    },
+    "queue": {
+      "title": "Hàng Đợi Thẩm Định Tín Dụng & Nhật Ký Hồ Sơ",
+      "subtitle": "Danh sách hồ sơ tín dụng trực tuyến, phân tích chuyên sâu điểm FICO và XAI"
+    },
+    "table": {
+      "grade": "Hạng",
+      "count": "Số hồ sơ",
+      "volume": "Dư nợ ($)",
+      "avgRate": "Lãi suất TB",
+      "defaultRate": "Tỷ lệ Nợ Xấu (NPL)"
+    },
+    "buttons": {
+      "refresh": "Làm mới",
+      "export": "Xuất Báo Cáo (CSV)"
+    },
+    "errors": {
+      "loadFailed": "Không thể tải dữ liệu dashboard."
+    }
   },
   "loanApplication": {
     "steps": {
@@ -240,6 +304,128 @@
       "cb_person_cred_hist_length": "Độ dài Lịch sử Tín dụng",
       "credit_utilization_ratio": "Tỷ lệ Sử dụng Hạn mức (CUR)",
       "past_delinquencies": "Số lần Trễ hạn Quá khứ"
+    }
+  },
+  "underwriting": {
+    "title": "Hàng Đợi Thẩm Định & Phân Tích Hồ Sơ Vay",
+    "subtitle": "Không gian làm việc cho Thẩm định viên: Mổ xẻ chi tiết tín hiệu XAI, kiểm tra hồ sơ và phê duyệt hạn mức thủ công",
+    "kpi": {
+      "totalInQueue": "Tổng Hồ Sơ Trong Hàng Đợi",
+      "streamActive": "Đang cập nhật thời gian thực",
+      "autoApproved": "Phê Duyệt Tự Động (STP)",
+      "ofTotal": "tổng số",
+      "manualReview": "Cần Thẩm Định Thủ Công",
+      "borderlineWarning": "Vùng đệm rủi ro (Grade C-D)",
+      "rejected": "Từ Chối Tự Động",
+      "highRiskDesc": "Vượt ngưỡng rủi ro cho phép"
+    },
+    "queue": {
+      "title": "Hàng Đợi Thẩm Định Tín Dụng & Nhật Ký Hồ Sơ",
+      "subtitle": "Danh sách hồ sơ tín dụng trực tuyến, phân tích chuyên sâu điểm FICO và XAI"
+    },
+    "sources": {
+      "all": "Tất cả Hàng đợi (Toàn diện)",
+      "backlog": "Hồ sơ Cần Thẩm định (10,084 Backlog Pool)",
+      "live": "Hồ sơ Nộp Trực tuyến (Live Stream)"
+    },
+    "batch": {
+      "selected": "Đã chọn {{count}} hồ sơ",
+      "approve": "Phê duyệt Hàng loạt",
+      "reject": "Từ chối Hàng loạt",
+      "successApprove": "Đã phê duyệt thành công {{count}} hồ sơ.",
+      "successReject": "Đã từ chối thành công {{count}} hồ sơ."
+    },
+    "table": {
+      "appClient": "Mã Hồ Sơ / Khách Hàng",
+      "incomeLoan": "Thu Nhập / Khoản Vay",
+      "gradeTerm": "Hạng / Kỳ Hạn",
+      "ficoScore": "Điểm FICO",
+      "pdScore": "Xác Suất PD",
+      "mlDecision": "Quyết Định ML",
+      "action": "Thao Tác",
+      "incomePrefix": "Thu nhập:",
+      "quickApprove": "Phê duyệt nhanh",
+      "quickReject": "Từ chối nhanh"
+    },
+    "buttons": {
+      "inspect": "Thẩm định"
+    },
+    "search": {
+      "placeholder": "Tìm theo Mã Hồ Sơ, Client ID..."
+    },
+    "filter": {
+      "allGrades": "Tất cả Hạng (Grade A-G)",
+      "gradeA": "Grade A (VIP Prime)",
+      "gradeB": "Grade B (Standard)",
+      "gradeC": "Grade C (Near Prime)",
+      "gradeD": "Grade D (Borderline)",
+      "gradeE": "Grade E (Subprime)",
+      "gradeF": "Grade F",
+      "gradeG": "Grade G (High Risk)",
+      "allDecisions": "Tất cả Quyết định ML",
+      "decisionApproved": "APPROVED (Phê duyệt)",
+      "decisionConditional": "APPROVED CONDITIONAL (Có điều kiện)",
+      "decisionManual": "MANUAL REVIEW (Cần thẩm định)",
+      "decisionRejected": "REJECTED (Từ chối)"
+    },
+    "drawer": {
+      "ficoScore": "Điểm Tín Dụng (FICO Score)",
+      "tierPrime": "Hạng Tín Dụng Prime",
+      "tierStandard": "Hạng Tiêu Chuẩn",
+      "tierBorderline": "Vùng đệm Thẩm định",
+      "tierSubprime": "Hồ sơ Dưới chuẩn",
+      "pdScore": "Xác Suất Vỡ Nợ (PD)",
+      "pdThreshold": "Ngưỡng cảnh báo: 5.00%",
+      "applicantSummary": "Thông tin Người vay & Khoản vay",
+      "income": "Thu nhập Hàng năm:",
+      "amount": "Số tiền Đề xuất Vay:",
+      "intent": "Mục đích Vay:",
+      "term": "Kỳ hạn Vay (Loan Term):",
+      "ownership": "Sở hữu Nhà:",
+      "empLength": "Thâm niên Công tác:",
+      "xaiTitle": "Giải Thích Đóng Góp Điểm WoE (XAI)",
+      "positiveSignals": "Tín hiệu Tích cực",
+      "negativeSignals": "Tín hiệu Cần lưu ý",
+      "positiveDesc": "Thu nhập cao & Lịch sử tín dụng sạch không có nợ xấu trên CIC.",
+      "negativeDesc": "Tỷ lệ nợ/thu nhập cao hoặc hình thức cư trú thuê nhà (RENT).",
+      "actionTitle": "Hành động Thẩm định viên (Underwriter Workspace)",
+      "approveLimit": "Phê Duyệt Hạn Mức",
+      "modifyTerms": "Điều Chỉnh",
+      "reject": "Từ Chối"
+    },
+    "notices": {
+      "confirmDeleteTitle": "Xác nhận xóa hồ sơ này khỏi hệ thống?",
+      "deleteTooltip": "Xóa hồ sơ",
+      "deleteOk": "Xóa",
+      "deleteCancel": "Hủy",
+      "confirmApprove": "Xác nhận Phê duyệt hồ sơ này?",
+      "confirmReject": "Xác nhận Từ chối hồ sơ này?",
+      "paginationTotal": "{{start}}-{{end}} / {{total}} hồ sơ"
+    },
+    "modal": {
+      "editTitle": "Điều chỉnh Điều khoản Khoản vay ({{id}})",
+      "loanAmount": "Số tiền vay ($)",
+      "loanTerm": "Kỳ hạn vay (Tháng)",
+      "intRate": "Lãi suất (%)",
+      "loanGrade": "Hạng Khoản vay (Grade A-G)",
+      "decision": "Quyết định Thẩm định viên",
+      "save": "Lưu thay đổi",
+      "cancel": "Hủy",
+      "requireAmount": "Vui lòng nhập số tiền vay",
+      "requireTerm": "Vui lòng chọn kỳ hạn vay",
+      "requireRate": "Vui lòng nhập lãi suất",
+      "requireGrade": "Vui lòng chọn hạng khoản vay"
+    },
+    "messages": {
+      "labelUpdated": "Đã cập nhật trạng thái thẩm định hồ sơ: {{id}}",
+      "modifySuccess": "Đã cập nhật thông tin và điều kiện khoản vay thành công.",
+      "deleteSuccess": "Đã xóa hồ sơ khoản vay khỏi hàng đợi."
+    },
+    "errors": {
+      "loadFailed": "Không thể tải hàng đợi thẩm định.",
+      "updateFailed": "Lỗi cập nhật trạng thái hồ sơ.",
+      "deleteFailed": "Lỗi khi xóa hồ sơ.",
+      "modifyFailed": "Lỗi khi cập nhật thông tin khoản vay."
     }
   }
 }
