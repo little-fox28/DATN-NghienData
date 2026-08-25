@@ -14,7 +14,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from services.api_server.app.config import HOST, PORT
-from services.api_server.app.routers import predict, enrich
+from services.api_server.app.routers import predict, enrich, analytics
 
 # ── App ───────────────────────────────────────────────────────────────────────
 app = FastAPI(
@@ -35,6 +35,7 @@ app.add_middleware(
 # ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(predict.router)
 app.include_router(enrich.router)
+app.include_router(analytics.router)
 
 
 # ── Health / Root ─────────────────────────────────────────────────────────────

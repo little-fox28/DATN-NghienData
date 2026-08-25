@@ -142,6 +142,13 @@ export const LoanApplicationPage: React.FC = () => {
         ml_pd_score: result.credit_risk_assessment.pd_score,
         ml_credit_score: result.credit_risk_assessment.credit_score,
         ml_decision: result.credit_risk_assessment.decision,
+        ml_risk_tier: result.credit_risk_assessment.risk_tier,
+        top_positive_factors: result.credit_risk_assessment.top_factors?.positive_factors,
+        top_negative_factors: result.credit_risk_assessment.top_factors?.negative_factors,
+        recommended_interest_rate: result.credit_risk_assessment.pricing_recommendation?.recommended_interest_rate,
+        max_credit_limit: result.credit_risk_assessment.pricing_recommendation?.max_credit_limit,
+        monthly_payment_estimate: result.credit_risk_assessment.pricing_recommendation?.monthly_payment_estimate,
+        total_interest_estimate: result.credit_risk_assessment.pricing_recommendation?.total_interest_estimate,
       });
 
       setSavedClientId(resp.client_ID);

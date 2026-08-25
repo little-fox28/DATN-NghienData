@@ -70,4 +70,114 @@ export interface SaveEnrichedRecordPayload {
   ml_pd_score: number;
   ml_credit_score: number;
   ml_decision: string;
+  ml_risk_tier?: string;
+  top_positive_factors?: Array<{ feature: string; points: number }>;
+  top_negative_factors?: Array<{ feature: string; points: number }>;
+  recommended_interest_rate?: number;
+  max_credit_limit?: number;
+  monthly_payment_estimate?: number;
+  total_interest_estimate?: number;
 }
+
+export interface PortfolioKPIs {
+  total_loan_volume: number;
+  total_applications: number;
+  overall_default_rate: number;
+  avg_interest_rate: number;
+  avg_annual_income: number;
+  avg_lti: number;
+  avg_dti: number;
+  avg_utilization: number;
+  avg_fico_score: number;
+  pending_manual_reviews: number;
+}
+
+export interface RiskTierItem {
+  tier: string;
+  name: string;
+  fico_range: string;
+  pct: number;
+  color: string;
+  decision: string;
+}
+
+export interface GradeItem {
+  grade: string;
+  count: number;
+  pct: number;
+  volume: number;
+  avg_rate: number;
+  default_rate: number;
+}
+
+export interface IntentItem {
+  intent: string;
+  count: number;
+  pct: number;
+  volume: number;
+  default_rate: number;
+}
+
+export interface TermItem {
+  term_months: number;
+  count: number;
+  pct: number;
+  volume: number;
+  default_rate: number;
+  woe_points: number;
+}
+
+export interface HomeOwnershipItem {
+  ownership: string;
+  count: number;
+  pct: number;
+  volume: number;
+  default_rate: number;
+}
+
+export interface PortfolioSummaryResponse {
+  success: boolean;
+  kpis: PortfolioKPIs;
+  risk_tiers: RiskTierItem[];
+  grades: GradeItem[];
+  intents: IntentItem[];
+  terms: TermItem[];
+  home_ownership: HomeOwnershipItem[];
+}
+
+export interface EnrichedRecordItem {
+  application_id?: string;
+  client_ID?: string;
+  display_client_ID?: string;
+  person_age: number;
+  person_income: number;
+  person_home_ownership: string;
+  person_emp_length: number;
+  loan_intent: string;
+  loan_grade: string;
+  loan_amnt: number;
+  loan_int_rate: number;
+  loan_term_months?: number;
+  loan_status: string | number;
+  loan_percent_income: number;
+  loan_to_income_ratio: number;
+  debt_to_income_ratio: number;
+  cb_person_default_on_file: string;
+  cb_person_cred_hist_length: number;
+  gender?: string;
+  marital_status?: string;
+  education_level?: string;
+  employment_type?: string;
+  ml_pd_score?: number;
+  ml_credit_score?: number;
+  ml_decision?: string;
+  ml_risk_tier?: string;
+  top_positive_factors?: Array<{ feature: string; points: number }> | string;
+  top_negative_factors?: Array<{ feature: string; points: number }> | string;
+  recommended_interest_rate?: number;
+  max_credit_limit?: number;
+  monthly_payment_estimate?: number;
+  total_interest_estimate?: number;
+  created_at?: string;
+}
+

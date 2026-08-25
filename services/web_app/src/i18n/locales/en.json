@@ -5,6 +5,8 @@
   },
   "menu": {
     "dashboard": "Dashboard",
+    "overview": "Portfolio Overview",
+    "underwriting": "Underwriting Queue",
     "apply": "New Loan Application"
   },
   "footer": {
@@ -20,14 +22,76 @@
     "en": "English"
   },
   "dashboard": {
-    "title": "System Overview (Dashboard)",
-    "welcome": "Welcome to the Credit Risk Assessment system powered by Core.",
-    "stats": {
-      "processed": "Total Processed Applications",
-      "highRisk": "High Risk Alerts",
-      "reappraisal": "Pending Reappraisal"
+    "title": "Credit Risk Executive Dashboard",
+    "subtitle": "Portfolio Surveillance, WoE Explainability Insights & Underwriting Queue",
+    "banner": {
+      "underwritingTitle": "Underwriting Workspace & Deep XAI Inspection",
+      "underwritingDesc": "Access the live loan origination stream, assess FICO signals and perform manual approvals.",
+      "goToUnderwriting": "Open Underwriting Queue"
     },
-    "futureNote": "Detailed chart reports will be added in future versions."
+    "kpi": {
+      "totalVolume": "Total Portfolio Volume",
+      "applications": "applications",
+      "defaultRate": "Default Rate (NPL)",
+      "riskAppetite": "Risk Appetite: < 22%",
+      "avgRate": "Average Interest Rate (APR)",
+      "riskAdjusted": "Risk-adjusted spread",
+      "avgFico": "Weighted Average FICO",
+      "ficoTier": "Tier: Standard Tier",
+      "manualQueue": "Manual Review Backlog",
+      "borderlineDesc": "Borderline risk zone (Grade C-D)",
+      "actionRequired": "Review Required",
+      "badgeStable": "Stable",
+      "badgeWarning": "Warning",
+      "tierB": "Tier B"
+    },
+    "riskTiers": {
+      "title": "Risk Tier Distribution & Decision Funnel",
+      "subtitle": "Segmented by FICO Standard Scorecards & ML Decision Policy",
+      "records": "records",
+      "gradeEscalation": "Credit Grade Escalation Matrix (A → G)",
+      "nplRatio": "NPL sharply escalates from Grade D",
+      "tierLow": "Very Low (Prime)",
+      "tierMedLow": "Low - Standard",
+      "tierMedHigh": "Medium-High",
+      "tierHigh": "High Risk (Subprime)"
+    },
+    "loanTerms": {
+      "title": "Loan Term Correlation & WoE Weights",
+      "subtitle": "Scorecard Points Contribution & Cumulative NPL Risk",
+      "volumePrefix": "Volume:",
+      "note36": "Standard banking term",
+      "note12": "Lowest credit risk (+0.38)",
+      "noteLong": "Cumulative long-term risk"
+    },
+    "exposure": {
+      "title": "Capital Concentration & Purpose Exposure",
+      "subtitle": "Portfolio Allocation by Loan Purpose & Housing Ownership",
+      "intentTitle": "Loan Intent / Purpose",
+      "housingTitle": "Home Ownership",
+      "rent": "Rent (RENT)",
+      "mortgage": "Mortgage (MORTGAGE)",
+      "own": "Own (OWN)",
+      "other": "Other (OTHER)"
+    },
+    "queue": {
+      "title": "Underwriting Queue & Case Intelligence",
+      "subtitle": "Live loan applications queue with deep FICO & XAI inspection"
+    },
+    "table": {
+      "grade": "Grade",
+      "count": "Applications",
+      "volume": "Volume ($)",
+      "avgRate": "Avg Rate",
+      "defaultRate": "Default Rate (NPL)"
+    },
+    "buttons": {
+      "refresh": "Refresh",
+      "export": "Export CSV Report"
+    },
+    "errors": {
+      "loadFailed": "Failed to load dashboard data."
+    }
   },
   "loanApplication": {
     "steps": {
@@ -234,6 +298,128 @@
       "cb_person_cred_hist_length": "Credit History Length",
       "credit_utilization_ratio": "Credit Utilization Ratio (CUR)",
       "past_delinquencies": "Past Delinquency Count"
+    }
+  },
+  "underwriting": {
+    "title": "Underwriting Queue & Case Intelligence",
+    "subtitle": "Underwriter Workspace: Deep XAI explainability signals, application review, and manual probing limit approval",
+    "kpi": {
+      "totalInQueue": "Total in Queue",
+      "streamActive": "Live Streaming Active",
+      "autoApproved": "Straight-Through Approved",
+      "ofTotal": "of total",
+      "manualReview": "Manual Review Pending",
+      "borderlineWarning": "Borderline risk zone (Grade C-D)",
+      "rejected": "Auto Rejected",
+      "highRiskDesc": "Exceeds risk appetite"
+    },
+    "queue": {
+      "title": "Underwriting Queue & Case Intelligence",
+      "subtitle": "Live loan applications queue with deep FICO & XAI inspection"
+    },
+    "sources": {
+      "all": "All Queue (Unified)",
+      "backlog": "Manual Review Backlog (10,084 Pool)",
+      "live": "Live Online Submissions"
+    },
+    "batch": {
+      "selected": "{{count}} records selected",
+      "approve": "Batch Approve",
+      "reject": "Batch Reject",
+      "successApprove": "Successfully approved {{count}} applications.",
+      "successReject": "Successfully rejected {{count}} applications."
+    },
+    "table": {
+      "appClient": "Application ID / Client",
+      "incomeLoan": "Income / Loan Amount",
+      "gradeTerm": "Grade / Term",
+      "ficoScore": "FICO Score",
+      "pdScore": "PD Score",
+      "mlDecision": "ML Decision",
+      "action": "Action",
+      "incomePrefix": "Income:",
+      "quickApprove": "Quick Approve",
+      "quickReject": "Quick Reject"
+    },
+    "buttons": {
+      "inspect": "Inspect"
+    },
+    "search": {
+      "placeholder": "Search by Application ID, Client ID..."
+    },
+    "filter": {
+      "allGrades": "All Grades (Grade A-G)",
+      "gradeA": "Grade A (VIP Prime)",
+      "gradeB": "Grade B (Standard)",
+      "gradeC": "Grade C (Near Prime)",
+      "gradeD": "Grade D (Borderline)",
+      "gradeE": "Grade E (Subprime)",
+      "gradeF": "Grade F",
+      "gradeG": "Grade G (High Risk)",
+      "allDecisions": "All ML Decisions",
+      "decisionApproved": "APPROVED",
+      "decisionConditional": "APPROVED CONDITIONAL",
+      "decisionManual": "MANUAL REVIEW",
+      "decisionRejected": "REJECTED"
+    },
+    "drawer": {
+      "ficoScore": "FICO Credit Score",
+      "tierPrime": "Prime Credit Tier",
+      "tierStandard": "Standard Tier",
+      "tierBorderline": "Manual Review Buffer Zone",
+      "tierSubprime": "Subprime Profile",
+      "pdScore": "Probability of Default (PD)",
+      "pdThreshold": "Threshold: 5.00%",
+      "applicantSummary": "Applicant & Loan Summary",
+      "income": "Annual Income:",
+      "amount": "Requested Loan Amount:",
+      "intent": "Loan Intent:",
+      "term": "Loan Term:",
+      "ownership": "Home Ownership:",
+      "empLength": "Employment Length:",
+      "xaiTitle": "WoE Contribution Explainability (XAI)",
+      "positiveSignals": "Positive Signals",
+      "negativeSignals": "Negative Signals",
+      "positiveDesc": "High annual income & clean credit bureau history without defaults.",
+      "negativeDesc": "Elevated debt-to-income ratio or rental housing status.",
+      "actionTitle": "Underwriter Decision Workspace",
+      "approveLimit": "Approve Limit",
+      "modifyTerms": "Modify Terms",
+      "reject": "Reject"
+    },
+    "notices": {
+      "confirmDeleteTitle": "Are you sure you want to delete this application?",
+      "deleteTooltip": "Delete application",
+      "deleteOk": "Delete",
+      "deleteCancel": "Cancel",
+      "confirmApprove": "Confirm approval of this application?",
+      "confirmReject": "Confirm rejection of this application?",
+      "paginationTotal": "{{start}}-{{end}} of {{total}} records"
+    },
+    "modal": {
+      "editTitle": "Adjust Loan Terms ({{id}})",
+      "loanAmount": "Loan Amount ($)",
+      "loanTerm": "Loan Term (Months)",
+      "intRate": "Interest Rate (%)",
+      "loanGrade": "Loan Grade (Grade A-G)",
+      "decision": "Underwriter Decision",
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "requireAmount": "Please enter loan amount",
+      "requireTerm": "Please select loan term",
+      "requireRate": "Please enter interest rate",
+      "requireGrade": "Please select loan grade"
+    },
+    "messages": {
+      "labelUpdated": "Application review status updated: {{id}}",
+      "modifySuccess": "Loan terms and details updated successfully.",
+      "deleteSuccess": "Application removed from underwriting queue."
+    },
+    "errors": {
+      "loadFailed": "Failed to load underwriting queue.",
+      "updateFailed": "Failed to update application status.",
+      "deleteFailed": "Failed to delete application.",
+      "modifyFailed": "Failed to modify loan terms."
     }
   }
 }

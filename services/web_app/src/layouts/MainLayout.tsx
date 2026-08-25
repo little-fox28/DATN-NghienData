@@ -1,9 +1,14 @@
-﻿import React from 'react';
+import {
+  AuditOutlined,
+  BarChartOutlined,
+  DashboardOutlined,
+  FormOutlined,
+} from '@ant-design/icons';
 import { Layout, Menu, theme } from 'antd';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { DashboardOutlined, FormOutlined } from '@ant-design/icons';
-import { Navbar } from '../components/Navbar';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Navbar } from '../components/Navbar';
 import { useAppContext } from '../contexts/AppProvider';
 
 const { Content, Footer, Sider } = Layout;
@@ -21,22 +26,35 @@ export const MainLayout: React.FC = () => {
     <Layout style={{ minHeight: '100vh' }}>
       <Navbar />
       <Layout>
-        <Sider width={250} theme={isDarkMode ? 'dark' : 'light'} style={{ background: colorBgContainer }}>
+        <Sider width={260} theme={isDarkMode ? 'dark' : 'light'} style={{ background: colorBgContainer }}>
           <Menu
             mode="inline"
             selectedKeys={[location.pathname]}
+            defaultOpenKeys={['dashboard-group']}
             style={{ height: '100%', borderRight: 0, paddingTop: 16 }}
             onClick={({ key }) => navigate(key)}
             items={[
               {
-                key: '/',
+                key: 'dashboard-group',
                 icon: <DashboardOutlined />,
-                label: t('menu.dashboard'),
+                label: t('menu.dashboard', 'Bảng Điều Khiển'),
+                children: [
+                  {
+                    key: '/',
+                    icon: <BarChartOutlined />,
+                    label: t('menu.overview', 'Tổng Quan Danh Mục'),
+                  },
+                  {
+                    key: '/underwriting',
+                    icon: <AuditOutlined />,
+                    label: t('menu.underwriting', 'Hàng Đợi Thẩm Định'),
+                  },
+                ],
               },
               {
                 key: '/apply',
                 icon: <FormOutlined />,
-                label: t('menu.apply'),
+                label: t('menu.apply', 'Tạo Hồ Sơ Vay Mới'),
               }
             ]}
           />
