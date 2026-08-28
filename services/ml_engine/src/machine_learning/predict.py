@@ -163,7 +163,7 @@ class ModelPredictor:
 
         Chuẩn tuân thủ:
             - ECOA/Fair Lending: Không dùng gender, marital_status, person_age
-            - Điều 468 BLDS Việt Nam: APR ≤ 20%/năm (chốt chặn pháp lý)
+            - North America Statutory Cap: APR ≤ 35%/năm (Usury Laws / Criminal Code of Canada / US MLA)
             - SPEC-ML-PRICING-2026-V1.0
 
         Args:
@@ -197,9 +197,9 @@ class ModelPredictor:
         # Tổng APR thô
         raw_apr = base_rate + risk_spread + capital_discount + intent_adjustment
 
-        # Chốt chặn pháp lý (Statutory Cap — Điều 468 BLDS)
+        # Chốt chặn pháp lý (Statutory Cap — North America Usury Laws)
         min_rate = float(cfg.get("min_rate", 6.0))
-        max_rate = float(cfg.get("max_rate", 24.0))
+        max_rate = float(cfg.get("max_rate", 35.0))
         recommended_rate = round(max(min(raw_apr, max_rate), min_rate), 2)
 
         # ── 2. Tính Hạn mức Tín dụng Tối đa (Dynamic Credit Limit) ──────────

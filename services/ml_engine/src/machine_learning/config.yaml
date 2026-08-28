@@ -119,7 +119,7 @@ tasks:
     # Chính sách Định giá Lãi suất Cá nhân hóa (Risk-Based Pricing Policy)
     # Thuật toán: APR = Base Rate + Risk Spread + Capital Discount + Intent Adj
     # Tham chiếu: SPEC-ML-PRICING-2026-V1.0 (docs/06_risk_based_pricing...)
-    # Tuân thủ: Điều 468 Bộ luật Dân sự VN (≤ 20%/năm), ECOA Fair Lending
+    # Tuân thủ: North America Usury Laws (≤ 35%/năm - Criminal Code of Canada / US MLA), ECOA Fair Lending
     # -------------------------------------------------------------------
     pricing_policy:
       # Lãi suất cơ sở (Cost of Funds + Operating Margin)
