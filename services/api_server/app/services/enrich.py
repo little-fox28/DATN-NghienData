@@ -126,82 +126,102 @@ def read_all_records() -> list[dict]:
     return all_records
 
 
-def read_manual_review_backlog(limit: int = 2000) -> list[dict]:
-    """Đọc danh sách hồ sơ cần thẩm định thủ công (Grade C & D) từ tập dữ liệu gốc."""
+def get_processed_client_ids() -> set[str]:
+    """Lấy tập hợp các client_ID và application_id đã được ghi nhận trong Live Enriched CSV hoặc bị xóa."""
+    processed = set(_DELETED_CLIENT_IDS)
+    for r in read_all_records():
+        cid = r.get("client_ID")
+        aid = r.get("application_id")
+        if cid:
+            processed.add(str(cid).strip())
+        if aid:
+            processed.add(str(aid).strip())
+    return processed
+
+
+def read_manual_review_backlog(limit: Optional[int] = None) -> list[dict]:
+    """Đọc danh sách hồ sơ cần thẩm định thủ công (Grade C & D) chưa được xử lý."""
     global _CACHED_RAW_BACKLOG
-    if _CACHED_RAW_BACKLOG:
-        return [r for r in _CACHED_RAW_BACKLOG if r.get("client_ID") not in _DELETED_CLIENT_IDS][:limit]
+    if not _CACHED_RAW_BACKLOG:
+        raw_path = get_raw_data_path()
+        if not raw_path:
+            return []
 
-    raw_path = get_raw_data_path()
-    if not raw_path:
-        return []
+        backlog: List[Dict[str, Any]] = []
+        try:
+            with open(raw_path, "r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    grade = str(row.get("loan_grade", "")).strip().upper()
+                    if grade in ["C", "D"]:
+                        client_id = str(row.get("client_ID") or row.get("id") or f"CUST-CD-{len(backlog)+1:05d}")
+                        int_rate = float(row.get("loan_int_rate") or 14.5)
+                        loan_term = int(float(row.get("loan_term_months") or 36))
+                        income = float(row.get("person_income") or 55000)
+                        loan_amnt = float(row.get("loan_amnt") or 12000)
+                        dti = float(row.get("debt_to_income_ratio") or 0.35)
+                        
+                        # Tính toán ước tính điểm FICO & PD cho nhóm thẩm định thủ công
+                        pd_est = 0.068 if grade == "C" else 0.092
+                        fico_est = 642 if grade == "C" else 608
 
-    backlog: List[Dict[str, Any]] = []
-    try:
-        with open(raw_path, "r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                grade = str(row.get("loan_grade", "")).strip().upper()
-                if grade in ["C", "D"]:
-                    client_id = str(row.get("client_ID") or row.get("id") or f"CUST-CD-{len(backlog)+1:05d}")
-                    int_rate = float(row.get("loan_int_rate") or 14.5)
-                    loan_term = int(float(row.get("loan_term_months") or 36))
-                    income = float(row.get("person_income") or 55000)
-                    loan_amnt = float(row.get("loan_amnt") or 12000)
-                    dti = float(row.get("debt_to_income_ratio") or 0.35)
-                    
-                    # Tính toán ước tính điểm FICO & PD cho nhóm thẩm định thủ công
-                    pd_est = 0.068 if grade == "C" else 0.092
-                    fico_est = 642 if grade == "C" else 608
+                        backlog.append({
+                            "application_id": f"APP-MR-{client_id.replace('CUST-', '')}",
+                            "client_ID": client_id,
+                            "person_age": row.get("person_age", 30),
+                            "person_income": income,
+                            "person_home_ownership": row.get("person_home_ownership", "RENT"),
+                            "person_emp_length": row.get("person_emp_length", 3),
+                            "loan_intent": row.get("loan_intent", "PERSONAL"),
+                            "loan_grade": grade,
+                            "loan_amnt": loan_amnt,
+                            "loan_int_rate": int_rate,
+                            "loan_status": str(row.get("loan_status", "-1")),
+                            "loan_percent_income": row.get("loan_percent_income", 0.22),
+                            "loan_to_income_ratio": row.get("loan_to_income_ratio", 0.22),
+                            "debt_to_income_ratio": dti,
+                            "cb_person_default_on_file": row.get("cb_person_default_on_file", "N"),
+                            "cb_person_cred_hist_length": row.get("cb_person_cred_hist_length", 4),
+                            "gender": row.get("gender", "MALE"),
+                            "marital_status": row.get("marital_status", "SINGLE"),
+                            "education_level": row.get("education_level", "BACHELOR"),
+                            "employment_type": row.get("employment_type", "FULL_TIME"),
+                            "loan_term_months": loan_term,
+                            "ml_pd_score": pd_est,
+                            "ml_credit_score": fico_est,
+                            "ml_decision": "MANUAL_REVIEW",
+                            "ml_risk_tier": "MEDIUM_HIGH" if grade == "C" else "HIGH",
+                            "top_positive_factors": [
+                                {"feature": "person_income", "points": 2.50},
+                                {"feature": "cb_person_default_on_file", "points": 1.80},
+                            ],
+                            "top_negative_factors": [
+                                {"feature": "debt_to_income_ratio", "points": -2.20},
+                                {"feature": "person_home_ownership", "points": -1.40},
+                            ],
+                            "recommended_interest_rate": int_rate,
+                            "max_credit_limit": loan_amnt * 1.2,
+                            "monthly_payment_estimate": round(loan_amnt / loan_term * 1.15, 2),
+                            "total_interest_estimate": round(loan_amnt * (int_rate / 100) * (loan_term / 12), 2),
+                            "created_at": datetime.now().isoformat(),
+                            "record_date": str(date.today()),
+                            "record_month": date.today().strftime("%Y-%m"),
+                            "source": "backlog",
+                        })
+            _CACHED_RAW_BACKLOG = backlog
+        except Exception as e:
+            print(f"Error loading backlog: {e}")
+            return []
 
-                    backlog.append({
-                        "application_id": f"APP-MR-{client_id.replace('CUST-', '')}",
-                        "client_ID": client_id,
-                        "person_age": row.get("person_age", 30),
-                        "person_income": income,
-                        "person_home_ownership": row.get("person_home_ownership", "RENT"),
-                        "person_emp_length": row.get("person_emp_length", 3),
-                        "loan_intent": row.get("loan_intent", "PERSONAL"),
-                        "loan_grade": grade,
-                        "loan_amnt": loan_amnt,
-                        "loan_int_rate": int_rate,
-                        "loan_status": str(row.get("loan_status", "-1")),
-                        "loan_percent_income": row.get("loan_percent_income", 0.22),
-                        "loan_to_income_ratio": row.get("loan_to_income_ratio", 0.22),
-                        "debt_to_income_ratio": dti,
-                        "cb_person_default_on_file": row.get("cb_person_default_on_file", "N"),
-                        "cb_person_cred_hist_length": row.get("cb_person_cred_hist_length", 4),
-                        "gender": row.get("gender", "MALE"),
-                        "marital_status": row.get("marital_status", "SINGLE"),
-                        "education_level": row.get("education_level", "BACHELOR"),
-                        "employment_type": row.get("employment_type", "FULL_TIME"),
-                        "loan_term_months": loan_term,
-                        "ml_pd_score": pd_est,
-                        "ml_credit_score": fico_est,
-                        "ml_decision": "MANUAL_REVIEW",
-                        "ml_risk_tier": "MEDIUM_HIGH" if grade == "C" else "HIGH",
-                        "top_positive_factors": [
-                            {"feature": "person_income", "points": 2.50},
-                            {"feature": "cb_person_default_on_file", "points": 1.80},
-                        ],
-                        "top_negative_factors": [
-                            {"feature": "debt_to_income_ratio", "points": -2.20},
-                            {"feature": "person_home_ownership", "points": -1.40},
-                        ],
-                        "recommended_interest_rate": int_rate,
-                        "max_credit_limit": loan_amnt * 1.2,
-                        "monthly_payment_estimate": round(loan_amnt / loan_term * 1.15, 2),
-                        "total_interest_estimate": round(loan_amnt * (int_rate / 100) * (loan_term / 12), 2),
-                        "created_at": datetime.now().isoformat(),
-                        "record_date": str(date.today()),
-                        "record_month": date.today().strftime("%Y-%m"),
-                        "source": "backlog",
-                    })
-        _CACHED_RAW_BACKLOG = backlog
-        return [r for r in backlog if r.get("client_ID") not in _DELETED_CLIENT_IDS][:limit]
-    except Exception as e:
-        print(f"Error loading backlog: {e}")
-        return []
+    processed = get_processed_client_ids()
+    active_backlog = [
+        r for r in _CACHED_RAW_BACKLOG
+        if str(r.get("client_ID", "")).strip() not in processed
+        and str(r.get("application_id", "")).strip() not in processed
+    ]
+    if limit is not None:
+        return active_backlog[:limit]
+    return active_backlog
 
 
 def get_record_by_id(client_id: str) -> Optional[dict]:

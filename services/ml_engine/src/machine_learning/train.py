@@ -77,6 +77,50 @@ class ModelTrainer:
         logger.info("Probability calibration completed successfully.")
         return self.model
 
+    def fine_tune(self, X_new: pd.DataFrame, y_new: pd.Series) -> CalibratedClassifierCV:
+        """Học tăng cường (Incremental / Warm-start) trên tập dữ liệu mới mà không cần học lại từ tập cũ."""
+        path_obj = Path(self.model_artifact)
+        if not path_obj.exists():
+            logger.warning("Chưa có mô hình đã huấn luyện trước đó. Chuyển sang huấn luyện mới.")
+            return self.train(X_new, y_new)
+
+        logger.info(f"Loading existing model from {self.model_artifact} for incremental fine-tuning...")
+        existing_calibrated = joblib.load(path_obj)
+        
+        # Trích xuất base XGBoost booster
+        base_model = getattr(existing_calibrated, "estimator", existing_calibrated)
+        base_model = getattr(base_model, "estimator", base_model)
+        existing_booster = base_model.get_booster()
+
+        # Đảm bảo đúng thứ tự và danh sách đặc trưng của booster hiện tại
+        booster_features = existing_booster.feature_names
+        if booster_features:
+            for col in booster_features:
+                if col not in X_new.columns:
+                    X_new[col] = 0.0
+            X_new = X_new[booster_features].astype(float)
+
+        # Tạo XGBoost tiếp nối với tốc độ học nhỏ để tinh chỉnh
+        params = self.model_params.copy()
+        params["seed"] = params.pop("random_state", self.random_state)
+        params["n_estimators"] = max(10, min(30, len(X_new)))
+        params["learning_rate"] = 0.02
+
+        self.model = XGBClassifier(**params)
+        logger.info(f"Fine-tuning XGBoost with {len(X_new)} new manually approved records (warm-start)...")
+        self.model.fit(X_new, y_new, xgb_model=existing_booster)
+
+        # Gắn booster vừa học tăng cường vào CalibratedClassifierCV wrapper hiện tại
+        try:
+            from sklearn.frozen import FrozenEstimator
+            existing_calibrated.estimator = FrozenEstimator(self.model)
+        except Exception:
+            existing_calibrated.estimator = self.model
+            
+        self.model = existing_calibrated
+        logger.info("Incremental fine-tuning completed and model wrapper updated successfully.")
+        return self.model
+
     def save_model(self) -> None:
         """Lưu mô hình đã huấn luyện ra file artifact (.joblib)."""
         if self.model is None:

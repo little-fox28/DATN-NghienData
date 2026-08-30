@@ -40,14 +40,14 @@ def get_enriched_records(
     """
     try:
         live_records = enrich_svc.read_all_records()
+        active_backlog = enrich_svc.read_manual_review_backlog(limit=None)
         
         if source == "live":
             pool = live_records
         elif source == "backlog":
-            pool = enrich_svc.read_manual_review_backlog(2000)
+            pool = active_backlog
         else: # all
-            backlog = enrich_svc.read_manual_review_backlog(2000)
-            pool = live_records + backlog
+            pool = live_records + active_backlog
 
         # Lọc theo grade nếu có
         if grade and grade != "ALL":
@@ -75,7 +75,7 @@ def get_enriched_records(
             "total_pages":   (total + page_size - 1) // page_size if total > 0 else 0,
             "records":       paginated_records,
             "live_count":    len(live_records),
-            "backlog_count": 10084,
+            "backlog_count": len(active_backlog),
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi đọc dữ liệu: {e}")

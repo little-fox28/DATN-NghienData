@@ -319,7 +319,7 @@
     },
     "sources": {
       "all": "All Queue (Unified)",
-      "backlog": "Manual Review Backlog (10,084 Pool)",
+      "backlog": "Manual Review Backlog",
       "live": "Live Online Submissions"
     },
     "batch": {

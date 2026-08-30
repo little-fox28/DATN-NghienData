@@ -3,7 +3,7 @@ import { CheckCircle2, Clock, Download, FileText, RefreshCw, XCircle } from 'luc
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import { deleteLoanRecord, getEnrichedRecords, updateLoanRecord, updateRecordLabel } from '../api/client';
+import { deleteLoanRecord, getEnrichedRecords, getEnrichedStats, updateLoanRecord, updateRecordLabel } from '../api/client';
 import { UnderwritingQueueTable } from '../components/dashboard/UnderwritingQueueTable';
 import type { EnrichedRecordItem } from '../types/loan';
 
@@ -20,7 +20,8 @@ export const UnderwritingPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(20);
   const [backlogCount, setBacklogCount] = useState<number>(10084);
-  const [liveCount, setLiveCount] = useState<number>(1);
+  const [liveCount, setLiveCount] = useState<number>(0);
+  const [stats, setStats] = useState<{ n_good_loan: number; n_default: number }>({ n_good_loan: 0, n_default: 0 });
 
   const fetchUnderwritingData = async (
     page = currentPage,
@@ -29,16 +30,21 @@ export const UnderwritingPage: React.FC = () => {
   ) => {
     try {
       setLoading(true);
-      const res = await getEnrichedRecords({
-        page,
-        pageSize: size,
-        source,
-      });
+      const [res, statsRes] = await Promise.all([
+        getEnrichedRecords({ page, pageSize: size, source }),
+        getEnrichedStats().catch(() => null),
+      ]);
       if (res?.records) {
         setRecords(res.records);
         setTotalRecords(res.total || res.records.length);
-        if (res.backlog_count) setBacklogCount(res.backlog_count);
+        if (res.backlog_count !== undefined) setBacklogCount(res.backlog_count);
         if (res.live_count !== undefined) setLiveCount(res.live_count);
+      }
+      if (statsRes) {
+        setStats({
+          n_good_loan: statsRes.n_good_loan || 0,
+          n_default: statsRes.n_default || 0,
+        });
       }
     } catch (err) {
       console.error('Error loading underwriting queue:', err);
@@ -157,16 +163,16 @@ export const UnderwritingPage: React.FC = () => {
   };
 
   // Operational statistics
-  const displayedTotal = activeSource === 'backlog' ? backlogCount : totalRecords;
-  const manualCases = activeSource === 'backlog' ? backlogCount : records.filter(r => r.ml_decision === 'MANUAL_REVIEW').length;
-  const approvedCases = records.filter(r => r.ml_decision === 'APPROVED' || r.ml_decision === 'APPROVED_CONDITIONAL').length;
-  const rejectedCases = records.filter(r => r.ml_decision === 'REJECTED').length;
+  const displayedTotal = activeSource === 'backlog' ? backlogCount : (activeSource === 'live' ? liveCount : (backlogCount + liveCount));
+  const manualCases = backlogCount;
+  const approvedCases = stats.n_good_loan;
+  const rejectedCases = stats.n_default;
 
   const kpis = [
     {
       title: t('underwriting.kpi.totalInQueue', 'Tổng Hồ Sơ Trong Hàng Đợi'),
       value: displayedTotal.toLocaleString(),
-      subtext: `${backlogCount.toLocaleString()} backlog • ${liveCount} live stream`,
+      subtext: `${backlogCount.toLocaleString()} cần thẩm định • ${liveCount.toLocaleString()} đã xử lý`,
       icon: FileText,
       color: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-900/60',
     },

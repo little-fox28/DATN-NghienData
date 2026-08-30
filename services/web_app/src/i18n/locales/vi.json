@@ -319,7 +319,7 @@
     },
     "sources": {
       "all": "Tất cả Hàng đợi (Toàn diện)",
-      "backlog": "Hồ sơ Cần Thẩm định (10,084 Backlog Pool)",
+      "backlog": "Hồ sơ Cần Thẩm định",
       "live": "Hồ sơ Nộp Trực tuyến (Live Stream)"
     },
     "batch": {

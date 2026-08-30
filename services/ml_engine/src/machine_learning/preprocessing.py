@@ -32,7 +32,7 @@ class DataPreprocessor:
         self.processed_data_path = get_abs_path("data/processed/df_clean.csv")
 
     def load_raw_data(self) -> pd.DataFrame:
-        """Đọc tệp CSV dữ liệu thô."""
+        """Đọc tệp CSV dữ liệu thô và tự động gộp các hồ sơ mới đã gán nhãn từ luồng thẩm định hàng ngày."""
         path = Path(self.raw_data_path)
         if not path.exists():
             # Fallback nếu tên file có khoảng trắng bị mã hoá URL (%20)
@@ -42,10 +42,72 @@ class DataPreprocessor:
                 path = fallback
             else:
                 raise FileNotFoundError(f"Không tìm thấy file dữ liệu thô tại: {path} hoặc {fallback}")
-        logger.info(f"Loading raw data from: {path}")
+        logger.info(f"Loading raw baseline data from: {path}")
         df = pd.read_csv(path)
-        logger.info(f"Loaded {len(df):,} records with {df.shape[1]} columns.")
-        return df
+        logger.info(f"Loaded {len(df):,} baseline records with {df.shape[1]} columns.")
+
+        # Tự động quét và hợp nhất các hồ sơ đã có nhãn thực tế từ enriched_loan_data_*.csv
+        raw_dir = path.parent
+        enriched_files = sorted(raw_dir.glob("enriched_loan_data_*.csv"))
+        if enriched_files:
+            enriched_records = []
+            for ef in enriched_files:
+                try:
+                    df_ef = pd.read_csv(ef)
+                    # Chỉ lấy các hồ sơ đã có nhãn rõ ràng (0: trả nợ tốt, 1: nợ xấu; bỏ qua -1: chưa thẩm định)
+                    if "loan_status" in df_ef.columns:
+                        labeled_mask = df_ef["loan_status"].astype(str).str.strip().isin(["0", "1", "0.0", "1.0"])
+                        df_labeled = df_ef[labeled_mask].copy()
+                        if not df_labeled.empty:
+                            df_labeled["loan_status"] = df_labeled["loan_status"].astype(float).astype(int)
+                            enriched_records.append(df_labeled)
+                except Exception as e:
+                    logger.warning(f"Không thể đọc file enriched {ef.name}: {e}")
+
+            if enriched_records:
+                df_all_enriched = pd.concat(enriched_records, ignore_index=True)
+                # Giữ các cột tương thích với tập dữ liệu gốc
+                common_cols = [c for c in df.columns if c in df_all_enriched.columns]
+                df_new_records = df_all_enriched[common_cols].copy()
+                
+                # Loại bỏ trùng lặp nếu client_ID đã có
+                if "client_ID" in df.columns and "client_ID" in df_new_records.columns:
+                    existing_cids = set(df["client_ID"].astype(str).str.strip())
+                    df_new_records = df_new_records[~df_new_records["client_ID"].astype(str).str.strip().isin(existing_cids)]
+                
+                if not df_new_records.empty:
+                    df = pd.concat([df, df_new_records], ignore_index=True)
+                    logger.info(f"✅ Active Learning: Hợp nhất thành công {len(df_new_records):,} hồ sơ mới đã thẩm định vào tập huấn luyện. Tổng dữ liệu hiện tại: {len(df):,} dòng.")
+
+    def load_incremental_data(self) -> pd.DataFrame:
+        """Đọc CHỈ các hồ sơ mới đã có nhãn thực tế từ các tệp enriched_loan_data_*.csv (không đọc tệp cũ)."""
+        raw_dir = Path(get_abs_path("data/raw"))
+        enriched_files = sorted(raw_dir.glob("enriched_loan_data_*.csv"))
+        if not enriched_files:
+            raise FileNotFoundError("Không tìm thấy tệp enriched nào trong data/raw/ để học tăng cường.")
+        
+        enriched_records = []
+        for ef in enriched_files:
+            try:
+                df_ef = pd.read_csv(ef)
+                if "loan_status" in df_ef.columns:
+                    labeled_mask = df_ef["loan_status"].astype(str).str.strip().isin(["0", "1", "0.0", "1.0"])
+                    df_labeled = df_ef[labeled_mask].copy()
+                    if not df_labeled.empty:
+                        df_labeled["loan_status"] = df_labeled["loan_status"].astype(float).astype(int)
+                        enriched_records.append(df_labeled)
+            except Exception as e:
+                logger.warning(f"Lỗi đọc {ef.name}: {e}")
+        
+        if not enriched_records:
+            raise ValueError("Chưa có hồ sơ nào được gán nhãn thực tế (0 hoặc 1) trong các tệp enriched để Re-train.")
+        
+        df_new = pd.concat(enriched_records, ignore_index=True)
+        if "client_ID" in df_new.columns:
+            df_new = df_new.drop_duplicates(subset=["client_ID"], keep="last")
+        
+        logger.info(f"Loaded {len(df_new)} newly labeled enriched records for incremental learning.")
+        return df_new
 
     def handle_missing_values(self, df: pd.DataFrame) -> pd.DataFrame:
         """Xử lý giá trị khuyết theo chiến lược BA:
