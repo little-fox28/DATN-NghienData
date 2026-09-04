@@ -93,6 +93,7 @@ class CreditRiskAssessment(BaseModel):
     """Kết quả đánh giá rủi ro tín dụng toàn diện từ mô hình ML."""
     pd_score: float = Field(..., description="Xác suất nợ xấu (0.0 – 1.0)")
     credit_score: int = Field(..., description="Điểm tín dụng FICO (300 – 850)")
+    loan_grade: Optional[str] = Field("B", description="Hạng tín dụng xếp hạng theo điểm FICO (A-G)")
     risk_tier: str = Field(..., description="Phân hạng rủi ro (LOW / MEDIUM_LOW / MEDIUM_HIGH / HIGH)")
     decision: str = Field(..., description="Quyết định tín dụng (APPROVED / APPROVED_CONDITIONAL / MANUAL_REVIEW / REJECTED)")
     contributions: Optional[dict] = Field(None, description="Điểm đóng góp WoE của từng biến")

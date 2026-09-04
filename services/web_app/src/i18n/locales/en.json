@@ -243,8 +243,10 @@
       "rejectedDesc": "Probability of default exceeds allowable risk appetite or serious past delinquencies recorded."
     },
     "coreMetrics": {
-      "ficoScore": "FICO Score",
-      "ficoScale": "Scale 300 – 850",
+      "ficoScore": "FICO Credit Score",
+      "ficoScale": "Standard Scale (300 - 850)",
+      "loanGrade": "Credit Loan Grade",
+      "gradeScale": "Internal Rating (A - G)",
       "pdScore": "Probability of Default",
       "pdThreshold": "Threshold: 5.00%",
       "pdWarning": "High Risk (PD > 5.0%)",

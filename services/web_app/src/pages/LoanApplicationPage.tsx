@@ -151,8 +151,16 @@ export const LoanApplicationPage: React.FC = () => {
         total_interest_estimate: result.credit_risk_assessment.pricing_recommendation?.total_interest_estimate,
       });
 
-      setSavedClientId(resp.client_ID);
-      message.success(`${t('loanApplication.buttons.created')}`);
+      notification.success({
+        message: t('loanApplication.buttons.created', 'Đã phê duyệt & lưu hồ sơ thành công!'),
+        placement: 'topRight',
+      });
+
+      // Reset form and return to Step 1 (Personal Demographics)
+      form.setFieldsValue(initialFormData);
+      setResult(null);
+      setSavedClientId(null);
+      setCurrentStep(0);
     } catch (err: any) {
       console.error(err);
       notification.error({

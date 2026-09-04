@@ -201,6 +201,36 @@ export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboa
     }
   };
 
+  const getDerivedGrade = (score: number): string => {
+    if (score >= 750) return 'A';
+    if (score >= 700) return 'B';
+    if (score >= 650) return 'C';
+    if (score >= 600) return 'D';
+    if (score >= 550) return 'E';
+    if (score >= 500) return 'F';
+    return 'G';
+  };
+
+  const currentGrade = assessment?.loan_grade || rawFeatures?.loan_grade || getDerivedGrade(credit_score);
+
+  const getLoanGradeStyle = (grade: string) => {
+    switch (String(grade).toUpperCase()) {
+      case 'A':
+        return 'text-emerald-600 dark:text-emerald-400';
+      case 'B':
+        return 'text-teal-600 dark:text-teal-400';
+      case 'C':
+        return 'text-amber-500 dark:text-amber-400';
+      case 'D':
+        return 'text-orange-500 dark:text-orange-400';
+      case 'E':
+      case 'F':
+      case 'G':
+      default:
+        return 'text-rose-500 dark:text-rose-400';
+    }
+  };
+
   return (
     <div className="w-full space-y-4 text-slate-800 dark:text-gray-100 font-sans">
       {/* 1. Header / Status */}
@@ -221,13 +251,22 @@ export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboa
         </div>
       </div>
 
-      {/* 2. Core Metrics (Grid of 3 cards with Dynamic Risk Coloring) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* 2. Core Metrics (Grid of 4 cards with Dynamic Risk & Grade Coloring) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* FICO Score */}
         <div className="bg-white dark:bg-[#141414] border border-gray-200 dark:border-[#2a2a2a] rounded-lg p-4 shadow-xs transition-colors">
           <div className="text-sm text-gray-500 dark:text-gray-400">{t('riskDashboard.coreMetrics.ficoScore', 'Điểm Tín dụng FICO')}</div>
           <div className={`text-2xl font-semibold mt-1 ${getFicoScoreStyle(credit_score)}`}>{credit_score}</div>
           <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('riskDashboard.coreMetrics.ficoScale', 'Thang đo chuẩn (300 - 850)')}</div>
+        </div>
+
+        {/* Loan Grade */}
+        <div className="bg-white dark:bg-[#141414] border border-gray-200 dark:border-[#2a2a2a] rounded-lg p-4 shadow-xs transition-colors">
+          <div className="text-sm text-gray-500 dark:text-gray-400">{t('riskDashboard.coreMetrics.loanGrade', 'Hạng Tín dụng')}</div>
+          <div className={`text-2xl font-semibold mt-1 ${getLoanGradeStyle(currentGrade)}`}>
+            {`Grade ${String(currentGrade).toUpperCase()}`}
+          </div>
+          <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('riskDashboard.coreMetrics.gradeScale', 'Phân hạng nội bộ (A - G)')}</div>
         </div>
 
         {/* Probability of Default (PD) */}

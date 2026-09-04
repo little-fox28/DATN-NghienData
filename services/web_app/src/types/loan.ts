@@ -43,6 +43,7 @@ export interface RiskBasedPricingRecommendation {
 export interface CreditRiskAssessment {
   pd_score: number;
   credit_score: number;
+  loan_grade?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | string;
   risk_tier: 'LOW' | 'MEDIUM_LOW' | 'MEDIUM_HIGH' | 'HIGH';
   decision: 'APPROVED' | 'APPROVED_CONDITIONAL' | 'MANUAL_REVIEW' | 'REJECTED';
   contributions?: Record<string, number>;

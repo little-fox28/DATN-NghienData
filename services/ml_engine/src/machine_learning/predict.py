@@ -79,6 +79,31 @@ class ModelPredictor:
         
         return max(min(score, score_max), score_min)
 
+    def _score_to_loan_grade(self, credit_score: int) -> str:
+        """Xếp hạng tín dụng (Grade A-G) dựa trên điểm tín dụng FICO.
+        - Grade A: >= 750 (Rất tốt)
+        - Grade B: 700 - 749 (Tốt / Tiêu chuẩn)
+        - Grade C: 650 - 699 (Cận chuẩn)
+        - Grade D: 600 - 649 (Cảnh báo rủi ro)
+        - Grade E: 550 - 599 (Kém)
+        - Grade F: 500 - 549 (Rất kém)
+        - Grade G: < 500 (Nguy cơ vỡ nợ cao)
+        """
+        if credit_score >= 750:
+            return "A"
+        elif credit_score >= 700:
+            return "B"
+        elif credit_score >= 650:
+            return "C"
+        elif credit_score >= 600:
+            return "D"
+        elif credit_score >= 550:
+            return "E"
+        elif credit_score >= 500:
+            return "F"
+        else:
+            return "G"
+
     def _assign_risk_tier(self, credit_score: int) -> tuple[str, str]:
         """Phân loại khách hàng vào nhóm rủi ro và đưa ra quyết định tín dụng.
 
@@ -308,6 +333,7 @@ class ModelPredictor:
             results.append({
                 "pd_score":          round(float(pd_val), 4),
                 "credit_score":      credit_score,
+                "loan_grade":        self._score_to_loan_grade(credit_score),
                 "risk_tier":         risk_tier,
                 "decision":          decision,
                 "recommended_rate":  pricing["recommended_interest_rate"],
@@ -327,6 +353,7 @@ class ModelPredictor:
             dict gồm:
             - pd_score            : Xác suất nợ xấu (0.0 – 1.0)
             - credit_score        : Điểm tín dụng FICO (300 – 850)
+            - loan_grade          : Hạng tín dụng (A - G)
             - risk_tier           : Phân hạng rủi ro (LOW / MEDIUM_LOW / MEDIUM_HIGH / HIGH)
             - decision            : Quyết định tín dụng
             - contributions       : Điểm đóng góp của từng biến (WoE Contribution)
@@ -355,6 +382,7 @@ class ModelPredictor:
 
         # Chuyển PD → Credit Score → Risk Tier & Decision
         credit_score = self._pd_to_credit_score(pd_val)
+        loan_grade = self._score_to_loan_grade(credit_score)
         risk_tier, decision = self._assign_risk_tier(credit_score)
 
         # Tính WoE Contribution cho từng biến (Explainability)
@@ -371,6 +399,7 @@ class ModelPredictor:
         return {
             "pd_score":               round(pd_val, 4),
             "credit_score":           credit_score,
+            "loan_grade":             loan_grade,
             "risk_tier":              risk_tier,
             "decision":               decision,
             "contributions":          contributions,

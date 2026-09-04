@@ -245,6 +245,8 @@
     "coreMetrics": {
       "ficoScore": "Điểm Tín dụng FICO",
       "ficoScale": "Thang đo chuẩn (300 - 850)",
+      "loanGrade": "Hạng Tín dụng",
+      "gradeScale": "Phân hạng nội bộ (A - G)",
       "pdScore": "Xác suất Vỡ nợ (PD)",
       "pdThreshold": "Ngưỡng cảnh báo: 5.00%",
       "pdWarning": "Rủi ro Cao (PD > 5.0%)",
