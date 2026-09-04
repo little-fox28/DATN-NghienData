@@ -79,6 +79,8 @@ class DataPreprocessor:
                     df = pd.concat([df, df_new_records], ignore_index=True)
                     logger.info(f"✅ Active Learning: Hợp nhất thành công {len(df_new_records):,} hồ sơ mới đã thẩm định vào tập huấn luyện. Tổng dữ liệu hiện tại: {len(df):,} dòng.")
 
+        return df
+
     def load_incremental_data(self) -> pd.DataFrame:
         """Đọc CHỈ các hồ sơ mới đã có nhãn thực tế từ các tệp enriched_loan_data_*.csv (không đọc tệp cũ)."""
         raw_dir = Path(get_abs_path("data/raw"))

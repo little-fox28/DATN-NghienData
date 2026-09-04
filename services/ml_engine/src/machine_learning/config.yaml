@@ -36,6 +36,7 @@ tasks:
     # - Confound        : past_delinquencies (bị confound bởi cb_person_default_on_file)
     # - ECOA/FCA cấm   : gender, marital_status
     # - Ngoài top 10   : cb_person_cred_hist_length, person_age
+    # - Target Leakage  : loan_grade (sinh sau khi thẩm định, không phải đầu vào từ khách hàng)
     drop_cols:
       - "client_ID"
       - "country"
@@ -52,17 +53,16 @@ tasks:
       - "marital_status"
       - "cb_person_cred_hist_length"
       - "person_age"
+      - "loan_grade"
 
     test_size: 0.2
     random_state: 42
 
     # -------------------------------------------------------------------
-    # 10 Biến được lựa chọn theo IV & nghiệp vụ (khung 5C)
-    # Nguồn: BA Document - Novabank Credit Scorecard
+    # Biến được lựa chọn theo IV & nghiệp vụ (khung 5C)
     # -------------------------------------------------------------------
     # Biến phân loại (Categorical / Ordinal / Binary)
     categorical_cols:
-      - "loan_grade"              # 5C: Character — Hạng tín dụng (Ordinal: A > B > C...)
       - "person_home_ownership"   # 5C: Capital    — Loại hình sở hữu nhà
       - "cb_person_default_on_file" # 5C: Character — Lịch sử vỡ nợ (Binary: Y/N)
       - "loan_intent"             # 5C: Conditions — Mục đích vay

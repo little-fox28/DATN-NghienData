@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, DatabaseOutlined, FileTextOutlined, LeftOutlined, ReloadOutlined, RightOutlined, SendOutlined, UserOutlined, WalletOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, FileTextOutlined, LeftOutlined, ReloadOutlined, RightOutlined, SendOutlined, UserOutlined, WalletOutlined } from '@ant-design/icons';
 import { App as AntApp, Button, Card, Col, Form, InputNumber, Row, Select, Steps, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -283,24 +283,6 @@ export const LoanApplicationPage: React.FC = () => {
                 </Form.Item>
               </Col>
               <Col xs={24} md={12}>
-                <Form.Item name="loan_grade" label={t('loanApplication.step3.grade')} rules={[{ required: true, message: t('loanApplication.errors.required') }]}>
-                  <Select size="large">
-                    <Option value="A">{t('loanApplication.step3.gradeA')}</Option>
-                    <Option value="B">{t('loanApplication.step3.gradeB')}</Option>
-                    <Option value="C">{t('loanApplication.step3.gradeC')}</Option>
-                    <Option value="D">{t('loanApplication.step3.gradeD')}</Option>
-                    <Option value="E">{t('loanApplication.step3.gradeE')}</Option>
-                    <Option value="F">{t('loanApplication.step3.gradeF')}</Option>
-                    <Option value="G">{t('loanApplication.step3.gradeG')}</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} md={12}>
-                <Form.Item name="loan_int_rate" label={t('loanApplication.step3.intRate')} rules={[{ required: true, message: t('loanApplication.errors.required') }]}>
-                  <InputNumber style={{ width: '100%' }} min={0} step={0.1} size="large" />
-                </Form.Item>
-              </Col>
-              <Col xs={24} md={12}>
                 <Form.Item name="loan_term_months" label={t('loanApplication.step3.term', 'Kỳ hạn Vay (Tháng)')} rules={[{ required: true, message: t('loanApplication.errors.required') }]}>
                   <Select size="large">
                     <Option value={12}>{t('loanApplication.step3.month12', '12 tháng (1 năm)')}</Option>
@@ -309,6 +291,11 @@ export const LoanApplicationPage: React.FC = () => {
                     <Option value={48}>{t('loanApplication.step3.month48', '48 tháng (4 năm)')}</Option>
                     <Option value={60}>{t('loanApplication.step3.month60', '60 tháng (5 năm)')}</Option>
                   </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item name="loan_int_rate" label={t('loanApplication.step3.intRate')} rules={[{ required: true, message: t('loanApplication.errors.required') }]}>
+                  <InputNumber style={{ width: '100%' }} min={0} step={0.1} size="large" />
                 </Form.Item>
               </Col>
             </Row>
@@ -332,17 +319,19 @@ export const LoanApplicationPage: React.FC = () => {
               onApproveProbingLimit={handleSaveToDB}
               onModifyTerms={() => setCurrentStep(2)}
               onReject={() => message.info(t('loanApplication.buttons.reject'))}
+              isSaving={saving}
+              isSaved={!!savedClientId}
             />
           </div>
         )}
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 32, paddingTop: 24, borderTop: '1px solid #f0f0f0' }}>
+        <div style={{ display: 'flex', justifyContent: currentStep === 3 ? 'center' : 'space-between', marginTop: 32, paddingTop: 24, borderTop: '1px solid #f0f0f0' }}>
           {currentStep > 0 && currentStep < 3 ? (
             <Button size="large" onClick={handlePrev} icon={<LeftOutlined />}>
               {t('loanApplication.buttons.prev')}
             </Button>
-          ) : <div />}
+          ) : currentStep < 3 ? <div /> : null}
 
           {currentStep < 2 && (
             <Button type="primary" size="large" onClick={handleNext}>
@@ -357,22 +346,9 @@ export const LoanApplicationPage: React.FC = () => {
           )}
 
           {currentStep === 3 && (
-            <div style={{ display: 'flex', gap: 16, margin: '0 auto' }}>
-              <Button size="large" onClick={handleReset} icon={<ReloadOutlined />}>
-                {t('loanApplication.buttons.reset')}
-              </Button>
-              <Button
-                type="primary"
-                size="large"
-                onClick={handleSaveToDB}
-                loading={saving}
-                disabled={!!savedClientId}
-                icon={savedClientId ? <CheckCircleOutlined /> : <DatabaseOutlined />}
-              // style={{ backgroundColor: savedClientId ? '#52c41a' : undefined }}
-              >
-                {savedClientId ? t('loanApplication.buttons.created') : t('loanApplication.buttons.saveToDb')}
-              </Button>
-            </div>
+            <Button size="large" onClick={handleReset} icon={<ReloadOutlined />}>
+              {t('loanApplication.buttons.reset')}
+            </Button>
           )}
         </div>
       </Card>

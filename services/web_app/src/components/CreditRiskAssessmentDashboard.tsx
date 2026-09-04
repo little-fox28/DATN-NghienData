@@ -13,6 +13,8 @@ export interface CreditRiskAssessmentDashboardProps {
   onApproveProbingLimit?: () => void;
   onModifyTerms?: () => void;
   onReject?: () => void;
+  isSaving?: boolean;
+  isSaved?: boolean;
 }
 
 export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboardProps> = ({
@@ -26,6 +28,8 @@ export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboa
   onApproveProbingLimit,
   onModifyTerms,
   onReject,
+  isSaving = false,
+  isSaved = false,
 }) => {
   const { t } = useTranslation();
 
@@ -383,15 +387,32 @@ export const CreditRiskAssessmentDashboard: React.FC<CreditRiskAssessmentDashboa
         <button
           type="button"
           onClick={onApproveProbingLimit}
-          className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors shadow-xs focus:outline-none cursor-pointer ${
-            decision === 'APPROVED' || decision === 'APPROVED_CONDITIONAL'
-              ? 'bg-emerald-600 hover:bg-emerald-700 text-white focus:ring-2 focus:ring-emerald-500/40'
-              : 'bg-amber-400 hover:bg-amber-500 text-slate-950 focus:ring-2 focus:ring-amber-500/40'
+          disabled={isSaving || isSaved}
+          className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors shadow-xs focus:outline-none flex items-center gap-2 ${
+            isSaved
+              ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 cursor-not-allowed'
+              : decision === 'APPROVED' || decision === 'APPROVED_CONDITIONAL'
+              ? 'bg-emerald-600 hover:bg-emerald-700 text-white focus:ring-2 focus:ring-emerald-500/40 cursor-pointer disabled:opacity-60'
+              : 'bg-amber-400 hover:bg-amber-500 text-slate-950 focus:ring-2 focus:ring-amber-500/40 cursor-pointer disabled:opacity-60'
           }`}
         >
-          {decision === 'APPROVED' || decision === 'APPROVED_CONDITIONAL'
-            ? t('loanApplication.buttons.approveDirect', 'Chấp thuận Phê duyệt Hạn mức')
-            : t('loanApplication.buttons.approveLimit', 'Phê duyệt Hạn mức Thăm dò')}
+          {isSaving ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>{t('loanApplication.buttons.saving', 'Đang lưu hồ sơ...')}</span>
+            </>
+          ) : isSaved ? (
+            <>
+              <span>✓ {t('loanApplication.buttons.created', 'Đã tạo hồ sơ vay')}</span>
+            </>
+          ) : (
+            decision === 'APPROVED' || decision === 'APPROVED_CONDITIONAL'
+              ? t('loanApplication.buttons.approveDirect', 'Chấp thuận Phê duyệt Hạn mức')
+              : t('loanApplication.buttons.approveLimit', 'Phê duyệt Hạn mức Thăm dò')
+          )}
         </button>
       </div>
     </div>

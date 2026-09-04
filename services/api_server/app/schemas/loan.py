@@ -9,7 +9,7 @@ class LoanApplication(BaseModel):
     person_home_ownership: str = Field(..., example="RENT", description="Sở hữu nhà (RENT, OWN, MORTGAGE, OTHER)")
     person_emp_length: float = Field(..., example=4.0, description="Số năm làm việc")
     loan_intent: str = Field(..., example="PERSONAL", description="Mục đích vay")
-    loan_grade: str = Field(..., example="B", description="Hạng tín dụng (A-G)")
+    loan_grade: Optional[str] = Field("B", example="B", description="Hạng tín dụng (A-G, sinh sau thẩm định hoặc mặc định)")
     loan_amnt: float = Field(..., example=10000, description="Số tiền vay ($)")
     loan_int_rate: float = Field(..., example=11.14, description="Lãi suất (%) — do khách hàng đề xuất")
     loan_percent_income: float = Field(..., example=0.15, description="Tỷ lệ nợ/thu nhập")

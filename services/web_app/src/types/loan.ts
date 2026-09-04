@@ -16,7 +16,7 @@ export interface LoanApplicationData {
 
   // Step 3: Loan Details
   loan_intent: 'PERSONAL' | 'EDUCATION' | 'MEDICAL' | 'VENTURE' | 'HOMEIMPROVEMENT' | 'DEBTCONSOLIDATION';
-  loan_grade: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+  loan_grade?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
   loan_amnt: number;
   loan_int_rate: number;
   loan_term_months?: number;
